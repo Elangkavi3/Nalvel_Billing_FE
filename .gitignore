@@ -7,18 +7,57 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# Dependencies and frontend build output
+node_modules/
+dist/
+dist-ssr/
 *.local
+
+# Environment files
+.env
+.env.*
 
 # Editor directories and files
 .vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
 !.vscode/extensions.json
-.idea
+!.vscode/*.code-snippets
+.idea/
+.vs/
+.history/
 .DS_Store
 *.suo
+*.user
+*.userosscache
+*.sln.docstates
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# Windows and Visual Studio build output
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Oo]bj/
+[Oo]ut/
+[Ll]og/
+[Ll]ogs/
+**/[Bb]in/*
+*.pdb
+*.obj
+*.cache
+*.tlog
+*.binlog
+
+# SQL/database local files
+*.mdf
+*.ldf
+*.ndf
