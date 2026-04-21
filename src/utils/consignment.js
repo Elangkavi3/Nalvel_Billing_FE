@@ -9,19 +9,6 @@ export function buildConsignmentPayload(form) {
   );
 }
 
-export function getConsignmentCalculations(form) {
-  const supplier = toNumber(form.supplierAmount);
-  const advance = toNumber(form.advance);
-  const expenses = toNumber(form.expenses);
-  const customerRate = toNumber(form.customerRate);
-
-  return {
-    balance: supplier - advance,
-    ledgerAmount: supplier,
-    profit: customerRate - supplier - expenses,
-  };
-}
-
 export function getUniqueValues(items, field) {
   return [...new Set(items.map((item) => item[field]).filter(Boolean))].sort((a, b) => a.localeCompare(b));
 }

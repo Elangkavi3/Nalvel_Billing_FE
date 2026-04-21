@@ -1,12 +1,10 @@
-import { SummaryBox } from '../components/common/SummaryBox.jsx';
 import { AutocompleteField } from '../components/forms/AutocompleteField.jsx';
 import { Field } from '../components/forms/Field.jsx';
 import { ReadOnlyField } from '../components/forms/ReadOnlyField.jsx';
 import { SelectField } from '../components/forms/SelectField.jsx';
 import { paymentModeOptions, paymentStatusOptions, truckTypeOptions } from '../constants/consignment.js';
-import { money } from '../utils/numbers.js';
 
-export function EntryFormPage({ calculated, editingId, form, suggestions, onBack, onSubmit, onUpdateField }) {
+export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, onUpdateField }) {
   return (
     <form id="consignment-form" className="entry-panel" onSubmit={onSubmit}>
       <div className="form-header">
@@ -19,8 +17,30 @@ export function EntryFormPage({ calculated, editingId, form, suggestions, onBack
       <div className="grid3">
         <section className="form-section">
           <h2>Basic Info</h2>
+          <div className="option-stack">
+            <RadioGroup
+              label="Entry View"
+              name="viewMode"
+              value={form.viewMode}
+              options={[
+                { label: 'GST', value: 'GST' },
+                { label: 'IMS', value: 'IMS' },
+              ]}
+              onChange={(value) => onUpdateField('viewMode', value)}
+            />
+          </div>
           <div className="field-row">
             <ReadOnlyField label="S.No" value={form.serialNo || 'Auto'} />
+            <Field
+              label="Sub S.No"
+              value={form.subSerialNo}
+              onChange={(value) => onUpdateField('subSerialNo', value)}
+            />
+          </div>
+          {form.viewMode === 'GST' && (
+            <Field label="GST No" value={form.gstNo} onChange={(value) => onUpdateField('gstNo', value)} />
+          )}
+          <div className="field-row">
             <Field
               label="Ledger Date"
               type="date"
@@ -69,7 +89,32 @@ export function EntryFormPage({ calculated, editingId, form, suggestions, onBack
             suggestions={suggestions.owner}
             onChange={(value) => onUpdateField('ownerName', value)}
           />
-          <Field label="Owner Contact" value={form.ownerContact} onChange={(value) => onUpdateField('ownerContact', value)} />
+          <div className="field-row">
+            <div>
+              <AutocompleteField
+                label="Owner Primary Contact"
+                value={form.ownerPrimaryContact}
+                suggestions={suggestions.ownerPrimaryContact}
+                onChange={(value) => onUpdateField('ownerPrimaryContact', value)}
+              />
+              <WhatsappCheck
+                checked={form.ownerPrimaryWhatsappAvailable}
+                onChange={(checked) => onUpdateField('ownerPrimaryWhatsappAvailable', checked)}
+              />
+            </div>
+            <div>
+              <AutocompleteField
+                label="Owner Alternate Contact"
+                value={form.ownerAlternateContact}
+                suggestions={suggestions.ownerAlternateContact}
+                onChange={(value) => onUpdateField('ownerAlternateContact', value)}
+              />
+              <WhatsappCheck
+                checked={form.ownerAlternateWhatsappAvailable}
+                onChange={(checked) => onUpdateField('ownerAlternateWhatsappAvailable', checked)}
+              />
+            </div>
+          </div>
         </section>
 
         <section className="form-section">
@@ -80,7 +125,32 @@ export function EntryFormPage({ calculated, editingId, form, suggestions, onBack
             suggestions={suggestions.driver}
             onChange={(value) => onUpdateField('driverName', value)}
           />
-          <Field label="Driver Contact" value={form.driverContact} onChange={(value) => onUpdateField('driverContact', value)} />
+          <div className="field-row">
+            <div>
+              <AutocompleteField
+                label="Driver Primary Contact"
+                value={form.driverPrimaryContact}
+                suggestions={suggestions.driverPrimaryContact}
+                onChange={(value) => onUpdateField('driverPrimaryContact', value)}
+              />
+              <WhatsappCheck
+                checked={form.driverPrimaryWhatsappAvailable}
+                onChange={(checked) => onUpdateField('driverPrimaryWhatsappAvailable', checked)}
+              />
+            </div>
+            <div>
+              <AutocompleteField
+                label="Driver Alternate Contact"
+                value={form.driverAlternateContact}
+                suggestions={suggestions.driverAlternateContact}
+                onChange={(value) => onUpdateField('driverAlternateContact', value)}
+              />
+              <WhatsappCheck
+                checked={form.driverAlternateWhatsappAvailable}
+                onChange={(checked) => onUpdateField('driverAlternateWhatsappAvailable', checked)}
+              />
+            </div>
+          </div>
           <div className="field-row">
             <AutocompleteField
               label="From Location"
@@ -111,13 +181,25 @@ export function EntryFormPage({ calculated, editingId, form, suggestions, onBack
               value={form.advance}
               onChange={(value) => onUpdateField('advance', value)}
             />
-            <ReadOnlyField label="Balance to Supplier" value={money(calculated.balance)} />
           </div>
-          <ReadOnlyField label="Ledger Amount" value={money(calculated.ledgerAmount)} />
         </section>
 
         <section className="form-section">
           <h2>Our Rate & Profit</h2>
+          {form.viewMode === 'GST' && (
+            <div className="inline-option-block">
+              <RadioGroup
+                label="GST Type"
+                name="gstType"
+                value={form.gstType}
+                options={[
+                  { label: '18%', value: '18' },
+                  { label: '5%', value: '5' },
+                ]}
+                onChange={(value) => onUpdateField('gstType', value)}
+              />
+            </div>
+          )}
           <Field
             label="Billing to Customer"
             type="number"
@@ -136,7 +218,6 @@ export function EntryFormPage({ calculated, editingId, form, suggestions, onBack
             value={form.expenses}
             onChange={(value) => onUpdateField('expenses', value)}
           />
-          <ReadOnlyField label="Net Profit" value={money(calculated.profit)} highlight />
 
           <h2>Extra</h2>
           <SelectField
@@ -151,16 +232,37 @@ export function EntryFormPage({ calculated, editingId, form, suggestions, onBack
           </label>
         </section>
       </div>
-
-      <section className="calc-bar">
-        <h2>Auto-calculated summary</h2>
-        <div className="summary-grid">
-          <SummaryBox label="Billing to Supplier" value={money(form.supplierAmount)} />
-          <SummaryBox label="Advance Paid" value={money(form.advance)} />
-          <SummaryBox label="Balance Due" value={money(calculated.balance)} />
-          <SummaryBox label="Net Profit" value={money(calculated.profit)} highlight />
-        </div>
-      </section>
     </form>
+  );
+}
+
+function WhatsappCheck({ checked, onChange }) {
+  return (
+    <label className="whatsapp-check">
+      <input type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} />
+      <span>WhatsApp available</span>
+    </label>
+  );
+}
+
+function RadioGroup({ label, name, value, options, onChange }) {
+  return (
+    <fieldset className="radio-group">
+      <legend>{label}</legend>
+      <div className="radio-options">
+        {options.map((option) => (
+          <label key={option.value} className="radio-option">
+            <input
+              type="radio"
+              name={name}
+              value={option.value}
+              checked={value === option.value}
+              onChange={(event) => onChange(event.target.value)}
+            />
+            <span>{option.label}</span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
   );
 }

@@ -5,8 +5,15 @@ import { emptyConsignmentForm, PAGE_SIZE } from './constants/consignment.js';
 import { MasterPage } from './pages/MasterPage.jsx';
 import { EntryFormPage } from './pages/EntryFormPage.jsx';
 import { SavedDataPage } from './pages/SavedDataPage.jsx';
-import { deleteConsignment, getAllConsignments, saveConsignment, searchConsignmentsByCustomer, updateConsignment } from './services/consignmentApi.js';
-import { buildConsignmentPayload, getConsignmentCalculations, getUniqueValues } from './utils/consignment.js';
+import {
+  deleteConsignment,
+  getAllConsignments,
+  getConsignmentById,
+  saveConsignment,
+  searchConsignmentsByCustomer,
+  updateConsignment,
+} from './services/consignmentApi.js';
+import { buildConsignmentPayload, getUniqueValues } from './utils/consignment.js';
 import { getErrorMessage } from './utils/errors.js';
 
 export function App() {
@@ -21,14 +28,16 @@ export function App() {
   const [message, setMessage] = useState('Ready to connect');
   const [error, setError] = useState('');
 
-  const calculated = useMemo(() => getConsignmentCalculations(form), [form]);
-
   const suggestions = useMemo(
     () => ({
       customer: getUniqueValues(allItems, 'customerName'),
       billTo: getUniqueValues(allItems, 'billTo'),
       owner: getUniqueValues(allItems, 'ownerName'),
+      ownerPrimaryContact: getUniqueValues(allItems, 'ownerPrimaryContact'),
+      ownerAlternateContact: getUniqueValues(allItems, 'ownerAlternateContact'),
       driver: getUniqueValues(allItems, 'driverName'),
+      driverPrimaryContact: getUniqueValues(allItems, 'driverPrimaryContact'),
+      driverAlternateContact: getUniqueValues(allItems, 'driverAlternateContact'),
       from: getUniqueValues(allItems, 'fromLocation'),
       to: getUniqueValues(allItems, 'toLocation'),
       truck: getUniqueValues(allItems, 'truckNo'),
@@ -74,6 +83,30 @@ export function App() {
     setActivePage('form');
   }
 
+  function applyConsignmentToForm(item) {
+    setForm({
+      ...emptyConsignmentForm,
+      ...item,
+      viewMode: item.viewMode ?? 'GST',
+      gstType: item.gstType ? String(item.gstType) : '18',
+      gstNo: item.gstNo ?? '',
+      weight: item.weight ?? '',
+      supplierAmount: item.supplierAmount ?? '',
+      advance: item.advance ?? '',
+      customerRate: item.customerRate ?? '',
+      expenses: item.expenses ?? '',
+      subSerialNo: item.subSerialNo ?? '',
+      ownerPrimaryContact: item.ownerPrimaryContact ?? '',
+      ownerPrimaryWhatsappAvailable: Boolean(item.ownerPrimaryWhatsappAvailable),
+      ownerAlternateContact: item.ownerAlternateContact ?? '',
+      ownerAlternateWhatsappAvailable: Boolean(item.ownerAlternateWhatsappAvailable),
+      driverPrimaryContact: item.driverPrimaryContact ?? '',
+      driverPrimaryWhatsappAvailable: Boolean(item.driverPrimaryWhatsappAvailable),
+      driverAlternateContact: item.driverAlternateContact ?? '',
+      driverAlternateWhatsappAvailable: Boolean(item.driverAlternateWhatsappAvailable),
+    });
+  }
+
   async function submitForm(event) {
     event.preventDefault();
     setLoading(true);
@@ -82,9 +115,11 @@ export function App() {
     try {
       const payload = buildConsignmentPayload(form);
       const saved = editingId ? await updateConsignment(editingId, payload) : await saveConsignment(payload);
+      const backendRecord = saved?.id ? await getConsignmentById(saved.id) : saved;
 
-      setMessage(editingId ? `Entry #${saved.id} updated` : `Entry #${saved.id} saved`);
-      clearForm();
+      setMessage(editingId ? `Entry #${backendRecord.id} updated` : `Entry #${backendRecord.id} saved`);
+      applyConsignmentToForm(backendRecord);
+      setEditingId(backendRecord.id ?? null);
       await loadData();
     } catch (err) {
       setError(getErrorMessage(err, 'Unable to save entry'));
@@ -94,15 +129,7 @@ export function App() {
   }
 
   function editItem(item) {
-    setForm({
-      ...emptyConsignmentForm,
-      ...item,
-      weight: item.weight ?? '',
-      supplierAmount: item.supplierAmount ?? '',
-      advance: item.advance ?? '',
-      customerRate: item.customerRate ?? '',
-      expenses: item.expenses ?? '',
-    });
+    applyConsignmentToForm(item);
     setEditingId(item.id ?? null);
     setActivePage('form');
     setMessage(`Editing entry #${item.id}`);
@@ -163,7 +190,6 @@ export function App() {
 
       {activePage === 'form' && (
         <EntryFormPage
-          calculated={calculated}
           editingId={editingId}
           form={form}
           suggestions={suggestions}

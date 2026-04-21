@@ -7,6 +7,10 @@ export async function getAllConsignments() {
   return Array.isArray(data) ? data : [];
 }
 
+export function getConsignmentById(id) {
+  return request(`${API_BASE}/${id}`);
+}
+
 export async function searchConsignmentsByCustomer(name) {
   const data = await request(`${API_BASE}/byCustomer?name=${encodeURIComponent(name)}`);
   return Array.isArray(data) ? data : [];
