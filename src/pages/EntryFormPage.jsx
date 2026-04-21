@@ -2,7 +2,7 @@ import { AutocompleteField } from '../components/forms/AutocompleteField.jsx';
 import { Field } from '../components/forms/Field.jsx';
 import { ReadOnlyField } from '../components/forms/ReadOnlyField.jsx';
 import { SelectField } from '../components/forms/SelectField.jsx';
-import { paymentModeOptions, paymentStatusOptions, truckTypeOptions } from '../constants/consignment.js';
+import { paymentModeOptions, paymentStatusOptions } from '../constants/consignment.js';
 
 export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, onUpdateField }) {
   return (
@@ -40,6 +40,9 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
           {form.viewMode === 'GST' && (
             <Field label="GST No" value={form.gstNo} onChange={(value) => onUpdateField('gstNo', value)} />
           )}
+          {form.viewMode === 'IMS' && (
+            <Field label="IMS No" value={form.imsNo} onChange={(value) => onUpdateField('imsNo', value)} />
+          )}
           <div className="field-row">
             <Field
               label="Ledger Date"
@@ -56,10 +59,16 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
             required
           />
           <Field
-            label="Movement / Loading Date"
-            type="date"
+            label="Loading Date & Time"
+            type="datetime-local"
             value={form.loadingDate}
             onChange={(value) => onUpdateField('loadingDate', value)}
+          />
+          <Field
+            label="Delivery Date & Time"
+            type="datetime-local"
+            value={form.deliveryDateTime}
+            onChange={(value) => onUpdateField('deliveryDateTime', value)}
           />
           <AutocompleteField
             label="Bill To / Delivery Customer"
@@ -76,10 +85,10 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
               suggestions={suggestions.truck}
               onChange={(value) => onUpdateField('truckNo', value)}
             />
-            <SelectField
+            <AutocompleteField
               label="Truck Type"
               value={form.truckType}
-              options={truckTypeOptions}
+              suggestions={suggestions.truckType}
               onChange={(value) => onUpdateField('truckType', value)}
             />
           </div>
@@ -169,7 +178,7 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
 
           <h2>Supplier Billing</h2>
           <Field
-            label="Billing Amount to Supplier"
+            label="Freight Amount to Truck Owner / Supplier"
             type="number"
             value={form.supplierAmount}
             onChange={(value) => onUpdateField('supplierAmount', value)}
@@ -213,11 +222,34 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
             onChange={(value) => onUpdateField('paymentStatus', value)}
           />
           <Field
-            label="Additional Expenses"
-            type="number"
-            value={form.expenses}
-            onChange={(value) => onUpdateField('expenses', value)}
+            label="Additional Charge Type"
+            value={form.additionalChargeType}
+            onChange={(value) => onUpdateField('additionalChargeType', value)}
           />
+          <Field
+            label="Additional Expense Type"
+            value={form.additionalExpenseType}
+            onChange={(value) => onUpdateField('additionalExpenseType', value)}
+          />
+          <Field
+            label="Net Freight"
+            type="number"
+            value={form.netFreight}
+            onChange={(value) => onUpdateField('netFreight', value)}
+          />
+          <div className="field-row">
+            <Field label="LR No." value={form.lrNo} onChange={(value) => onUpdateField('lrNo', value)} />
+            <Field label="LR Date" type="date" value={form.lrDate} onChange={(value) => onUpdateField('lrDate', value)} />
+          </div>
+          <div className="field-row">
+            <Field label="Invoice No." value={form.invoiceNo} onChange={(value) => onUpdateField('invoiceNo', value)} />
+            <Field
+              label="Invoice Date"
+              type="date"
+              value={form.invoiceDate}
+              onChange={(value) => onUpdateField('invoiceDate', value)}
+            />
+          </div>
 
           <h2>Extra</h2>
           <SelectField
