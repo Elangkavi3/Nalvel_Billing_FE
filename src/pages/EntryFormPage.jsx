@@ -223,19 +223,15 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
           />
           <Field
             label="Additional Charge Type"
+            type="number"
             value={form.additionalChargeType}
             onChange={(value) => onUpdateField('additionalChargeType', value)}
           />
           <Field
             label="Additional Expense Type"
+            type="number"
             value={form.additionalExpenseType}
             onChange={(value) => onUpdateField('additionalExpenseType', value)}
-          />
-          <Field
-            label="Net Freight"
-            type="number"
-            value={form.netFreight}
-            onChange={(value) => onUpdateField('netFreight', value)}
           />
           <div className="field-row">
             <Field label="LR No." value={form.lrNo} onChange={(value) => onUpdateField('lrNo', value)} />

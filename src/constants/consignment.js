@@ -32,7 +32,6 @@ export const emptyConsignmentForm = {
   customerRate: '',
   additionalChargeType: '',
   additionalExpenseType: '',
-  netFreight: '',
   lrNo: '',
   lrDate: '',
   invoiceNo: '',
@@ -45,4 +44,4 @@ export const emptyConsignmentForm = {
 export const truckTypeOptions = ['32 ft SXL', 'Mini', '17ft', '20ft', 'Trailer'];
 export const paymentStatusOptions = ['Pending', 'Partial', 'Paid'];
 export const paymentModeOptions = ['Bank Transfer', 'DD', 'Cheque', 'UPI', 'Cash'];
-export const numericConsignmentFields = new Set(['weight', 'supplierAmount', 'advance', 'customerRate', 'netFreight']);
+export const numericConsignmentFields = new Set(['weight', 'supplierAmount', 'advance', 'customerRate', 'additionalChargeType', 'additionalExpenseType']);

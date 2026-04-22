@@ -16,6 +16,10 @@ import {
 import { buildConsignmentPayload, getUniqueValues } from './utils/consignment.js';
 import { getErrorMessage } from './utils/errors.js';
 
+function toDateTimeLocal(value) {
+  return typeof value === 'string' && value ? value.slice(0, 16) : '';
+}
+
 export function App() {
   const [form, setForm] = useState(emptyConsignmentForm);
   const [items, setItems] = useState([]);
@@ -88,32 +92,32 @@ export function App() {
     setForm({
       ...emptyConsignmentForm,
       ...item,
-      viewMode: item.viewMode ?? 'GST',
+      viewMode: item.gstNo ? 'GST' : item.imsNo ? 'IMS' : 'GST',
       gstType: item.gstType ? String(item.gstType) : '18',
       gstNo: item.gstNo ?? '',
       imsNo: item.imsNo ?? '',
-      loadingDate: item.loadingDate ?? '',
-      deliveryDateTime: item.deliveryDateTime ?? '',
+      ledgerDate: toDateTimeLocal(item.ledgerDateTime),
+      loadingDate: toDateTimeLocal(item.loadingDateTime),
+      deliveryDateTime: toDateTimeLocal(item.deliveryDateTime),
       weight: item.weight ?? '',
       supplierAmount: item.supplierAmount ?? '',
       advance: item.advance ?? '',
       customerRate: item.customerRate ?? '',
-      additionalChargeType: item.additionalChargeType ?? '',
-      additionalExpenseType: item.additionalExpenseType ?? '',
-      netFreight: item.netFreight ?? '',
+      additionalChargeType: item.additionalCharges ?? '',
+      additionalExpenseType: item.expenses ?? '',
       lrNo: item.lrNo ?? '',
-      lrDate: item.lrDate ?? '',
+      lrDate: toDateTimeLocal(item.lrDateTime),
       invoiceNo: item.invoiceNo ?? '',
-      invoiceDate: item.invoiceDate ?? '',
+      invoiceDate: toDateTimeLocal(item.invoiceDateTime),
       subSerialNo: item.subSerialNo ?? '',
       ownerPrimaryContact: item.ownerPrimaryContact ?? '',
-      ownerPrimaryWhatsappAvailable: Boolean(item.ownerPrimaryWhatsappAvailable),
+      ownerPrimaryWhatsappAvailable: Boolean(item.ownerPrimaryWhatsapp),
       ownerAlternateContact: item.ownerAlternateContact ?? '',
-      ownerAlternateWhatsappAvailable: Boolean(item.ownerAlternateWhatsappAvailable),
+      ownerAlternateWhatsappAvailable: Boolean(item.ownerAlternateWhatsapp),
       driverPrimaryContact: item.driverPrimaryContact ?? '',
-      driverPrimaryWhatsappAvailable: Boolean(item.driverPrimaryWhatsappAvailable),
+      driverPrimaryWhatsappAvailable: Boolean(item.driverPrimaryWhatsapp),
       driverAlternateContact: item.driverAlternateContact ?? '',
-      driverAlternateWhatsappAvailable: Boolean(item.driverAlternateWhatsappAvailable),
+      driverAlternateWhatsappAvailable: Boolean(item.driverAlternateWhatsapp),
     });
   }
 
@@ -123,14 +127,22 @@ export function App() {
     setError('');
 
     try {
+      const isEditing = Boolean(editingId);
       const payload = buildConsignmentPayload(form);
       const saved = editingId ? await updateConsignment(editingId, payload) : await saveConsignment(payload);
       const backendRecord = saved?.id ? await getConsignmentById(saved.id) : saved;
+      const successMessage = isEditing ? `Entry #${backendRecord.id} updated successfully` : `Entry #${backendRecord.id} saved successfully`;
 
-      setMessage(editingId ? `Entry #${backendRecord.id} updated` : `Entry #${backendRecord.id} saved`);
-      applyConsignmentToForm(backendRecord);
-      setEditingId(backendRecord.id ?? null);
+      setMessage(successMessage);
       await loadData();
+      window.alert(successMessage);
+
+      if (isEditing) {
+        applyConsignmentToForm(backendRecord);
+        setEditingId(backendRecord.id ?? null);
+      } else {
+        clearForm();
+      }
     } catch (err) {
       setError(getErrorMessage(err, 'Unable to save entry'));
     } finally {
