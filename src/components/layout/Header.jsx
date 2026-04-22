@@ -10,7 +10,7 @@ export function Header({ activePage, editingId, loading, onBack, onClear }) {
         <div className="nl-avatar">NL</div>
       </div>
       <div className="top-actions">
-        {activePage !== 'home' && (
+        {activePage !== 'home' && activePage !== 'view' && (
           <>
             <button type="button" className="btn secondary" onClick={onClear}>
               Clear

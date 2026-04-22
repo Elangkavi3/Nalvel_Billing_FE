@@ -20,6 +20,7 @@ const sampleConsignment = {
 
 export function SavedDataPage({
   currentPage,
+  filter,
   items,
   loading,
   pagedItems,
@@ -28,6 +29,8 @@ export function SavedDataPage({
   onBack,
   onDelete,
   onEdit,
+  onFilterChange,
+  onView,
   onLoadAll,
   onSearch,
   onSearchNameChange,
@@ -35,6 +38,14 @@ export function SavedDataPage({
 }) {
   const displayItems = items.length === 0 ? [sampleConsignment] : pagedItems;
   const showingSample = items.length === 0;
+
+  function setMode(mode) {
+    onFilterChange((current) => ({ ...current, mode }));
+  }
+
+  function setRangeValue(key, value) {
+    onFilterChange((current) => ({ ...current, mode: 'range', [key]: value }));
+  }
 
   return (
     <section className="list-panel">
@@ -61,6 +72,36 @@ export function SavedDataPage({
               All
             </button>
           </form>
+        </div>
+      </div>
+
+      <div className="saved-filter-section">
+        <div className="filter-bar">
+          <div className="filter-pills" role="group" aria-label="Saved data date filters">
+            <button type="button" className={filter.mode === 'today' ? 'filter-pill active' : 'filter-pill'} onClick={() => setMode('today')}>
+              Today
+            </button>
+            <button type="button" className={filter.mode === 'week' ? 'filter-pill active' : 'filter-pill'} onClick={() => setMode('week')}>
+              This Week
+            </button>
+            <button type="button" className={filter.mode === 'month' ? 'filter-pill active' : 'filter-pill'} onClick={() => setMode('month')}>
+              This Month
+            </button>
+            <button type="button" className={filter.mode === 'range' ? 'filter-pill active' : 'filter-pill'} onClick={() => setMode('range')}>
+              Date Range
+            </button>
+          </div>
+
+          <div className="filter-range">
+            <label className="filter-date-field">
+              <span>From</span>
+              <input type="date" value={filter.from} onChange={(event) => setRangeValue('from', event.target.value)} />
+            </label>
+            <label className="filter-date-field">
+              <span>To</span>
+              <input type="date" value={filter.to} onChange={(event) => setRangeValue('to', event.target.value)} />
+            </label>
+          </div>
         </div>
       </div>
 
@@ -104,9 +145,14 @@ export function SavedDataPage({
                 <td>{item.paymentStatus}</td>
                 <td className="action-cell">
                   {showingSample ? (
-                    <span className="empty-cell">Sample data</span>
+                    <button type="button" className="link-button" onClick={() => onView(item)}>
+                      View
+                    </button>
                   ) : (
                     <>
+                      <button type="button" className="link-button" onClick={() => onView(item)}>
+                        View
+                      </button>
                       <button type="button" className="link-button" onClick={() => onEdit(item)}>
                         Edit
                       </button>

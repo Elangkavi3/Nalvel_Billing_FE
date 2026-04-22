@@ -1,4 +1,28 @@
-﻿export function MasterPage({ onNavigate }) {
+import { money } from '../utils/numbers.js';
+
+function getFilterButtonClass(currentMode, mode) {
+  return currentMode === mode ? 'filter-pill active' : 'filter-pill';
+}
+
+function getItemDate(item) {
+  return item.ledgerDateTime || item.loadingDateTime || item.deliveryDateTime || item.ledgerDate || item.loadingDate || '';
+}
+
+export function MasterPage({ items = [], filter, onFilterChange, onNavigate }) {
+  const totalEntries = items.length;
+  const billedAmount = items.reduce((sum, item) => sum + (Number(item.customerRate) || 0), 0);
+  const recentItems = [...items]
+    .sort((left, right) => new Date(getItemDate(right) || 0) - new Date(getItemDate(left) || 0))
+    .slice(0, 5);
+
+  function setMode(mode) {
+    onFilterChange((current) => ({ ...current, mode }));
+  }
+
+  function setRangeValue(key, value) {
+    onFilterChange((current) => ({ ...current, mode: 'range', [key]: value }));
+  }
+
   return (
     <section className="home-panel">
       <div className="home-intro">
@@ -6,20 +30,6 @@
           <h2>Nalvel Billing Workspace</h2>
           <p>Manage freight entries, customer billing, supplier payments, and movement records from one place.</p>
         </div>
-        {/* <div className="home-intro-actions">
-          <button type="button" className="home-intro-action" onClick={() => onNavigate('form')}>
-            <small>Entry Form</small>
-            <span>Create new entry</span>
-          </button>
-          <button type="button" className="home-intro-action" onClick={() => onNavigate('data')}>
-            <small>Saved Data</small>
-            <span>Browse records</span>
-          </button>
-          <button type="button" className="home-intro-action">
-            <small>Invoice</small>
-            <span>Generate invoice</span>
-          </button>
-        </div> */}
       </div>
 
       <div className="home-actions">
@@ -42,14 +52,49 @@
         </button>
       </div>
 
+      <div className="home-filter-section">
+        <div>
+          <p className="eyebrow">Quick Filters</p>
+          <h3>Filter consignments by date</h3>
+        </div>
+
+        <div className="filter-bar">
+          <div className="filter-pills" role="group" aria-label="Home date filters">
+            <button type="button" className={getFilterButtonClass(filter.mode, 'today')} onClick={() => setMode('today')}>
+              Today
+            </button>
+            <button type="button" className={getFilterButtonClass(filter.mode, 'week')} onClick={() => setMode('week')}>
+              This Week
+            </button>
+            <button type="button" className={getFilterButtonClass(filter.mode, 'month')} onClick={() => setMode('month')}>
+              This Month
+            </button>
+            <button type="button" className={getFilterButtonClass(filter.mode, 'range')} onClick={() => setMode('range')}>
+              Date Range
+            </button>
+          </div>
+
+          <div className="filter-range">
+            <label className="filter-date-field">
+              <span>From</span>
+              <input type="date" value={filter.from} onChange={(event) => setRangeValue('from', event.target.value)} />
+            </label>
+            <label className="filter-date-field">
+              <span>To</span>
+              <input type="date" value={filter.to} onChange={(event) => setRangeValue('to', event.target.value)} />
+            </label>
+          </div>
+        </div>
+      </div>
+
       <div className="home-stats">
         <div className="stat-card">
-          <span>142</span>
-          <p>Entries today</p>
+          <span>{totalEntries}</span>
+          <p>Entries in selected filter</p>
         </div>
         <div className="stat-card">
-          <span>₹84k</span>
-          <p>Billed this week</p>
+          <span>{money(billedAmount)}</span>
+          <p>Customer bill total</p>
         </div>
       </div>
 
@@ -65,24 +110,28 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>CNS-0041</td>
-              <td>Chennai → Delhi</td>
-              <td><span className="status-pill delivered">Paid</span></td>
-              <td>₹4,200</td>
-            </tr>
-            <tr>
-              <td>CNS-0040</td>
-              <td>Mumbai → Pune</td>
-              <td><span className="status-pill intransit">Pending</span></td>
-              <td>₹1,800</td>
-            </tr>
-            <tr>
-              <td>CNS-0039</td>
-              <td>Bangalore → Hyderabad</td>
-              <td><span className="status-pill pending">Partial</span></td>
-              <td>₹2,600</td>
-            </tr>
+            {recentItems.length === 0 ? (
+              <tr>
+                <td colSpan="4" className="empty-cell">
+                  No consignments found for the selected filter.
+                </td>
+              </tr>
+            ) : (
+              recentItems.map((item) => (
+                <tr key={item.id}>
+                  <td>{item.serialNo || item.id}</td>
+                  <td>
+                    {item.fromLocation || '-'} to {item.toLocation || '-'}
+                  </td>
+                  <td>
+                    <span className={`status-pill ${(item.paymentStatus || 'Pending').toLowerCase()}`}>
+                      {item.paymentStatus || 'Pending'}
+                    </span>
+                  </td>
+                  <td>{money(item.customerRate)}</td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
