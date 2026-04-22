@@ -45,8 +45,8 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
           )}
           <div className="field-row">
             <Field
-              label="Ledger Date"
-              type="date"
+              label="Ledger Date & Time"
+              type="datetime-local"
               value={form.ledgerDate}
               onChange={(value) => onUpdateField('ledgerDate', value)}
             />
@@ -239,13 +239,18 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
           />
           <div className="field-row">
             <Field label="LR No." value={form.lrNo} onChange={(value) => onUpdateField('lrNo', value)} />
-            <Field label="LR Date" type="date" value={form.lrDate} onChange={(value) => onUpdateField('lrDate', value)} />
+            <Field
+              label="LR Date & Time"
+              type="datetime-local"
+              value={form.lrDate}
+              onChange={(value) => onUpdateField('lrDate', value)}
+            />
           </div>
           <div className="field-row">
             <Field label="Invoice No." value={form.invoiceNo} onChange={(value) => onUpdateField('invoiceNo', value)} />
             <Field
-              label="Invoice Date"
-              type="date"
+              label="Invoice Date & Time"
+              type="datetime-local"
               value={form.invoiceDate}
               onChange={(value) => onUpdateField('invoiceDate', value)}
             />

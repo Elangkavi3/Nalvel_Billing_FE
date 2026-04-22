@@ -7,7 +7,7 @@ export const emptyConsignmentForm = {
   imsNo: '',
   serialNo: '',
   subSerialNo: '',
-  ledgerDate: new Date().toISOString().slice(0, 10),
+  ledgerDate: new Date().toISOString().slice(0, 16),
   loadingDate: new Date().toISOString().slice(0, 16),
   deliveryDateTime: '',
   customerName: '',
