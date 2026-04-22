@@ -60,6 +60,9 @@ export function MasterPage({ items = [], filter, onFilterChange, onNavigate }) {
 
         <div className="filter-bar">
           <div className="filter-pills" role="group" aria-label="Home date filters">
+            <button type="button" className={getFilterButtonClass(filter.mode, 'all')} onClick={() => setMode('all')}>
+              All
+            </button>
             <button type="button" className={getFilterButtonClass(filter.mode, 'today')} onClick={() => setMode('today')}>
               Today
             </button>

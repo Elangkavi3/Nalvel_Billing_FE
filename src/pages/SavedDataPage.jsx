@@ -1,23 +1,6 @@
 import { Pagination } from '../components/common/Pagination.jsx';
 import { money } from '../utils/numbers.js';
 
-const sampleConsignment = {
-  id: 'sample-consignment',
-  serialNo: '1',
-  subSerialNo: 'A',
-  customerName: 'Nalvel Demo Customer',
-  billTo: 'Nalvel Demo Billing',
-  fromLocation: 'Chennai',
-  toLocation: 'Delhi',
-  truckNo: 'TN 01 AB 1234',
-  driverName: 'Ravi Kumar',
-  driverPrimaryContact: '9876543210',
-  supplierAmount: 42000,
-  customerRate: 48500,
-  profit: 6500,
-  paymentStatus: 'Pending',
-};
-
 export function SavedDataPage({
   currentPage,
   filter,
@@ -36,8 +19,7 @@ export function SavedDataPage({
   onSearchNameChange,
   onSetPage,
 }) {
-  const displayItems = items.length === 0 ? [sampleConsignment] : pagedItems;
-  const showingSample = items.length === 0;
+  const hasItems = items.length > 0;
 
   function setMode(mode) {
     onFilterChange((current) => ({ ...current, mode }));
@@ -78,6 +60,9 @@ export function SavedDataPage({
       <div className="saved-filter-section">
         <div className="filter-bar">
           <div className="filter-pills" role="group" aria-label="Saved data date filters">
+            <button type="button" className={filter.mode === 'all' ? 'filter-pill active' : 'filter-pill'} onClick={() => setMode('all')}>
+              All
+            </button>
             <button type="button" className={filter.mode === 'today' ? 'filter-pill active' : 'filter-pill'} onClick={() => setMode('today')}>
               Today
             </button>
@@ -123,47 +108,47 @@ export function SavedDataPage({
             </tr>
           </thead>
           <tbody>
-            {displayItems.map((item) => (
-              <tr key={item.id}>
-                <td>{item.serialNo || item.id}</td>
-                <td>{item.subSerialNo || '-'}</td>
-                <td>
-                  <strong>{item.customerName}</strong>
-                  <span>{item.billTo}</span>
-                </td>
-                <td>
-                  {item.fromLocation} to {item.toLocation}
-                </td>
-                <td>{item.truckNo}</td>
-                <td>
-                  <strong>{item.driverName || '-'}</strong>
-                  <span>{item.driverPrimaryContact || item.driverAlternateContact || '-'}</span>
-                </td>
-                <td>{money(item.supplierAmount)}</td>
-                <td>{money(item.customerRate)}</td>
-                <td className="profit-text">{money(item.profit)}</td>
-                <td>{item.paymentStatus}</td>
-                <td className="action-cell">
-                  {showingSample ? (
+            {hasItems ? (
+              pagedItems.map((item) => (
+                <tr key={item.id}>
+                  <td>{item.serialNo || item.id}</td>
+                  <td>{item.subSerialNo || '-'}</td>
+                  <td>
+                    <strong>{item.customerName}</strong>
+                    <span>{item.billTo}</span>
+                  </td>
+                  <td>
+                    {item.fromLocation} to {item.toLocation}
+                  </td>
+                  <td>{item.truckNo}</td>
+                  <td>
+                    <strong>{item.driverName || '-'}</strong>
+                    <span>{item.driverPrimaryContact || item.driverAlternateContact || '-'}</span>
+                  </td>
+                  <td>{money(item.supplierAmount)}</td>
+                  <td>{money(item.customerRate)}</td>
+                  <td className="profit-text">{money(item.profit)}</td>
+                  <td>{item.paymentStatus}</td>
+                  <td className="action-cell">
                     <button type="button" className="link-button" onClick={() => onView(item)}>
                       View
                     </button>
-                  ) : (
-                    <>
-                      <button type="button" className="link-button" onClick={() => onView(item)}>
-                        View
-                      </button>
-                      <button type="button" className="link-button" onClick={() => onEdit(item)}>
-                        Edit
-                      </button>
-                      <button type="button" className="link-button danger" onClick={() => onDelete(item.id)}>
-                        Delete
-                      </button>
-                    </>
-                  )}
+                    <button type="button" className="link-button" onClick={() => onEdit(item)}>
+                      Edit
+                    </button>
+                    <button type="button" className="link-button danger" onClick={() => onDelete(item.id)}>
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="11" className="empty-cell">
+                  No records from backend for the current filter/search.
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>

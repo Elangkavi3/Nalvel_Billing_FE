@@ -89,8 +89,8 @@ export function App() {
   const [message, setMessage] = useState('Ready to connect');
   const [error, setError] = useState('');
   const [successPopup, setSuccessPopup] = useState('');
-  const [homeFilter, setHomeFilter] = useState({ mode: 'today', from: '', to: '' });
-  const [dataFilter, setDataFilter] = useState({ mode: 'today', from: '', to: '' });
+  const [homeFilter, setHomeFilter] = useState({ mode: 'all', from: '', to: '' });
+  const [dataFilter, setDataFilter] = useState({ mode: 'all', from: '', to: '' });
 
   const suggestions = useMemo(
     () => ({
