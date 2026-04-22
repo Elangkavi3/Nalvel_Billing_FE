@@ -1,6 +1,23 @@
 import { Pagination } from '../components/common/Pagination.jsx';
 import { money } from '../utils/numbers.js';
 
+const sampleConsignment = {
+  id: 'sample-consignment',
+  serialNo: '1',
+  subSerialNo: 'A',
+  customerName: 'Nalvel Demo Customer',
+  billTo: 'Nalvel Demo Billing',
+  fromLocation: 'Chennai',
+  toLocation: 'Delhi',
+  truckNo: 'TN 01 AB 1234',
+  driverName: 'Ravi Kumar',
+  driverPrimaryContact: '9876543210',
+  supplierAmount: 42000,
+  customerRate: 48500,
+  profit: 6500,
+  paymentStatus: 'Pending',
+};
+
 export function SavedDataPage({
   currentPage,
   items,
@@ -16,6 +33,9 @@ export function SavedDataPage({
   onSearchNameChange,
   onSetPage,
 }) {
+  const displayItems = items.length === 0 ? [sampleConsignment] : pagedItems;
+  const showingSample = items.length === 0;
+
   return (
     <section className="list-panel">
       <div className="list-head">
@@ -62,44 +82,42 @@ export function SavedDataPage({
             </tr>
           </thead>
           <tbody>
-            {items.length === 0 ? (
-              <tr>
-                <td colSpan={11} className="empty-cell">
-                  No consignments found
+            {displayItems.map((item) => (
+              <tr key={item.id}>
+                <td>{item.serialNo || item.id}</td>
+                <td>{item.subSerialNo || '-'}</td>
+                <td>
+                  <strong>{item.customerName}</strong>
+                  <span>{item.billTo}</span>
+                </td>
+                <td>
+                  {item.fromLocation} to {item.toLocation}
+                </td>
+                <td>{item.truckNo}</td>
+                <td>
+                  <strong>{item.driverName || '-'}</strong>
+                  <span>{item.driverPrimaryContact || item.driverAlternateContact || '-'}</span>
+                </td>
+                <td>{money(item.supplierAmount)}</td>
+                <td>{money(item.customerRate)}</td>
+                <td className="profit-text">{money(item.profit)}</td>
+                <td>{item.paymentStatus}</td>
+                <td className="action-cell">
+                  {showingSample ? (
+                    <span className="empty-cell">Sample data</span>
+                  ) : (
+                    <>
+                      <button type="button" className="link-button" onClick={() => onEdit(item)}>
+                        Edit
+                      </button>
+                      <button type="button" className="link-button danger" onClick={() => onDelete(item.id)}>
+                        Delete
+                      </button>
+                    </>
+                  )}
                 </td>
               </tr>
-            ) : (
-              pagedItems.map((item) => (
-                <tr key={item.id}>
-                  <td>{item.serialNo || item.id}</td>
-                  <td>{item.subSerialNo || '-'}</td>
-                  <td>
-                    <strong>{item.customerName}</strong>
-                    <span>{item.billTo}</span>
-                  </td>
-                  <td>
-                    {item.fromLocation} to {item.toLocation}
-                  </td>
-                  <td>{item.truckNo}</td>
-                  <td>
-                    <strong>{item.driverName || '-'}</strong>
-                    <span>{item.driverPrimaryContact || item.driverAlternateContact || '-'}</span>
-                  </td>
-                  <td>{money(item.supplierAmount)}</td>
-                  <td>{money(item.customerRate)}</td>
-                  <td className="profit-text">{money(item.profit)}</td>
-                  <td>{item.paymentStatus}</td>
-                  <td className="action-cell">
-                    <button type="button" className="link-button" onClick={() => onEdit(item)}>
-                      Edit
-                    </button>
-                    <button type="button" className="link-button danger" onClick={() => onDelete(item.id)}>
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
+            ))}
           </tbody>
         </table>
       </div>
