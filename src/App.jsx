@@ -31,6 +31,7 @@ export function App() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('Ready to connect');
   const [error, setError] = useState('');
+  const [successPopup, setSuccessPopup] = useState('');
 
   const suggestions = useMemo(
     () => ({
@@ -135,7 +136,7 @@ export function App() {
 
       setMessage(successMessage);
       await loadData();
-      window.alert(successMessage);
+      setSuccessPopup(successMessage);
 
       if (isEditing) {
         applyConsignmentToForm(backendRecord);
@@ -239,6 +240,30 @@ export function App() {
           onSearchNameChange={setSearchName}
           onSetPage={setCurrentPage}
         />
+      )}
+
+      {successPopup && (
+        <section className="success-popup-backdrop" role="presentation" onClick={() => setSuccessPopup('')}>
+          <div
+            className="success-popup"
+            role="alertdialog"
+            aria-live="assertive"
+            aria-label="Submission successful"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="success-popup-icon" aria-hidden="true">
+              <svg viewBox="0 0 64 64" fill="none">
+                <circle cx="32" cy="32" r="30" />
+                <path d="M18 33.5 27.5 43 46 24.5" />
+              </svg>
+            </div>
+            <h2>Success</h2>
+            <p>{successPopup}</p>
+            <button type="button" className="btn primary" onClick={() => setSuccessPopup('')}>
+              Continue
+            </button>
+          </div>
+        </section>
       )}
     </main>
   );
