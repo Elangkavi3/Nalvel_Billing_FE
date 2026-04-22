@@ -1,10 +1,13 @@
 export function Header({ activePage, editingId, loading, onBack, onClear }) {
   return (
     <section className="topbar">
-      <div>
-        <p className="eyebrow">Nalvel Logistics</p>
-        <h1>Freight Data Entry</h1>
-        <p className="subline">Movement and billing register</p>
+      <div className="topbar-brand">
+        <span className="brand-text">NALVEL LOGISTICS</span>
+        <span className="brand-divider">•</span>
+        <span className="brand-text">Freight Data Entry</span>
+        <span className="brand-divider">•</span>
+        <span className="brand-text">Movement and billing register</span>
+        <div className="nl-avatar">NL</div>
       </div>
       <div className="top-actions">
         {activePage !== 'home' && (

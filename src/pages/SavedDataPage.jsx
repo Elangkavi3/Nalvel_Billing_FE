@@ -49,9 +49,11 @@ export function SavedDataPage({
           <thead>
             <tr>
               <th>S.No</th>
+              <th>Sub S.No</th>
               <th>Customer</th>
               <th>Route</th>
               <th>Truck</th>
+              <th>Driver</th>
               <th>Supplier</th>
               <th>Customer Bill</th>
               <th>Profit</th>
@@ -62,7 +64,7 @@ export function SavedDataPage({
           <tbody>
             {items.length === 0 ? (
               <tr>
-                <td colSpan={9} className="empty-cell">
+                <td colSpan={11} className="empty-cell">
                   No consignments found
                 </td>
               </tr>
@@ -70,6 +72,7 @@ export function SavedDataPage({
               pagedItems.map((item) => (
                 <tr key={item.id}>
                   <td>{item.serialNo || item.id}</td>
+                  <td>{item.subSerialNo || '-'}</td>
                   <td>
                     <strong>{item.customerName}</strong>
                     <span>{item.billTo}</span>
@@ -78,6 +81,10 @@ export function SavedDataPage({
                     {item.fromLocation} to {item.toLocation}
                   </td>
                   <td>{item.truckNo}</td>
+                  <td>
+                    <strong>{item.driverName || '-'}</strong>
+                    <span>{item.driverPrimaryContact || item.driverAlternateContact || '-'}</span>
+                  </td>
                   <td>{money(item.supplierAmount)}</td>
                   <td>{money(item.customerRate)}</td>
                   <td className="profit-text">{money(item.profit)}</td>
