@@ -202,6 +202,8 @@ export function BillingViewPage({ item, onBack, onEdit, onHome }) {
             <FinanceItem label="Billed to Customer" value={money(item.customerRate)} />
             <FinanceItem label="Freight (Supplier)" value={money(item.supplierAmount)} />
             <FinanceItem label="Advance Paid" value={money(item.advance)} accent="advance" />
+           <FinanceItem label="Net Freight" value={money(item.netFreight)} accent="netFreight" />
+
             <FinanceItem label="Gross Margin" value={money(item.profit)} accent="profit" />
           </div>
         </div>
