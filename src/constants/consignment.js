@@ -2,18 +2,18 @@ export const PAGE_SIZE = 10;
 
 export const emptyConsignmentForm = {
   viewMode: 'GST',
-  gstType: '18',
+  gstType: '',
   gstNo: '',
   imsNo: '',
   serialNo: '',
   subSerialNo: '',
-  ledgerDate: new Date().toISOString().slice(0, 16),
-  loadingDate: new Date().toISOString().slice(0, 16),
+  ledgerDate: '',
+  loadingDate: '',
   deliveryDateTime: '',
   customerName: '',
   billTo: '',
   truckNo: '',
-  truckType: '32 ft SXL',
+  truckType: '',
   ownerName: '',
   ownerPrimaryContact: '',
   ownerPrimaryWhatsappAvailable: false,
@@ -29,19 +29,34 @@ export const emptyConsignmentForm = {
   weight: '',
   supplierAmount: '',
   advance: '',
+  balance: '',
+  ledgerAmount: '',
   customerRate: '',
-  additionalChargeType: '',
-  additionalExpenseType: '',
+  additionalCharges: '',
+  expenses: '',
+  netFreight: '',
+  profit: '',
   lrNo: '',
   lrDate: '',
   invoiceNo: '',
   invoiceDate: '',
-  paymentStatus: 'Pending',
-  paymentMode: 'Bank Transfer',
+  paymentStatus: '',
+  paymentMode: '',
   remarks: '',
 };
 
 export const truckTypeOptions = ['32 ft SXL', 'Mini', '17ft', '20ft', 'Trailer'];
 export const paymentStatusOptions = ['Pending', 'Partial', 'Paid'];
 export const paymentModeOptions = ['Bank Transfer', 'DD', 'Cheque', 'UPI', 'Cash'];
-export const numericConsignmentFields = new Set(['weight', 'supplierAmount', 'advance', 'customerRate', 'additionalChargeType', 'additionalExpenseType']);
+export const numericConsignmentFields = new Set([
+  'weight',
+  'supplierAmount',
+  'advance',
+  'balance',
+  'ledgerAmount',
+  'customerRate',
+  'additionalCharges',
+  'expenses',
+  'netFreight',
+  'profit',
+]);

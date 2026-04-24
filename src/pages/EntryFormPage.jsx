@@ -1,12 +1,11 @@
 import { AutocompleteField } from '../components/forms/AutocompleteField.jsx';
 import { Field } from '../components/forms/Field.jsx';
-import { ReadOnlyField } from '../components/forms/ReadOnlyField.jsx';
 import { SelectField } from '../components/forms/SelectField.jsx';
 import { paymentModeOptions, paymentStatusOptions } from '../constants/consignment.js';
 
 export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, onUpdateField }) {
   return (
-    <form id="consignment-form" className="entry-panel" onSubmit={onSubmit}>
+    <form id="consignment-form" className="entry-panel" onSubmit={onSubmit} autoComplete="off">
       <div className="form-header">
         <span>{editingId ? `Editing #${form.serialNo || editingId}` : 'New Entry'}</span>
         <button type="button" className="header-back" onClick={onBack}>
@@ -17,32 +16,16 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
       <div className="grid3">
         <section className="form-section">
           <h2>Basic Info</h2>
-          <div className="option-stack">
-            <RadioGroup
-              label="Entry View"
-              name="viewMode"
-              value={form.viewMode}
-              options={[
-                { label: 'GST', value: 'GST' },
-                { label: 'IMS', value: 'IMS' },
-              ]}
-              onChange={(value) => onUpdateField('viewMode', value)}
-            />
-          </div>
           <div className="field-row">
-            <ReadOnlyField label="S.No" value={form.serialNo || 'Auto'} />
+            <Field label="S.No" value={form.serialNo} onChange={(value) => onUpdateField('serialNo', value)} />
             <Field
               label="Sub S.No"
               value={form.subSerialNo}
               onChange={(value) => onUpdateField('subSerialNo', value)}
             />
           </div>
-          {form.viewMode === 'GST' && (
-            <Field label="GST No" value={form.gstNo} onChange={(value) => onUpdateField('gstNo', value)} />
-          )}
-          {form.viewMode === 'IMS' && (
-            <Field label="IMS No" value={form.imsNo} onChange={(value) => onUpdateField('imsNo', value)} />
-          )}
+          <Field label="GST No" value={form.gstNo} onChange={(value) => onUpdateField('gstNo', value)} />
+          <Field label="IMS No" value={form.imsNo} onChange={(value) => onUpdateField('imsNo', value)} />
           <div className="field-row">
             <Field
               label="Ledger Date & Time"
@@ -190,6 +173,15 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
               value={form.advance}
               onChange={(value) => onUpdateField('advance', value)}
             />
+            <Field label="Balance" type="number" value={form.balance} onChange={(value) => onUpdateField('balance', value)} />
+          </div>
+          <div className="field-row">
+            <Field
+              label="Ledger Amount"
+              type="number"
+              value={form.ledgerAmount}
+              onChange={(value) => onUpdateField('ledgerAmount', value)}
+            />
           </div>
         </section>
 
@@ -201,6 +193,7 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
                 label="GST Type"
                 name="gstType"
                 value={form.gstType}
+                required={Boolean(form.gstNo && form.gstNo.trim())}
                 options={[
                   { label: '18%', value: '18' },
                   { label: '5%', value: '5' },
@@ -219,20 +212,30 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
             label="Supplier Payment Status"
             value={form.paymentStatus}
             options={paymentStatusOptions}
+            required
             onChange={(value) => onUpdateField('paymentStatus', value)}
           />
           <Field
             label="Additional Charge Type"
             type="number"
-            value={form.additionalChargeType}
-            onChange={(value) => onUpdateField('additionalChargeType', value)}
+            value={form.additionalCharges}
+            onChange={(value) => onUpdateField('additionalCharges', value)}
           />
           <Field
             label="Additional Expense Type"
             type="number"
-            value={form.additionalExpenseType}
-            onChange={(value) => onUpdateField('additionalExpenseType', value)}
+            value={form.expenses}
+            onChange={(value) => onUpdateField('expenses', value)}
           />
+          <div className="field-row">
+            <Field
+              label="Net Freight"
+              type="number"
+              value={form.netFreight}
+              onChange={(value) => onUpdateField('netFreight', value)}
+            />
+            <Field label="Profit" type="number" value={form.profit} onChange={(value) => onUpdateField('profit', value)} />
+          </div>
           <div className="field-row">
             <Field label="LR No." value={form.lrNo} onChange={(value) => onUpdateField('lrNo', value)} />
             <Field
@@ -257,11 +260,16 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
             label="Payment Mode"
             value={form.paymentMode}
             options={paymentModeOptions}
+            required
             onChange={(value) => onUpdateField('paymentMode', value)}
           />
           <label className="field">
             <span>Remarks / Notes</span>
-            <textarea value={form.remarks} onChange={(event) => onUpdateField('remarks', event.target.value)} />
+            <textarea
+              autoComplete="off"
+              value={form.remarks}
+              onChange={(event) => onUpdateField('remarks', event.target.value)}
+            />
           </label>
         </section>
       </div>
@@ -278,7 +286,7 @@ function WhatsappCheck({ checked, onChange }) {
   );
 }
 
-function RadioGroup({ label, name, value, options, onChange }) {
+function RadioGroup({ label, name, value, options, onChange, required = false }) {
   return (
     <fieldset className="radio-group">
       <legend>{label}</legend>
@@ -289,6 +297,7 @@ function RadioGroup({ label, name, value, options, onChange }) {
               type="radio"
               name={name}
               value={option.value}
+              required={required}
               checked={value === option.value}
               onChange={(event) => onChange(event.target.value)}
             />

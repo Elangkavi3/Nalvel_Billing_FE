@@ -4,21 +4,20 @@ import { toNumber } from './numbers.js';
 export function buildConsignmentPayload(form) {
   const payload = Object.fromEntries(
     Object.entries(form)
-      .filter(([key]) => !['id', 'serialNo', 'balance', 'ledgerAmount', 'profit', 'viewMode'].includes(key))
+      .filter(([key]) => !['id', 'viewMode'].includes(key))
       .map(([key, value]) => [key, numericConsignmentFields.has(key) ? toNumber(value) : value]),
   );
 
   const {
     ledgerDate,
     loadingDate,
+    deliveryDateTime,
     lrDate,
     invoiceDate,
     ownerPrimaryWhatsappAvailable,
     ownerAlternateWhatsappAvailable,
     driverPrimaryWhatsappAvailable,
     driverAlternateWhatsappAvailable,
-    additionalChargeType,
-    additionalExpenseType,
     ...rest
   } = payload;
 
@@ -26,14 +25,13 @@ export function buildConsignmentPayload(form) {
     ...rest,
     ledgerDateTime: ledgerDate || null,
     loadingDateTime: loadingDate || null,
+    deliveryDateTime: deliveryDateTime || null,
     lrDateTime: lrDate || null,
     invoiceDateTime: invoiceDate || null,
     ownerPrimaryWhatsapp: ownerPrimaryWhatsappAvailable,
     ownerAlternateWhatsapp: ownerAlternateWhatsappAvailable,
     driverPrimaryWhatsapp: driverPrimaryWhatsappAvailable,
     driverAlternateWhatsapp: driverAlternateWhatsappAvailable,
-    additionalCharges: additionalChargeType,
-    expenses: additionalExpenseType,
   };
 }
 

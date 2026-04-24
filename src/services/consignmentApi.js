@@ -1,35 +1,42 @@
 import { request } from './http.js';
-
-const API_BASE = '/api/consignment';
+import { consignmentEndpoints } from './endpoints.js';
 
 export async function getAllConsignments() {
-  const data = await request(`${API_BASE}/getAllData`);
+  const data = await request(consignmentEndpoints.readAll());
   return Array.isArray(data) ? data : [];
 }
 
 export function getConsignmentById(id) {
-  return request(`${API_BASE}/${id}`);
+  return request(consignmentEndpoints.readById(id));
 }
 
 export async function searchConsignmentsByCustomer(name) {
-  const data = await request(`${API_BASE}/byCustomer?name=${encodeURIComponent(name)}`);
+  const data = await request(consignmentEndpoints.readByCustomer(name));
   return Array.isArray(data) ? data : [];
 }
 
 export function saveConsignment(payload) {
-  return request(`${API_BASE}/save`, {
+  return request(consignmentEndpoints.create(), {
     method: 'POST',
     body: JSON.stringify(payload),
   });
 }
 
 export function updateConsignment(id, payload) {
-  return request(`${API_BASE}/update/${id}`, {
+  if (id === undefined || id === null || id === '') {
+    throw new Error('Update failed: missing consignment id');
+  }
+
+  return request(consignmentEndpoints.updateById(id), {
     method: 'PUT',
     body: JSON.stringify(payload),
   });
 }
 
 export function deleteConsignment(id) {
-  return request(`${API_BASE}/${id}`, { method: 'DELETE' });
+  if (id === undefined || id === null || id === '') {
+    throw new Error('Delete failed: missing consignment id');
+  }
+
+  return request(consignmentEndpoints.deleteById(id), { method: 'DELETE' });
 }

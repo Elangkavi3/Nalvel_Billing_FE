@@ -9,7 +9,6 @@ import { SavedDataPage } from './pages/SavedDataPage.jsx';
 import {
   deleteConsignment,
   getAllConsignments,
-  getConsignmentById,
   saveConsignment,
   searchConsignmentsByCustomer,
   updateConsignment,
@@ -77,7 +76,7 @@ function applyDateFilter(items, filter) {
 }
 
 export function App() {
-  const [form, setForm] = useState(emptyConsignmentForm);
+  const [form, setForm] = useState(() => ({ ...emptyConsignmentForm }));
   const [items, setItems] = useState([]);
   const [allItems, setAllItems] = useState([]);
   const [editingId, setEditingId] = useState(null);
@@ -144,7 +143,7 @@ export function App() {
   }
 
   function clearForm() {
-    setForm(emptyConsignmentForm);
+    setForm({ ...emptyConsignmentForm });
     setEditingId(null);
     setViewingItem(null);
     setError('');
@@ -166,9 +165,13 @@ export function App() {
       weight: item.weight ?? '',
       supplierAmount: item.supplierAmount ?? '',
       advance: item.advance ?? '',
+      balance: item.balance ?? '',
+      ledgerAmount: item.ledgerAmount ?? '',
       customerRate: item.customerRate ?? '',
-      additionalChargeType: item.additionalCharges ?? '',
-      additionalExpenseType: item.expenses ?? '',
+      additionalCharges: item.additionalCharges ?? '',
+      expenses: item.expenses ?? '',
+      netFreight: item.netFreight ?? '',
+      profit: item.profit ?? '',
       lrNo: item.lrNo ?? '',
       lrDate: toDateTimeLocal(item.lrDateTime),
       invoiceNo: item.invoiceNo ?? '',
@@ -191,22 +194,18 @@ export function App() {
     setError('');
 
     try {
-      const isEditing = Boolean(editingId);
+      const targetId = editingId ?? form.id ?? null;
+      const isEditing = Boolean(targetId);
       const payload = buildConsignmentPayload(form);
-      const saved = editingId ? await updateConsignment(editingId, payload) : await saveConsignment(payload);
-      const backendRecord = saved?.id ? await getConsignmentById(saved.id) : saved;
-      const successMessage = isEditing ? `Entry #${backendRecord.id} updated successfully` : `Entry #${backendRecord.id} saved successfully`;
+      const saved = isEditing ? await updateConsignment(targetId, payload) : await saveConsignment(payload);
+      const recordId = saved?.id ?? targetId ?? '';
+      const successMessage = isEditing ? `Entry #${recordId} updated successfully` : `Entry #${recordId} saved successfully`;
 
       setMessage(successMessage);
       await loadData();
       setSuccessPopup(successMessage);
 
-      if (isEditing) {
-        applyConsignmentToForm(backendRecord);
-        setEditingId(backendRecord.id ?? null);
-      } else {
-        clearForm();
-      }
+      clearForm();
     } catch (err) {
       setError(getErrorMessage(err, 'Unable to save entry'));
     } finally {
