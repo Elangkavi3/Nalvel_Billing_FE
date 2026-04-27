@@ -2,11 +2,37 @@ import { numericConsignmentFields } from '../constants/consignment.js';
 import { toNumber } from './numbers.js';
 
 export function buildConsignmentPayload(form) {
-  return Object.fromEntries(
+  const payload = Object.fromEntries(
     Object.entries(form)
-      .filter(([key]) => !['id', 'serialNo', 'balance', 'ledgerAmount', 'profit'].includes(key))
+      .filter(([key]) => !['id', 'viewMode'].includes(key))
       .map(([key, value]) => [key, numericConsignmentFields.has(key) ? toNumber(value) : value]),
   );
+
+  const {
+    ledgerDate,
+    loadingDate,
+    deliveryDateTime,
+    lrDate,
+    invoiceDate,
+    ownerPrimaryWhatsappAvailable,
+    ownerAlternateWhatsappAvailable,
+    driverPrimaryWhatsappAvailable,
+    driverAlternateWhatsappAvailable,
+    ...rest
+  } = payload;
+
+  return {
+    ...rest,
+    ledgerDateTime: ledgerDate || null,
+    loadingDateTime: loadingDate || null,
+    deliveryDateTime: deliveryDateTime || null,
+    lrDateTime: lrDate || null,
+    invoiceDateTime: invoiceDate || null,
+    ownerPrimaryWhatsapp: ownerPrimaryWhatsappAvailable,
+    ownerAlternateWhatsapp: ownerAlternateWhatsappAvailable,
+    driverPrimaryWhatsapp: driverPrimaryWhatsappAvailable,
+    driverAlternateWhatsapp: driverAlternateWhatsappAvailable,
+  };
 }
 
 export function getUniqueValues(items, field) {

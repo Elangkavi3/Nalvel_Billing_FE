@@ -3,6 +3,7 @@ import { money } from '../utils/numbers.js';
 
 export function SavedDataPage({
   currentPage,
+  filter,
   items,
   loading,
   pagedItems,
@@ -11,11 +12,23 @@ export function SavedDataPage({
   onBack,
   onDelete,
   onEdit,
+  onFilterChange,
+  onView,
   onLoadAll,
   onSearch,
   onSearchNameChange,
   onSetPage,
 }) {
+  const hasItems = items.length > 0;
+
+  function setMode(mode) {
+    onFilterChange((current) => ({ ...current, mode }));
+  }
+
+  function setRangeValue(key, value) {
+    onFilterChange((current) => ({ ...current, mode: 'range', [key]: value }));
+  }
+
   return (
     <section className="list-panel">
       <div className="list-head">
@@ -44,6 +57,39 @@ export function SavedDataPage({
         </div>
       </div>
 
+      <div className="saved-filter-section">
+        <div className="filter-bar">
+          <div className="filter-pills" role="group" aria-label="Saved data date filters">
+            <button type="button" className={filter.mode === 'all' ? 'filter-pill active' : 'filter-pill'} onClick={() => setMode('all')}>
+              All
+            </button>
+            <button type="button" className={filter.mode === 'today' ? 'filter-pill active' : 'filter-pill'} onClick={() => setMode('today')}>
+              Today
+            </button>
+            <button type="button" className={filter.mode === 'week' ? 'filter-pill active' : 'filter-pill'} onClick={() => setMode('week')}>
+              This Week
+            </button>
+            <button type="button" className={filter.mode === 'month' ? 'filter-pill active' : 'filter-pill'} onClick={() => setMode('month')}>
+              This Month
+            </button>
+            <button type="button" className={filter.mode === 'range' ? 'filter-pill active' : 'filter-pill'} onClick={() => setMode('range')}>
+              Date Range
+            </button>
+          </div>
+
+          <div className="filter-range">
+            <label className="filter-date-field">
+              <span>From</span>
+              <input type="date" value={filter.from} onChange={(event) => setRangeValue('from', event.target.value)} />
+            </label>
+            <label className="filter-date-field">
+              <span>To</span>
+              <input type="date" value={filter.to} onChange={(event) => setRangeValue('to', event.target.value)} />
+            </label>
+          </div>
+        </div>
+      </div>
+
       <div className="table-wrap">
         <table>
           <thead>
@@ -62,13 +108,7 @@ export function SavedDataPage({
             </tr>
           </thead>
           <tbody>
-            {items.length === 0 ? (
-              <tr>
-                <td colSpan={11} className="empty-cell">
-                  No consignments found
-                </td>
-              </tr>
-            ) : (
+            {hasItems ? (
               pagedItems.map((item) => (
                 <tr key={item.id}>
                   <td>{item.serialNo || item.id}</td>
@@ -90,6 +130,9 @@ export function SavedDataPage({
                   <td className="profit-text">{money(item.profit)}</td>
                   <td>{item.paymentStatus}</td>
                   <td className="action-cell">
+                    <button type="button" className="link-button" onClick={() => onView(item)}>
+                      View
+                    </button>
                     <button type="button" className="link-button" onClick={() => onEdit(item)}>
                       Edit
                     </button>
@@ -99,6 +142,12 @@ export function SavedDataPage({
                   </td>
                 </tr>
               ))
+            ) : (
+              <tr>
+                <td colSpan="11" className="empty-cell">
+                  No records from backend for the current filter/search.
+                </td>
+              </tr>
             )}
           </tbody>
         </table>
