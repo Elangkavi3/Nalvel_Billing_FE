@@ -503,7 +503,7 @@ h2 {
 
 .advance-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
   gap: 8px;
   align-items: end;
 }
@@ -1655,6 +1655,14 @@ td span {
   .bill-card-wide,
   .bill-card-half {
     grid-column: auto;
+  }
+
+  .advance-row {
+    grid-template-columns: 1fr;
+  }
+
+  .advance-add-btn {
+    justify-self: start;
   }
 }
 

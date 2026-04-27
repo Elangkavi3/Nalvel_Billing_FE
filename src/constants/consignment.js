@@ -29,7 +29,7 @@ export const emptyConsignmentForm = {
   supplierRateType: 'fixed_cost',
   supplierAmount: '',
   advance: '',
-  advanceEntries: [{ id: 1, amount: '' }],
+  advanceEntries: [{ id: 1, amount: '', refNo: '' }],
   balance: '',
   ledgerAmount: '',
   customerRate: '',
@@ -52,6 +52,10 @@ export const paymentModeOptions = ['Bank Transfer', 'DD', 'Cheque', 'UPI', 'Cash
 export const supplierRateTypeOptions = [
   { label: 'Fixed Cost', value: 'fixed_cost' },
   { label: 'Cost per MT', value: 'cost_per_mt' },
+];
+export const PaymentTypeOptions = [
+  { label: 'Driver Payment', value: 'Driver_Payment' },
+  { label: 'Truck Owner', value: 'Truck_Owner' },
 ];
 export const numericConsignmentFields = new Set([
   'netWeight',

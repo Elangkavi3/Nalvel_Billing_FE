@@ -1,7 +1,7 @@
 import { AutocompleteField } from '../components/forms/AutocompleteField.jsx';
 import { Field } from '../components/forms/Field.jsx';
 import { SelectField } from '../components/forms/SelectField.jsx';
-import { paymentModeOptions, paymentStatusOptions, supplierRateTypeOptions } from '../constants/consignment.js';
+import { paymentModeOptions, paymentStatusOptions, supplierRateTypeOptions, PaymentTypeOptions} from '../constants/consignment.js';
 
 export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, onUpdateField }) {
   return (
@@ -57,19 +57,25 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
               onChange={(value) => onUpdateField('loadingDate', value)}
             />
             <div className="field-row">
-            <AutocompleteField
-              label="Loading Location"
-              value={form.fromLocation}
-              suggestions={suggestions.from}
-              onChange={(value) => onUpdateField('fromLocation', value)}
-            />
-            <AutocompleteField
-              label="Delivery Location"
-              value={form.toLocation}
-              suggestions={suggestions.to}
-              onChange={(value) => onUpdateField('toLocation', value)}
-            />
-          </div>
+              <label className="field">
+                <span>Loading Location</span>
+                <textarea
+                  rows={4}
+                  autoComplete="off"
+                  value={form.fromLocation}
+                  onChange={(event) => onUpdateField('fromLocation', event.target.value)}
+                />
+              </label>
+              <label className="field">
+                <span>Delivery Location</span>
+                <textarea
+                  rows={4}
+                  autoComplete="off"
+                  value={form.toLocation}
+                  onChange={(event) => onUpdateField('toLocation', event.target.value)}
+                />
+              </label>
+            </div>
           </div>
           <div className="field-row">
              <AutocompleteField
@@ -108,16 +114,17 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
               value={form.netWeight}
               onChange={(value) => onUpdateField('netWeight', value)}
             />
-           
-            <Field
-              label="Material Description"
-              type="text"
+             <label className="field">
+            <span>Material Description</span>
+            <textarea
+              rows={4}
+              autoComplete="off"
               value={form.material}
-              onChange={(value) => onUpdateField('material', value)}
+              onChange={(event) => onUpdateField('material', event.target.value)}
             />
-           
-           
+          </label>
           </div>
+         
         </fieldset>
 
         <fieldset className="form-section form-section-half">
@@ -230,20 +237,37 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
             <Field
               label="Commission"
               type="number"
-              value={form.advance}
-              onChange={(value) => onUpdateField('advance', value)}
+              value={form.Commission}
+              onChange={(value) => onUpdateField('Commission', value)}
             />
-            <Field label="Net Payment Balance" type="number" value={form.balance} onChange={(value) => onUpdateField('balance', value)} />
+            <Field label="Net Payment Balance" type="number" value={form.netBalance} onChange={(value) => onUpdateField('netBalance', value)} />
           </div>
           <AdvanceEntriesField entries={form.advanceEntries} onChange={(nextEntries) => onUpdateField('advanceEntries', nextEntries)} />
-         
+           <div className="field-row">
+            
+            <Field
+              label="Total Advance"
+              type="number"
+              value={form.totalAdvance}
+              onChange={(value) => onUpdateField('totalAdvance', value)}
+            />
+            <Field label="Balance" type="number" value={form.balance} onChange={(value) => onUpdateField('balance', value)} />
+          </div>
+             <div className="field-row">
           <SelectField
-            label="Supplier Payment Status"
-            value={form.paymentStatus}
-            options={paymentStatusOptions}
+              label="Payment Type Options"
+              value={form.paymentType}
+              options={PaymentTypeOptions}
+              onChange={(value) => onUpdateField('paymentType', value)}
+            />
+         <SelectField
+            label="Truck Pay Mode"
+            value={form.paymentMode}
+            options={paymentModeOptions}
             required
-            onChange={(value) => onUpdateField('paymentStatus', value)}
+            onChange={(value) => onUpdateField('paymentMode', value)}
           />
+          </div>
         </fieldset>
 
         <fieldset className="form-section form-section-third">
@@ -264,7 +288,7 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
             </div>
           )}
           <Field
-            label="Booking to Customer"
+            label="Freight Booking Cost"
             type="number"
             value={form.customerRate}
             onChange={(value) => onUpdateField('customerRate', value)}
@@ -277,7 +301,7 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
               onChange={(value) => onUpdateField('additionalCharges', value)}
             />
             <Field
-              label="Additional Expense"
+              label="Total Expense"
               type="number"
               value={form.expenses}
               onChange={(value) => onUpdateField('expenses', value)}
@@ -315,7 +339,7 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
         <fieldset className="form-section form-section-third">
           <legend>Extra</legend>
           <SelectField
-            label="Payment Mode"
+            label="Customer Payment Mode"
             value={form.paymentMode}
             options={paymentModeOptions}
             required
@@ -355,15 +379,15 @@ function RadioGroup({ label, name, value, options, onChange, required = false })
 }
 
 function AdvanceEntriesField({ entries, onChange }) {
-  const rows = Array.isArray(entries) && entries.length > 0 ? entries : [{ id: 1, amount: '' }];
+  const rows = Array.isArray(entries) && entries.length > 0 ? entries : [{ id: 1, amount: '', refNo: '' }];
 
-  function updateEntry(index, amount) {
-    const nextEntries = rows.map((entry, entryIndex) => (entryIndex === index ? { ...entry, amount } : entry));
+  function updateEntry(index, key, value) {
+    const nextEntries = rows.map((entry, entryIndex) => (entryIndex === index ? { ...entry, [key]: value } : entry));
     onChange(nextEntries);
   }
 
   function addEntry() {
-    const nextEntries = [...rows, { id: rows.length + 1, amount: '' }];
+    const nextEntries = [...rows, { id: rows.length + 1, amount: '', refNo: '' }];
     onChange(nextEntries);
   }
 
@@ -378,9 +402,13 @@ function AdvanceEntriesField({ entries, onChange }) {
               min="0"
               step="1"
               inputMode="numeric"
-              value={entry.amount}
-              onChange={(event) => updateEntry(index, event.target.value)}
+              value={entry.amount ?? ''}
+              onChange={(event) => updateEntry(index, 'amount', event.target.value)}
             />
+          </label>
+          <label className="field advance-entry-field">
+            <span>Ref No {index + 1}</span>
+            <input type="text" value={entry.refNo ?? ''} onChange={(event) => updateEntry(index, 'refNo', event.target.value)} />
           </label>
           {index === rows.length - 1 && (
             <button type="button" className="advance-add-btn" onClick={addEntry} aria-label="Add advance row">

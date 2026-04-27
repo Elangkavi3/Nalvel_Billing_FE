@@ -49,10 +49,11 @@ function normalizeAdvanceEntries(item) {
     return source.map((entry, index) => ({
       id: entry.id ?? index + 1,
       amount: entry.amount ?? '',
+      refNo: entry.refNo ?? '',
     }));
   }
 
-  return [{ id: 1, amount: item?.advance ?? '' }];
+  return [{ id: 1, amount: item?.advance ?? '', refNo: '' }];
 }
 
 function applyDateFilter(items, filter) {
