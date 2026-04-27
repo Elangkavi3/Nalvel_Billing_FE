@@ -128,17 +128,18 @@ export function BillingViewPage({ item, onBack, onEdit, onHome }) {
             </article>
 
             <article className="bill-card bill-card-half">
-              <SectionTitle icon="R" title="Driver" />
-              <div className="bill-route-pill">
-                <span>{item.fromLocation || '-'}</span>
-                <span className="arrow">&rarr;</span>
-                <span>{item.toLocation || '-'}</span>
-              </div>
-              <Field label="Driver Name" value={item.driverName} />
-              <div className="bill-field-row">
-                <Field label="Primary Contact" value={item.driverPrimaryContact || '-'} mono />
-                <Field label="Alternate Contact" value={item.driverAlternateContact || '-'} mono />
-              </div>
+            <SectionTitle icon="R" title="Driver Info" />
+            <div className="bill-route-pill">
+              <span>{item.fromLocation || '-'}</span>
+              <span className="arrow">&rarr;</span>
+              <span>{item.toLocation || '-'}</span>
+            </div>
+            <Field label="Driver Name" value={item.driverName} />
+            <Field label="DL No." value={item.dlNo || '-'} mono />
+            <div className="bill-field-row">
+              <Field label="Primary Contact" value={item.driverPrimaryContact || '-'} mono />
+              <Field label="Alternate Contact" value={item.driverAlternateContact || '-'} mono />
+            </div>
             </article>
 
             <article className="bill-card">

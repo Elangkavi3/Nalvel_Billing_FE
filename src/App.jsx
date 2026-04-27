@@ -43,6 +43,18 @@ function getEndOfWeek(date) {
   return end;
 }
 
+function normalizeAdvanceEntries(item) {
+  const source = Array.isArray(item?.advanceEntries) && item.advanceEntries.length > 0 ? item.advanceEntries : null;
+  if (source) {
+    return source.map((entry, index) => ({
+      id: entry.id ?? index + 1,
+      amount: entry.amount ?? '',
+    }));
+  }
+
+  return [{ id: 1, amount: item?.advance ?? '' }];
+}
+
 function applyDateFilter(items, filter) {
   if (!Array.isArray(items)) return [];
 
@@ -194,9 +206,9 @@ export function App() {
       tareWeight: item.tareWeight ?? '',
       actualWeight: item.actualWeight ?? '',
       crossVehicleWeight: item.crossVehicleWeight ?? '',
-      weight: item.weight ?? item.netWeight ?? '',
       supplierAmount: item.supplierAmount ?? '',
       advance: item.advance ?? '',
+      advanceEntries: normalizeAdvanceEntries(item),
       balance: item.balance ?? '',
       ledgerAmount: item.ledgerAmount ?? '',
       customerRate: item.customerRate ?? '',
@@ -208,14 +220,12 @@ export function App() {
       lrDate: toDateTimeLocal(item.lrDateTime),
       invoiceNo: item.invoiceNo ?? '',
       invoiceDate: toDateTimeLocal(item.invoiceDateTime),
+      paymentStatus: item.paymentStatus ?? '',
+      dlNo: item.dlNo ?? '',
       ownerPrimaryContact: item.ownerPrimaryContact ?? '',
-      ownerPrimaryWhatsappAvailable: Boolean(item.ownerPrimaryWhatsapp),
       ownerAlternateContact: item.ownerAlternateContact ?? '',
-      ownerAlternateWhatsappAvailable: Boolean(item.ownerAlternateWhatsapp),
       driverPrimaryContact: item.driverPrimaryContact ?? '',
-      driverPrimaryWhatsappAvailable: Boolean(item.driverPrimaryWhatsapp),
       driverAlternateContact: item.driverAlternateContact ?? '',
-      driverAlternateWhatsappAvailable: Boolean(item.driverAlternateWhatsapp),
     });
   }
 

@@ -14,8 +14,8 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
       </div>
 
       <div className="entry-layout">
-        <section className="form-section form-section-wide">
-          <h2>Basic Info</h2>
+        <fieldset className="form-section form-section-wide">
+          <legend>Basic Info</legend>
           <div className="field-row">
             <Field label="S.No" value={form.serialNo} onChange={(value) => onUpdateField('serialNo', value)} />
             <RadioGroup
@@ -80,10 +80,7 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
               label="Net Weight"
               type="number"
               value={form.netWeight}
-              onChange={(value) => {
-                onUpdateField('netWeight', value);
-                onUpdateField('weight', value);
-              }}
+              onChange={(value) => onUpdateField('netWeight', value)}
             />
             <Field
               label="Tare Weight"
@@ -104,10 +101,10 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
               onChange={(value) => onUpdateField('crossVehicleWeight', value)}
             />
           </div>
-        </section>
+        </fieldset>
 
-        <section className="form-section">
-          <h2>Vehicle Info</h2>
+        <fieldset className="form-section form-section-half">
+          <legend>Vehicle Info</legend>
           <div className="field-row">
             <AutocompleteField
               label="Truck No"
@@ -142,16 +139,19 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
               onChange={(value) => onUpdateField('ownerAlternateContact', value)}
             />
           </div>
-        </section>
+        </fieldset>
 
-        <section className="form-section">
-          <h2>Driver</h2>
-          <AutocompleteField
-            label="Driver Name"
-            value={form.driverName}
-            suggestions={suggestions.driver}
-            onChange={(value) => onUpdateField('driverName', value)}
-          />
+        <fieldset className="form-section form-section-half">
+          <legend>Driver Info</legend>
+          <div className="field-row">
+            <AutocompleteField
+              label="Driver Name"
+              value={form.driverName}
+              suggestions={suggestions.driver}
+              onChange={(value) => onUpdateField('driverName', value)}
+            />
+            <Field label="DL No." value={form.dlNo} onChange={(value) => onUpdateField('dlNo', value)} />
+          </div>
           <div className="field-row">
             <AutocompleteField
               label="Driver Primary Contact"
@@ -180,10 +180,10 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
               onChange={(value) => onUpdateField('toLocation', value)}
             />
           </div>
-        </section>
+        </fieldset>
 
-        <section className="form-section">
-          <h2>Supplier Billing</h2>
+        <fieldset className="form-section form-section-third">
+          <legend>Supplier Billing</legend>
           <Field
             label="Freight Amount to Truck Owner / Supplier"
             type="number"
@@ -192,13 +192,14 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
           />
           <div className="field-row">
             <Field
-              label="Advance to Supplier"
+              label="Advance Total"
               type="number"
               value={form.advance}
               onChange={(value) => onUpdateField('advance', value)}
             />
             <Field label="Balance" type="number" value={form.balance} onChange={(value) => onUpdateField('balance', value)} />
           </div>
+          <AdvanceEntriesField entries={form.advanceEntries} onChange={(nextEntries) => onUpdateField('advanceEntries', nextEntries)} />
           <Field
             label="Ledger Amount"
             type="number"
@@ -212,10 +213,10 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
             required
             onChange={(value) => onUpdateField('paymentStatus', value)}
           />
-        </section>
+        </fieldset>
 
-        <section className="form-section">
-          <h2>Our Rate & Profit</h2>
+        <fieldset className="form-section form-section-third">
+          <legend>Our Rate & Profit</legend>
           {form.viewMode === 'GST' && (
             <div className="inline-option-block">
               <RadioGroup
@@ -278,10 +279,10 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
               onChange={(value) => onUpdateField('invoiceDate', value)}
             />
           </div>
-        </section>
+        </fieldset>
 
-        <section className="form-section">
-          <h2>Extra</h2>
+        <fieldset className="form-section form-section-third">
+          <legend>Extra</legend>
           <SelectField
             label="Payment Mode"
             value={form.paymentMode}
@@ -293,7 +294,7 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
             <span>Remarks / Notes</span>
             <textarea autoComplete="off" value={form.remarks} onChange={(event) => onUpdateField('remarks', event.target.value)} />
           </label>
-        </section>
+        </fieldset>
       </div>
     </form>
   );
@@ -319,5 +320,44 @@ function RadioGroup({ label, name, value, options, onChange, required = false })
         ))}
       </div>
     </fieldset>
+  );
+}
+
+function AdvanceEntriesField({ entries, onChange }) {
+  const rows = Array.isArray(entries) && entries.length > 0 ? entries : [{ id: 1, amount: '' }];
+
+  function updateEntry(index, amount) {
+    const nextEntries = rows.map((entry, entryIndex) => (entryIndex === index ? { ...entry, amount } : entry));
+    onChange(nextEntries);
+  }
+
+  function addEntry() {
+    const nextEntries = [...rows, { id: rows.length + 1, amount: '' }];
+    onChange(nextEntries);
+  }
+
+  return (
+    <div className="advance-list">
+      {rows.map((entry, index) => (
+        <div key={entry.id ?? index} className="advance-row">
+          <label className="field advance-entry-field">
+            <span>Advance {index + 1}</span>
+            <input
+              type="number"
+              min="0"
+              step="1"
+              inputMode="numeric"
+              value={entry.amount}
+              onChange={(event) => updateEntry(index, event.target.value)}
+            />
+          </label>
+          {index === rows.length - 1 && (
+            <button type="button" className="advance-add-btn" onClick={addEntry} aria-label="Add advance row">
+              +
+            </button>
+          )}
+        </div>
+      ))}
+    </div>
   );
 }

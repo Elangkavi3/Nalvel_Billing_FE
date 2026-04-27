@@ -1,4 +1,4 @@
-export function Field({ label, value, onChange, type = 'text', required = false }) {
+export function Field({ label, value, onChange = () => {}, type = 'text', required = false, readOnly = false }) {
   return (
     <label className="field">
       <span>{label}</span>
@@ -7,6 +7,8 @@ export function Field({ label, value, onChange, type = 'text', required = false 
         value={value}
         required={required}
         autoComplete="off"
+        readOnly={readOnly}
+        className={readOnly ? 'readonly' : undefined}
         onChange={(event) => onChange(event.target.value)}
       />
     </label>

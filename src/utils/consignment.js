@@ -1,10 +1,53 @@
 import { numericConsignmentFields } from '../constants/consignment.js';
 import { toNumber } from './numbers.js';
 
+const allowedPayloadFields = new Set([
+  'serialNo',
+  'customerName',
+  'billTo',
+  'gstNo',
+  'imsNo',
+  'gstType',
+  'truckNo',
+  'truckType',
+  'ownerName',
+  'ownerPrimaryContact',
+  'ownerAlternateContact',
+  'driverName',
+  'dlNo',
+  'driverPrimaryContact',
+  'driverAlternateContact',
+  'fromLocation',
+  'toLocation',
+  'netWeight',
+  'tareWeight',
+  'actualWeight',
+  'crossVehicleWeight',
+  'supplierAmount',
+  'advance',
+  'balance',
+  'ledgerAmount',
+  'customerRate',
+  'additionalCharges',
+  'netFreight',
+  'expenses',
+  'profit',
+  'paymentStatus',
+  'paymentMode',
+  'remarks',
+  'lrNo',
+  'invoiceNo',
+  'ledgerDate',
+  'loadingDate',
+  'deliveryDateTime',
+  'lrDate',
+  'invoiceDate',
+]);
+
 export function buildConsignmentPayload(form) {
   const payload = Object.fromEntries(
     Object.entries(form)
-      .filter(([key]) => !['id', 'viewMode'].includes(key))
+      .filter(([key]) => allowedPayloadFields.has(key))
       .map(([key, value]) => [key, numericConsignmentFields.has(key) ? toNumber(value) : value]),
   );
 
@@ -14,27 +57,20 @@ export function buildConsignmentPayload(form) {
     deliveryDateTime,
     lrDate,
     invoiceDate,
-    ownerPrimaryWhatsappAvailable,
-    ownerAlternateWhatsappAvailable,
-    driverPrimaryWhatsappAvailable,
-    driverAlternateWhatsappAvailable,
+    gstNo,
+    imsNo,
     ...rest
   } = payload;
 
-  const normalizedNetWeight = rest.netWeight ?? rest.weight ?? null;
-
   return {
     ...rest,
-    weight: normalizedNetWeight,
+    gstNo: gstNo ?? '',
+    imsNo: imsNo ?? '',
     ledgerDateTime: ledgerDate || null,
     loadingDateTime: loadingDate || null,
     deliveryDateTime: deliveryDateTime || null,
     lrDateTime: lrDate || null,
     invoiceDateTime: invoiceDate || null,
-    ownerPrimaryWhatsapp: ownerPrimaryWhatsappAvailable,
-    ownerAlternateWhatsapp: ownerAlternateWhatsappAvailable,
-    driverPrimaryWhatsapp: driverPrimaryWhatsappAvailable,
-    driverAlternateWhatsapp: driverAlternateWhatsappAvailable,
   };
 }
 

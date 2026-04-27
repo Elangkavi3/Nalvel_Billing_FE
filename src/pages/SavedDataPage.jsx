@@ -98,7 +98,7 @@ export function SavedDataPage({
               <th>Customer</th>
               <th>Route</th>
               <th>Truck</th>
-              <th>Driver</th>
+              <th>Driver Info</th>
               <th>Supplier</th>
               <th>Customer Bill</th>
               <th>Profit</th>
@@ -121,6 +121,7 @@ export function SavedDataPage({
                   <td>{item.truckNo}</td>
                   <td>
                     <strong>{item.driverName || '-'}</strong>
+                    <span>{item.dlNo || '-'}</span>
                     <span>{item.driverPrimaryContact || item.driverAlternateContact || '-'}</span>
                   </td>
                   <td>{money(item.supplierAmount)}</td>
