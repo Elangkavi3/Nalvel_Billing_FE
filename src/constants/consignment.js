@@ -25,7 +25,8 @@ export const emptyConsignmentForm = {
   netWeight: '',
   tareWeight: '',
   actualWeight: '',
-  crossVehicleWeight: '',
+  grossWeight: '',
+  supplierRateType: 'fixed_cost',
   supplierAmount: '',
   advance: '',
   advanceEntries: [{ id: 1, amount: '' }],
@@ -48,11 +49,15 @@ export const emptyConsignmentForm = {
 export const truckTypeOptions = ['32 ft SXL', 'Mini', '17ft', '20ft', 'Trailer'];
 export const paymentStatusOptions = ['Advance 1', 'Advance 2', 'Advance 3'];
 export const paymentModeOptions = ['Bank Transfer', 'DD', 'Cheque', 'UPI', 'Cash'];
+export const supplierRateTypeOptions = [
+  { label: 'Fixed Cost', value: 'fixed_cost' },
+  { label: 'Cost per MT', value: 'cost_per_mt' },
+];
 export const numericConsignmentFields = new Set([
   'netWeight',
   'tareWeight',
   'actualWeight',
-  'crossVehicleWeight',
+  'grossWeight',
   'supplierAmount',
   'advance',
   'balance',

@@ -1,7 +1,7 @@
 import { AutocompleteField } from '../components/forms/AutocompleteField.jsx';
 import { Field } from '../components/forms/Field.jsx';
 import { SelectField } from '../components/forms/SelectField.jsx';
-import { paymentModeOptions, paymentStatusOptions } from '../constants/consignment.js';
+import { paymentModeOptions, paymentStatusOptions, supplierRateTypeOptions } from '../constants/consignment.js';
 
 export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, onUpdateField }) {
   return (
@@ -18,12 +18,11 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
           <legend>Basic Info</legend>
           <div className="field-row">
             <Field label="S.No" value={form.serialNo} onChange={(value) => onUpdateField('serialNo', value)} />
-            <RadioGroup
-              label="Entry Type"
-              name="viewMode"
+            <SelectField
+              label="Billing Type"
               value={form.viewMode}
               options={[
-                { label: 'GST No', value: 'GST' },
+                { label: 'GST Invoice', value: 'GST' },
                 { label: 'IMS No', value: 'IMS' },
               ]}
               onChange={(value) => onUpdateField('viewMode', value)}
@@ -32,21 +31,21 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
           </div>
           <div className="field-row">
             {form.viewMode === 'GST' ? (
-              <Field label="GST No" value={form.gstNo} onChange={(value) => onUpdateField('gstNo', value)} />
+              <GstNumberField value={form.gstNo} onChange={(value) => onUpdateField('gstNo', value)} />
             ) : (
               <Field label="IMS No" value={form.imsNo} onChange={(value) => onUpdateField('imsNo', value)} />
             )}
           </div>
           <div className="field-row">
             <AutocompleteField
-            label="Biiling Customer Name"
+            label="Booking Customer Name"
             value={form.customerName}
             suggestions={suggestions.customer}
             onChange={(value) => onUpdateField('customerName', value)}
             required
           />
             <Field
-              label="Billing Date & Time"
+              label="Booking Date & Time"
               type="datetime-local"
               value={form.ledgerDate}
               onChange={(value) => onUpdateField('ledgerDate', value)}
@@ -57,10 +56,24 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
               value={form.loadingDate}
               onChange={(value) => onUpdateField('loadingDate', value)}
             />
+            <div className="field-row">
+            <AutocompleteField
+              label="Loading Location"
+              value={form.fromLocation}
+              suggestions={suggestions.from}
+              onChange={(value) => onUpdateField('fromLocation', value)}
+            />
+            <AutocompleteField
+              label="Delivery Location"
+              value={form.toLocation}
+              suggestions={suggestions.to}
+              onChange={(value) => onUpdateField('toLocation', value)}
+            />
+          </div>
           </div>
           <div className="field-row">
              <AutocompleteField
-              label="Bill To / Delivery Customer"
+              label="Customer to be billed"
               value={form.billTo}
               suggestions={suggestions.billTo}
               onChange={(value) => onUpdateField('billTo', value)}
@@ -76,30 +89,34 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
           </div>
          
           <div className="field-grid-4">
+             <Field
+              label="Gross Weight"
+              type="number"
+              value={form.grossWeight}
+              onChange={(value) => onUpdateField('grossWeight', value)}
+            />
+               <Field
+              label="Tare Weight"
+              type="number"
+              value={form.tareWeight}
+              onChange={(value) => onUpdateField('tareWeight', value)}
+            />
+
             <Field
               label="Net Weight"
               type="number"
               value={form.netWeight}
               onChange={(value) => onUpdateField('netWeight', value)}
             />
+           
             <Field
-              label="Tare Weight"
-              type="number"
-              value={form.tareWeight}
-              onChange={(value) => onUpdateField('tareWeight', value)}
+              label="Material Description"
+              type="text"
+              value={form.material}
+              onChange={(value) => onUpdateField('material', value)}
             />
-            <Field
-              label="Actual Weight"
-              type="number"
-              value={form.actualWeight}
-              onChange={(value) => onUpdateField('actualWeight', value)}
-            />
-            <Field
-              label="Cross Vehicle Weight"
-              type="number"
-              value={form.crossVehicleWeight}
-              onChange={(value) => onUpdateField('crossVehicleWeight', value)}
-            />
+           
+           
           </div>
         </fieldset>
 
@@ -166,46 +183,60 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
               onChange={(value) => onUpdateField('driverAlternateContact', value)}
             />
           </div>
-          <div className="field-row">
-            <AutocompleteField
-              label="From Location"
-              value={form.fromLocation}
-              suggestions={suggestions.from}
-              onChange={(value) => onUpdateField('fromLocation', value)}
-            />
-            <AutocompleteField
-              label="To Location"
-              value={form.toLocation}
-              suggestions={suggestions.to}
-              onChange={(value) => onUpdateField('toLocation', value)}
-            />
-          </div>
+          
         </fieldset>
 
         <fieldset className="form-section form-section-third">
           <legend>Supplier Billing</legend>
-          <Field
-            label="Freight Amount to Truck Owner / Supplier"
-            type="number"
-            value={form.supplierAmount}
-            onChange={(value) => onUpdateField('supplierAmount', value)}
-          />
-          <div className="field-row">
-            <Field
-              label="Advance Total"
-              type="number"
-              value={form.advance}
-              onChange={(value) => onUpdateField('advance', value)}
+           <SelectField
+              label="Freight Amount Type"
+              value={form.supplierRateType}
+              options={supplierRateTypeOptions}
+              onChange={(value) => onUpdateField('supplierRateType', value)}
             />
-            <Field label="Balance" type="number" value={form.balance} onChange={(value) => onUpdateField('balance', value)} />
+          <div className="field-row">
+           
+            <Field
+              label={form.supplierRateType === 'cost_per_mt' ? 'Cost per MT' : 'Fixed Cost'}
+              type="number"
+              value={form.supplierAmount}
+              onChange={(value) => onUpdateField('supplierAmount', value)}
+            />
+            <Field
+              label="Chargeble Weight"
+              type="number"
+              value={form.chargebleWeight}
+              onChange={(value) => onUpdateField('chargebleWeight', value)}
+            />
           </div>
-          <AdvanceEntriesField entries={form.advanceEntries} onChange={(nextEntries) => onUpdateField('advanceEntries', nextEntries)} />
-          <Field
-            label="Ledger Amount"
+             <div className="field-row">
+
+             <Field
+            label="Payable Amount"
             type="number"
             value={form.ledgerAmount}
             onChange={(value) => onUpdateField('ledgerAmount', value)}
           />
+           <Field
+            label="Halting Charge"
+            type="number"
+            value={form.haltingCharge}
+            onChange={(value) => onUpdateField('haltingCharge', value)}
+          />
+
+        </div>
+          <div className="field-row">
+            
+            <Field
+              label="Commission"
+              type="number"
+              value={form.advance}
+              onChange={(value) => onUpdateField('advance', value)}
+            />
+            <Field label="Net Payment Balance" type="number" value={form.balance} onChange={(value) => onUpdateField('balance', value)} />
+          </div>
+          <AdvanceEntriesField entries={form.advanceEntries} onChange={(nextEntries) => onUpdateField('advanceEntries', nextEntries)} />
+         
           <SelectField
             label="Supplier Payment Status"
             value={form.paymentStatus}
@@ -233,7 +264,7 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
             </div>
           )}
           <Field
-            label="Billing to Customer"
+            label="Booking to Customer"
             type="number"
             value={form.customerRate}
             onChange={(value) => onUpdateField('customerRate', value)}
@@ -271,7 +302,7 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
             />
           </div>
           <div className="field-row">
-            <Field label="Invoice No." value={form.invoiceNo} onChange={(value) => onUpdateField('invoiceNo', value)} />
+            <Field label="Customer Invoice No." value={form.invoiceNo} onChange={(value) => onUpdateField('invoiceNo', value)} />
             <Field
               label="Invoice Date & Time"
               type="datetime-local"
@@ -359,5 +390,31 @@ function AdvanceEntriesField({ entries, onChange }) {
         </div>
       ))}
     </div>
+  );
+}
+
+function GstNumberField({ value, onChange }) {
+  const prefix = 'Nalvel-';
+  const digits = String(value || '').startsWith(prefix) ? String(value).slice(prefix.length) : String(value || '');
+
+  function handleChange(nextValue) {
+    const nextDigits = String(nextValue || '').replace(/\D/g, '');
+    onChange(nextDigits ? `${prefix}${nextDigits}` : '');
+  }
+
+  return (
+    <label className="field gst-no-field">
+      <span>GST Invoice</span>
+      <div className="gst-no-control">
+        <span className="gst-no-prefix">{prefix}</span>
+        <input
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          value={digits}
+          onChange={(event) => handleChange(event.target.value)}
+        />
+      </div>
+    </label>
   );
 }

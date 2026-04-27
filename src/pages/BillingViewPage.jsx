@@ -38,7 +38,8 @@ export function BillingViewPage({ item, onBack, onEdit, onHome }) {
   const netWeight = item.netWeight ?? item.weight ?? '-';
   const tareWeight = item.tareWeight ?? '-';
   const actualWeight = item.actualWeight ?? '-';
-  const crossVehicleWeight = item.crossVehicleWeight ?? '-';
+  const grossWeight = item.grossWeight ?? item.crossVehicleWeight ?? '-';
+  const supplierRateLabel = item.supplierRateType === 'cost_per_mt' ? 'Cost per MT' : 'Fixed Cost';
 
   return (
     <section className="bill-view-shell">
@@ -108,7 +109,7 @@ export function BillingViewPage({ item, onBack, onEdit, onHome }) {
                 <Field label="Net Weight" value={netWeight} />
                 <Field label="Tare Weight" value={tareWeight} />
                 <Field label="Actual Weight" value={actualWeight} />
-                <Field label="Cross Vehicle Weight" value={crossVehicleWeight} />
+                <Field label="Gross Weight" value={grossWeight} />
               </div>
               <div className="bill-field-row">
                 <Field label="LR Date" value={formatDateTime(item.lrDateTime)} mono />
@@ -144,7 +145,7 @@ export function BillingViewPage({ item, onBack, onEdit, onHome }) {
 
             <article className="bill-card">
               <SectionTitle icon="S" title="Supplier Billing" />
-              <Field label="Freight to Truck Owner / Supplier" value={money(item.supplierAmount)} amount />
+              <Field label={supplierRateLabel} value={money(item.supplierAmount)} amount />
               <Field label="Advance to Supplier" value={money(item.advance)} amount />
               <Field
                 label="Supplier Payment Status"

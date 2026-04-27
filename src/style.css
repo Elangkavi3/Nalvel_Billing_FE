@@ -462,6 +462,39 @@ h2 {
   resize: vertical;
 }
 
+.gst-no-field {
+  min-width: 0;
+}
+
+.gst-no-control {
+  position: relative;
+  display: grid;
+  width: 100%;
+  align-items: center;
+}
+
+.gst-no-prefix {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding-right: 8px;
+  border-right: 1px solid #bdd2dd;
+  background: transparent;
+  color: var(--accent-dark);
+  font-size: 14px;
+  font-weight: 800;
+  pointer-events: none;
+}
+
+.gst-no-control input {
+  width: 100%;
+  padding-left: 82px;
+}
+
 .advance-list {
   display: grid;
   gap: 10px;
