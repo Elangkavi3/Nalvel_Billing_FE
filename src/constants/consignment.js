@@ -6,7 +6,6 @@ export const emptyConsignmentForm = {
   gstNo: '',
   imsNo: '',
   serialNo: '',
-  subSerialNo: '',
   ledgerDate: '',
   loadingDate: '',
   deliveryDateTime: '',
@@ -26,6 +25,10 @@ export const emptyConsignmentForm = {
   driverAlternateWhatsappAvailable: false,
   fromLocation: '',
   toLocation: '',
+  netWeight: '',
+  tareWeight: '',
+  actualWeight: '',
+  crossVehicleWeight: '',
   weight: '',
   supplierAmount: '',
   advance: '',
@@ -46,9 +49,13 @@ export const emptyConsignmentForm = {
 };
 
 export const truckTypeOptions = ['32 ft SXL', 'Mini', '17ft', '20ft', 'Trailer'];
-export const paymentStatusOptions = ['Pending', 'Partial', 'Paid'];
+export const paymentStatusOptions = ['Advance 1', 'Advance 2', 'Advance 3'];
 export const paymentModeOptions = ['Bank Transfer', 'DD', 'Cheque', 'UPI', 'Cash'];
 export const numericConsignmentFields = new Set([
+  'netWeight',
+  'tareWeight',
+  'actualWeight',
+  'crossVehicleWeight',
   'weight',
   'supplierAmount',
   'advance',

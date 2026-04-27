@@ -21,8 +21,11 @@ export function buildConsignmentPayload(form) {
     ...rest
   } = payload;
 
+  const normalizedNetWeight = rest.netWeight ?? rest.weight ?? null;
+
   return {
     ...rest,
+    weight: normalizedNetWeight,
     ledgerDateTime: ledgerDate || null,
     loadingDateTime: loadingDate || null,
     deliveryDateTime: deliveryDateTime || null,

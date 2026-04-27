@@ -95,7 +95,6 @@ export function SavedDataPage({
           <thead>
             <tr>
               <th>S.No</th>
-              <th>Sub S.No</th>
               <th>Customer</th>
               <th>Route</th>
               <th>Truck</th>
@@ -112,7 +111,6 @@ export function SavedDataPage({
               pagedItems.map((item) => (
                 <tr key={item.id}>
                   <td>{item.serialNo || item.id}</td>
-                  <td>{item.subSerialNo || '-'}</td>
                   <td>
                     <strong>{item.customerName}</strong>
                     <span>{item.billTo}</span>
@@ -144,7 +142,7 @@ export function SavedDataPage({
               ))
             ) : (
               <tr>
-                <td colSpan="11" className="empty-cell">
+                <td colSpan="10" className="empty-cell">
                   No records from backend for the current filter/search.
                 </td>
               </tr>

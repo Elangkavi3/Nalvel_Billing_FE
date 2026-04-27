@@ -13,53 +13,100 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
         </button>
       </div>
 
-      <div className="grid3">
-        <section className="form-section">
+      <div className="entry-layout">
+        <section className="form-section form-section-wide">
           <h2>Basic Info</h2>
           <div className="field-row">
             <Field label="S.No" value={form.serialNo} onChange={(value) => onUpdateField('serialNo', value)} />
-            <Field
-              label="Sub S.No"
-              value={form.subSerialNo}
-              onChange={(value) => onUpdateField('subSerialNo', value)}
+            <RadioGroup
+              label="Entry Type"
+              name="viewMode"
+              value={form.viewMode}
+              options={[
+                { label: 'GST No', value: 'GST' },
+                { label: 'IMS No', value: 'IMS' },
+              ]}
+              onChange={(value) => onUpdateField('viewMode', value)}
+              required
             />
           </div>
-          <Field label="GST No" value={form.gstNo} onChange={(value) => onUpdateField('gstNo', value)} />
-          <Field label="IMS No" value={form.imsNo} onChange={(value) => onUpdateField('imsNo', value)} />
           <div className="field-row">
-            <Field
-              label="Ledger Date & Time"
-              type="datetime-local"
-              value={form.ledgerDate}
-              onChange={(value) => onUpdateField('ledgerDate', value)}
-            />
+            {form.viewMode === 'GST' ? (
+              <Field label="GST No" value={form.gstNo} onChange={(value) => onUpdateField('gstNo', value)} />
+            ) : (
+              <Field label="IMS No" value={form.imsNo} onChange={(value) => onUpdateField('imsNo', value)} />
+            )}
           </div>
-          <AutocompleteField
-            label="Customer Name"
+          <div className="field-row">
+            <AutocompleteField
+            label="Biiling Customer Name"
             value={form.customerName}
             suggestions={suggestions.customer}
             onChange={(value) => onUpdateField('customerName', value)}
             required
           />
-          <Field
-            label="Loading Date & Time"
-            type="datetime-local"
-            value={form.loadingDate}
-            onChange={(value) => onUpdateField('loadingDate', value)}
-          />
-          <Field
-            label="Delivery Date & Time"
-            type="datetime-local"
-            value={form.deliveryDateTime}
-            onChange={(value) => onUpdateField('deliveryDateTime', value)}
-          />
-          <AutocompleteField
-            label="Bill To / Delivery Customer"
-            value={form.billTo}
-            suggestions={suggestions.billTo}
-            onChange={(value) => onUpdateField('billTo', value)}
-          />
+            <Field
+              label="Billing Date & Time"
+              type="datetime-local"
+              value={form.ledgerDate}
+              onChange={(value) => onUpdateField('ledgerDate', value)}
+            />
+            <Field
+              label="Loading Date & Time"
+              type="datetime-local"
+              value={form.loadingDate}
+              onChange={(value) => onUpdateField('loadingDate', value)}
+            />
+          </div>
+          <div className="field-row">
+             <AutocompleteField
+              label="Bill To / Delivery Customer"
+              value={form.billTo}
+              suggestions={suggestions.billTo}
+              onChange={(value) => onUpdateField('billTo', value)}
+            />
+            <Field
+              label="Delivery Date & Time"
+              type="datetime-local"
+              value={form.deliveryDateTime}
+              onChange={(value) => onUpdateField('deliveryDateTime', value)}
+            />
+             
+           
+          </div>
+         
+          <div className="field-grid-4">
+            <Field
+              label="Net Weight"
+              type="number"
+              value={form.netWeight}
+              onChange={(value) => {
+                onUpdateField('netWeight', value);
+                onUpdateField('weight', value);
+              }}
+            />
+            <Field
+              label="Tare Weight"
+              type="number"
+              value={form.tareWeight}
+              onChange={(value) => onUpdateField('tareWeight', value)}
+            />
+            <Field
+              label="Actual Weight"
+              type="number"
+              value={form.actualWeight}
+              onChange={(value) => onUpdateField('actualWeight', value)}
+            />
+            <Field
+              label="Cross Vehicle Weight"
+              type="number"
+              value={form.crossVehicleWeight}
+              onChange={(value) => onUpdateField('crossVehicleWeight', value)}
+            />
+          </div>
+        </section>
 
+        <section className="form-section">
           <h2>Vehicle Info</h2>
           <div className="field-row">
             <AutocompleteField
@@ -82,35 +129,23 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
             onChange={(value) => onUpdateField('ownerName', value)}
           />
           <div className="field-row">
-            <div>
-              <AutocompleteField
-                label="Owner Primary Contact"
-                value={form.ownerPrimaryContact}
-                suggestions={suggestions.ownerPrimaryContact}
-                onChange={(value) => onUpdateField('ownerPrimaryContact', value)}
-              />
-              <WhatsappCheck
-                checked={form.ownerPrimaryWhatsappAvailable}
-                onChange={(checked) => onUpdateField('ownerPrimaryWhatsappAvailable', checked)}
-              />
-            </div>
-            <div>
-              <AutocompleteField
-                label="Owner Alternate Contact"
-                value={form.ownerAlternateContact}
-                suggestions={suggestions.ownerAlternateContact}
-                onChange={(value) => onUpdateField('ownerAlternateContact', value)}
-              />
-              <WhatsappCheck
-                checked={form.ownerAlternateWhatsappAvailable}
-                onChange={(checked) => onUpdateField('ownerAlternateWhatsappAvailable', checked)}
-              />
-            </div>
+            <AutocompleteField
+              label="Owner Primary Contact"
+              value={form.ownerPrimaryContact}
+              suggestions={suggestions.ownerPrimaryContact}
+              onChange={(value) => onUpdateField('ownerPrimaryContact', value)}
+            />
+            <AutocompleteField
+              label="Owner Alternate Contact"
+              value={form.ownerAlternateContact}
+              suggestions={suggestions.ownerAlternateContact}
+              onChange={(value) => onUpdateField('ownerAlternateContact', value)}
+            />
           </div>
         </section>
 
         <section className="form-section">
-          <h2>Driver & Route</h2>
+          <h2>Driver</h2>
           <AutocompleteField
             label="Driver Name"
             value={form.driverName}
@@ -118,30 +153,18 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
             onChange={(value) => onUpdateField('driverName', value)}
           />
           <div className="field-row">
-            <div>
-              <AutocompleteField
-                label="Driver Primary Contact"
-                value={form.driverPrimaryContact}
-                suggestions={suggestions.driverPrimaryContact}
-                onChange={(value) => onUpdateField('driverPrimaryContact', value)}
-              />
-              <WhatsappCheck
-                checked={form.driverPrimaryWhatsappAvailable}
-                onChange={(checked) => onUpdateField('driverPrimaryWhatsappAvailable', checked)}
-              />
-            </div>
-            <div>
-              <AutocompleteField
-                label="Driver Alternate Contact"
-                value={form.driverAlternateContact}
-                suggestions={suggestions.driverAlternateContact}
-                onChange={(value) => onUpdateField('driverAlternateContact', value)}
-              />
-              <WhatsappCheck
-                checked={form.driverAlternateWhatsappAvailable}
-                onChange={(checked) => onUpdateField('driverAlternateWhatsappAvailable', checked)}
-              />
-            </div>
+            <AutocompleteField
+              label="Driver Primary Contact"
+              value={form.driverPrimaryContact}
+              suggestions={suggestions.driverPrimaryContact}
+              onChange={(value) => onUpdateField('driverPrimaryContact', value)}
+            />
+            <AutocompleteField
+              label="Driver Alternate Contact"
+              value={form.driverAlternateContact}
+              suggestions={suggestions.driverAlternateContact}
+              onChange={(value) => onUpdateField('driverAlternateContact', value)}
+            />
           </div>
           <div className="field-row">
             <AutocompleteField
@@ -157,8 +180,9 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
               onChange={(value) => onUpdateField('toLocation', value)}
             />
           </div>
-          <Field label="Weight (MT)" type="number" value={form.weight} onChange={(value) => onUpdateField('weight', value)} />
+        </section>
 
+        <section className="form-section">
           <h2>Supplier Billing</h2>
           <Field
             label="Freight Amount to Truck Owner / Supplier"
@@ -175,14 +199,19 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
             />
             <Field label="Balance" type="number" value={form.balance} onChange={(value) => onUpdateField('balance', value)} />
           </div>
-          <div className="field-row">
-            <Field
-              label="Ledger Amount"
-              type="number"
-              value={form.ledgerAmount}
-              onChange={(value) => onUpdateField('ledgerAmount', value)}
-            />
-          </div>
+          <Field
+            label="Ledger Amount"
+            type="number"
+            value={form.ledgerAmount}
+            onChange={(value) => onUpdateField('ledgerAmount', value)}
+          />
+          <SelectField
+            label="Supplier Payment Status"
+            value={form.paymentStatus}
+            options={paymentStatusOptions}
+            required
+            onChange={(value) => onUpdateField('paymentStatus', value)}
+          />
         </section>
 
         <section className="form-section">
@@ -208,25 +237,20 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
             value={form.customerRate}
             onChange={(value) => onUpdateField('customerRate', value)}
           />
-          <SelectField
-            label="Supplier Payment Status"
-            value={form.paymentStatus}
-            options={paymentStatusOptions}
-            required
-            onChange={(value) => onUpdateField('paymentStatus', value)}
-          />
-          <Field
-            label="Additional Charge Type"
-            type="number"
-            value={form.additionalCharges}
-            onChange={(value) => onUpdateField('additionalCharges', value)}
-          />
-          <Field
-            label="Additional Expense Type"
-            type="number"
-            value={form.expenses}
-            onChange={(value) => onUpdateField('expenses', value)}
-          />
+          <div className="field-row">
+            <Field
+              label="Additional Charge"
+              type="number"
+              value={form.additionalCharges}
+              onChange={(value) => onUpdateField('additionalCharges', value)}
+            />
+            <Field
+              label="Additional Expense"
+              type="number"
+              value={form.expenses}
+              onChange={(value) => onUpdateField('expenses', value)}
+            />
+          </div>
           <div className="field-row">
             <Field
               label="Net Freight"
@@ -254,7 +278,9 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
               onChange={(value) => onUpdateField('invoiceDate', value)}
             />
           </div>
+        </section>
 
+        <section className="form-section">
           <h2>Extra</h2>
           <SelectField
             label="Payment Mode"
@@ -265,24 +291,11 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
           />
           <label className="field">
             <span>Remarks / Notes</span>
-            <textarea
-              autoComplete="off"
-              value={form.remarks}
-              onChange={(event) => onUpdateField('remarks', event.target.value)}
-            />
+            <textarea autoComplete="off" value={form.remarks} onChange={(event) => onUpdateField('remarks', event.target.value)} />
           </label>
         </section>
       </div>
     </form>
-  );
-}
-
-function WhatsappCheck({ checked, onChange }) {
-  return (
-    <label className="whatsapp-check">
-      <input type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} />
-      <span>WhatsApp available</span>
-    </label>
   );
 }
 

@@ -139,7 +139,35 @@ export function App() {
   }, []);
 
   function updateField(field, value) {
-    setForm((current) => ({ ...current, [field]: value }));
+    setForm((current) => {
+      const nextForm = { ...current, [field]: value };
+
+      if (field === 'viewMode') {
+        if (value === 'GST') {
+          nextForm.imsNo = '';
+        } else if (value === 'IMS') {
+          nextForm.gstNo = '';
+          nextForm.gstType = '';
+        }
+      }
+
+      if (field === 'gstNo') {
+        if (value && value.toString().trim()) {
+          nextForm.viewMode = 'GST';
+          nextForm.imsNo = '';
+        }
+      }
+
+      if (field === 'imsNo') {
+        if (value && value.toString().trim()) {
+          nextForm.viewMode = 'IMS';
+          nextForm.gstNo = '';
+          nextForm.gstType = '';
+        }
+      }
+
+      return nextForm;
+    });
   }
 
   function clearForm() {
@@ -162,7 +190,11 @@ export function App() {
       ledgerDate: toDateTimeLocal(item.ledgerDateTime),
       loadingDate: toDateTimeLocal(item.loadingDateTime),
       deliveryDateTime: toDateTimeLocal(item.deliveryDateTime),
-      weight: item.weight ?? '',
+      netWeight: item.netWeight ?? item.weight ?? '',
+      tareWeight: item.tareWeight ?? '',
+      actualWeight: item.actualWeight ?? '',
+      crossVehicleWeight: item.crossVehicleWeight ?? '',
+      weight: item.weight ?? item.netWeight ?? '',
       supplierAmount: item.supplierAmount ?? '',
       advance: item.advance ?? '',
       balance: item.balance ?? '',
@@ -176,7 +208,6 @@ export function App() {
       lrDate: toDateTimeLocal(item.lrDateTime),
       invoiceNo: item.invoiceNo ?? '',
       invoiceDate: toDateTimeLocal(item.invoiceDateTime),
-      subSerialNo: item.subSerialNo ?? '',
       ownerPrimaryContact: item.ownerPrimaryContact ?? '',
       ownerPrimaryWhatsappAvailable: Boolean(item.ownerPrimaryWhatsapp),
       ownerAlternateContact: item.ownerAlternateContact ?? '',
