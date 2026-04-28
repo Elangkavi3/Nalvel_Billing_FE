@@ -45,10 +45,10 @@ export function MasterPage({ items = [], filter, onFilterChange, onNavigate }) {
           <strong>Search, edit, delete, and review consignments</strong>
         </button>
 
-        <button type="button" className="home-action">
-          <small>Billing</small>
-          <span>Invoice Generate</span>
-          <strong>Create and export customer invoices</strong>
+        <button type="button" className="home-action" onClick={() => onNavigate('lr')}>
+          <small>Logistics</small>
+          <span>LR Generation</span>
+          <strong>Create loading receipt from saved data</strong>
         </button>
       </div>
 

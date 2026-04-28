@@ -5,6 +5,7 @@ import { emptyConsignmentForm, PAGE_SIZE } from './constants/consignment.js';
 import { MasterPage } from './pages/MasterPage.jsx';
 import { BillingViewPage } from './pages/BillingViewPage.jsx';
 import { EntryFormPage } from './pages/EntryFormPage.jsx';
+import { LRGenerationPage } from './pages/LRGenerationPage.jsx';
 import { SavedDataPage } from './pages/SavedDataPage.jsx';
 import {
   deleteConsignment,
@@ -424,6 +425,14 @@ export function App() {
           onSearch={searchByCustomer}
           onSearchNameChange={setSearchName}
           onSetPage={setCurrentPage}
+        />
+      )}
+
+      {activePage === 'lr' && (
+        <LRGenerationPage
+          items={allItems}
+          onBack={() => setActivePage('home')}
+          onSaved={setMessage}
         />
       )}
 
