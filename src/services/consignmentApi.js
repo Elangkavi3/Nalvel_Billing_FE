@@ -1,18 +1,20 @@
 import { request } from './http.js';
 import { consignmentEndpoints } from './endpoints.js';
+import { normalizeConsignment, normalizeConsignments } from '../utils/consignment.js';
 
 export async function getAllConsignments() {
   const data = await request(consignmentEndpoints.readAll());
-  return Array.isArray(data) ? data : [];
+  return normalizeConsignments(data);
 }
 
-export function getConsignmentById(id) {
-  return request(consignmentEndpoints.readById(id));
+export async function getConsignmentById(id) {
+  const data = await request(consignmentEndpoints.readById(id));
+  return normalizeConsignment(data);
 }
 
 export async function searchConsignmentsByCustomer(name) {
   const data = await request(consignmentEndpoints.readByCustomer(name));
-  return Array.isArray(data) ? data : [];
+  return normalizeConsignments(data);
 }
 
 export function saveConsignment(payload) {

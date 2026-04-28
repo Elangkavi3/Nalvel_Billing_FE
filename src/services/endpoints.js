@@ -21,6 +21,7 @@ function toQuery(params) {
 }
 
 const CONSIGNMENT_BASE = '/api/consignment';
+const ADVANCE_PAYMENT_BASE = '/api/advance-payment';
 
 export const consignmentEndpoints = {
   create: () => withApiBase(`${CONSIGNMENT_BASE}/save`),
@@ -29,4 +30,11 @@ export const consignmentEndpoints = {
   readByCustomer: (name) => withApiBase(`${CONSIGNMENT_BASE}/byCustomer?${toQuery({ name })}`),
   updateById: (id) => withApiBase(`${CONSIGNMENT_BASE}/update/${id}`),
   deleteById: (id) => withApiBase(`${CONSIGNMENT_BASE}/${id}`),
+};
+
+export const advancePaymentEndpoints = {
+  create: (consignmentId) => withApiBase(`${ADVANCE_PAYMENT_BASE}/save/${consignmentId}`),
+  readByConsignmentId: (consignmentId) => withApiBase(`${ADVANCE_PAYMENT_BASE}/consignment/${consignmentId}`),
+  updateById: (id) => withApiBase(`${ADVANCE_PAYMENT_BASE}/update/${id}`),
+  deleteById: (id) => withApiBase(`${ADVANCE_PAYMENT_BASE}/${id}`),
 };
