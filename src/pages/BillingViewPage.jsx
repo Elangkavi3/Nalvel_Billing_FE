@@ -147,10 +147,8 @@ export function BillingViewPage({ item, onBack, onEdit, onHome }) {
               <SectionTitle icon="S" title="Supplier Billing" />
               <Field label={supplierRateLabel} value={money(item.supplierAmount)} amount />
               <Field label="Advance to Supplier" value={money(item.advance)} amount />
-              <Field
-                label="Supplier Payment Status"
-                value={<span className={`bill-badge ${statusClass(item.paymentStatus)}`}>{item.paymentStatus || 'Pending'}</span>}
-              />
+              <Field label="Payment Type" value={item.paymentType || '-'} />
+              <Field label="Truck Pay Mode" value={<span className="bill-badge payment">{paymentModeLabel(item.truckpaymentMode)}</span>} />
             </article>
 
             <article className="bill-card">
@@ -165,7 +163,7 @@ export function BillingViewPage({ item, onBack, onEdit, onHome }) {
 
             <article className="bill-card">
               <SectionTitle icon="E" title="Extra" />
-              <Field label="Payment Mode" value={<span className="bill-badge payment">{paymentModeLabel(item.paymentMode)}</span>} />
+              <Field label="Customer Payment Mode" value={<span className="bill-badge payment">{paymentModeLabel(item.customerPaymentMode)}</span>} />
               <Field label="Remarks / Notes" value={item.remarks || '-'} muted />
             </article>
           </div>

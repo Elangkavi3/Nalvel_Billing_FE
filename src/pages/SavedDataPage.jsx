@@ -102,7 +102,7 @@ export function SavedDataPage({
               <th>Supplier</th>
               <th>Customer Bill</th>
               <th>Profit</th>
-              <th>Status</th>
+              <th>Payment</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -118,16 +118,29 @@ export function SavedDataPage({
                   <td>
                     {item.fromLocation} to {item.toLocation}
                   </td>
-                  <td>{item.truckNo}</td>
+                  <td>
+                    <strong>{item.truckNo || '-'}</strong>
+                    <span>{item.truckType || '-'}</span>
+                    <span>{item.ownerName || '-'}</span>
+                    <span>{item.ownerPrimaryContact || item.ownerAlternateContact || '-'}</span>
+                  </td>
                   <td>
                     <strong>{item.driverName || '-'}</strong>
                     <span>{item.dlNo || '-'}</span>
                     <span>{item.driverPrimaryContact || item.driverAlternateContact || '-'}</span>
                   </td>
-                  <td>{money(item.supplierAmount)}</td>
+                  <td>
+                    <strong>{money(item.supplierAmount)}</strong>
+                    <span>Advance: {money(item.totalAdvance)}</span>
+                    <span>Balance: {money(item.balance)}</span>
+                  </td>
                   <td>{money(item.customerRate)}</td>
                   <td className="profit-text">{money(item.profit)}</td>
-                  <td>{item.paymentStatus}</td>
+                  <td>
+                    <strong>{item.paymentType || '-'}</strong>
+                    <span>Truck: {item.truckpaymentMode || '-'}</span>
+                    <span>Customer: {item.customerPaymentMode || '-'}</span>
+                  </td>
                   <td className="action-cell">
                     <button type="button" className="link-button" onClick={() => onView(item)}>
                       View

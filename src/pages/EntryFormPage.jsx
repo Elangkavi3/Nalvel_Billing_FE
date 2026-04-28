@@ -3,6 +3,13 @@ import { Field } from '../components/forms/Field.jsx';
 import { SelectField } from '../components/forms/SelectField.jsx';
 import { paymentModeOptions, paymentStatusOptions, supplierRateTypeOptions, PaymentTypeOptions} from '../constants/consignment.js';
 
+const mobileProps = {
+  inputMode: 'numeric',
+  maxLength: 10,
+  pattern: '[0-9]{10}',
+  title: 'Enter exactly 10 digits',
+};
+
 export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, onUpdateField }) {
   return (
     <form id="consignment-form" className="entry-panel" onSubmit={onSubmit} autoComplete="off">
@@ -155,12 +162,14 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
               value={form.ownerPrimaryContact}
               suggestions={suggestions.ownerPrimaryContact}
               onChange={(value) => onUpdateField('ownerPrimaryContact', value)}
+              {...mobileProps}
             />
             <AutocompleteField
               label="Owner Alternate Contact"
               value={form.ownerAlternateContact}
               suggestions={suggestions.ownerAlternateContact}
               onChange={(value) => onUpdateField('ownerAlternateContact', value)}
+              {...mobileProps}
             />
           </div>
         </fieldset>
@@ -182,12 +191,14 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
               value={form.driverPrimaryContact}
               suggestions={suggestions.driverPrimaryContact}
               onChange={(value) => onUpdateField('driverPrimaryContact', value)}
+              {...mobileProps}
             />
             <AutocompleteField
               label="Driver Alternate Contact"
               value={form.driverAlternateContact}
               suggestions={suggestions.driverAlternateContact}
               onChange={(value) => onUpdateField('driverAlternateContact', value)}
+              {...mobileProps}
             />
           </div>
           
@@ -237,8 +248,8 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
             <Field
               label="Commission"
               type="number"
-              value={form.Commission}
-              onChange={(value) => onUpdateField('Commission', value)}
+              value={form.commission}
+              onChange={(value) => onUpdateField('commission', value)}
             />
             <Field label="Net Payment Balance" type="number" value={form.netBalance} onChange={(value) => onUpdateField('netBalance', value)} />
           </div>
@@ -262,10 +273,10 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
             />
          <SelectField
             label="Truck Pay Mode"
-            value={form.paymentMode}
+            value={form.truckpaymentMode}
             options={paymentModeOptions}
             required
-            onChange={(value) => onUpdateField('paymentMode', value)}
+            onChange={(value) => onUpdateField('truckpaymentMode', value)}
           />
           </div>
         </fieldset>
@@ -340,10 +351,10 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
           <legend>Extra</legend>
           <SelectField
             label="Customer Payment Mode"
-            value={form.paymentMode}
+            value={form.customerPaymentMode}
             options={paymentModeOptions}
             required
-            onChange={(value) => onUpdateField('paymentMode', value)}
+            onChange={(value) => onUpdateField('customerPaymentMode', value)}
           />
           <label className="field">
             <span>Remarks / Notes</span>
@@ -387,7 +398,7 @@ function AdvanceEntriesField({ entries, onChange }) {
   }
 
   function addEntry() {
-    const nextEntries = [...rows, { id: rows.length + 1, amount: '', refNo: '' }];
+    const nextEntries = [...rows, { id: `new-${Date.now()}`, amount: '', refNo: '' }];
     onChange(nextEntries);
   }
 

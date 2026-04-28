@@ -13,7 +13,18 @@ import {
   searchConsignmentsByCustomer,
   updateConsignment,
 } from './services/consignmentApi.js';
-import { buildConsignmentPayload, getUniqueValues } from './utils/consignment.js';
+import {
+  deleteAdvancePayment,
+  getAdvancePaymentsByConsignmentId,
+  saveAdvancePayment,
+  updateAdvancePayment,
+} from './services/advancePaymentApi.js';
+import {
+  buildAdvancePaymentPayload,
+  buildConsignmentPayload,
+  getUniqueValues,
+  normalizeAdvanceEntries,
+} from './utils/consignment.js';
 import { getErrorMessage } from './utils/errors.js';
 
 function toDateTimeLocal(value) {
@@ -43,17 +54,22 @@ function getEndOfWeek(date) {
   return end;
 }
 
-function normalizeAdvanceEntries(item) {
-  const source = Array.isArray(item?.advanceEntries) && item.advanceEntries.length > 0 ? item.advanceEntries : null;
-  if (source) {
-    return source.map((entry, index) => ({
-      id: entry.id ?? index + 1,
-      amount: entry.amount ?? '',
-      refNo: entry.refNo ?? '',
-    }));
-  }
+const contactFields = new Set([
+  'ownerPrimaryContact',
+  'ownerAlternateContact',
+  'driverPrimaryContact',
+  'driverAlternateContact',
+]);
 
-  return [{ id: 1, amount: item?.advance ?? '', refNo: '' }];
+function normalizeContactNumber(value) {
+  return String(value ?? '').replace(/\D/g, '').slice(0, 10);
+}
+
+function invalidContactFields(form) {
+  return [...contactFields].filter((field) => {
+    const value = form[field];
+    return value && String(value).length !== 10;
+  });
 }
 
 function applyDateFilter(items, filter) {
@@ -153,7 +169,8 @@ export function App() {
 
   function updateField(field, value) {
     setForm((current) => {
-      const nextForm = { ...current, [field]: value };
+      const nextValue = contactFields.has(field) ? normalizeContactNumber(value) : value;
+      const nextForm = { ...current, [field]: nextValue };
 
       if (field === 'viewMode') {
         if (value === 'GST') {
@@ -207,10 +224,16 @@ export function App() {
       tareWeight: item.tareWeight ?? '',
       actualWeight: item.actualWeight ?? '',
       grossWeight: item.grossWeight ?? item.crossVehicleWeight ?? '',
+      material: item.material ?? '',
       supplierRateType: item.supplierRateType ?? 'fixed_cost',
       supplierAmount: item.supplierAmount ?? '',
+      chargebleWeight: item.chargebleWeight ?? '',
+      haltingCharge: item.haltingCharge ?? '',
+      commission: item.commission ?? '',
+      netBalance: item.netBalance ?? '',
       advance: item.advance ?? '',
-      advanceEntries: normalizeAdvanceEntries(item),
+      advanceEntries: normalizeAdvanceEntries(item.advanceEntries),
+      totalAdvance: item.totalAdvance ?? '',
       balance: item.balance ?? '',
       ledgerAmount: item.ledgerAmount ?? '',
       customerRate: item.customerRate ?? '',
@@ -223,12 +246,37 @@ export function App() {
       invoiceNo: item.invoiceNo ?? '',
       invoiceDate: toDateTimeLocal(item.invoiceDateTime),
       paymentStatus: item.paymentStatus ?? '',
+      paymentType: item.paymentType ?? '',
+      truckpaymentMode: item.truckpaymentMode ?? '',
+      customerPaymentMode: item.customerPaymentMode ?? item.paymentMode ?? '',
       dlNo: item.dlNo ?? '',
       ownerPrimaryContact: item.ownerPrimaryContact ?? '',
       ownerAlternateContact: item.ownerAlternateContact ?? '',
       driverPrimaryContact: item.driverPrimaryContact ?? '',
       driverAlternateContact: item.driverAlternateContact ?? '',
     });
+  }
+
+  async function syncAdvancePayments(consignmentId, currentForm) {
+    const existingEntries = await getAdvancePaymentsByConsignmentId(consignmentId);
+    const existingIds = new Set(existingEntries.map((entry) => entry.id));
+    const submittedEntries = normalizeAdvanceEntries(currentForm.advanceEntries).filter((entry) => entry.amount !== '' || entry.refNo);
+    const submittedExistingIds = new Set(submittedEntries.map((entry) => entry.id).filter((id) => existingIds.has(id)));
+
+    await Promise.all(
+      existingEntries
+        .filter((entry) => !submittedExistingIds.has(entry.id))
+        .map((entry) => deleteAdvancePayment(entry.id)),
+    );
+
+    await Promise.all(
+      submittedEntries.map((entry, index) => {
+        const payload = buildAdvancePaymentPayload(entry, index, currentForm);
+        return existingIds.has(entry.id)
+          ? updateAdvancePayment(entry.id, payload)
+          : saveAdvancePayment(consignmentId, payload);
+      }),
+    );
   }
 
   async function submitForm(event) {
@@ -239,10 +287,18 @@ export function App() {
     try {
       const targetId = editingId ?? form.id ?? null;
       const isEditing = Boolean(targetId);
+      const invalidContacts = invalidContactFields(form);
+      if (invalidContacts.length > 0) {
+        throw new Error('Mobile number must be exactly 10 digits');
+      }
       const payload = buildConsignmentPayload(form);
       const saved = isEditing ? await updateConsignment(targetId, payload) : await saveConsignment(payload);
       const recordId = saved?.id ?? targetId ?? '';
       const successMessage = isEditing ? `Entry #${recordId} updated successfully` : `Entry #${recordId} saved successfully`;
+
+      if (recordId) {
+        await syncAdvancePayments(recordId, form);
+      }
 
       setMessage(successMessage);
       await loadData();
@@ -256,13 +312,22 @@ export function App() {
     }
   }
 
-  function editItem(item) {
-    applyConsignmentToForm(item);
-    setEditingId(item.id ?? null);
-    setViewingItem(null);
-    setActivePage('form');
-    setMessage(`Editing entry #${item.id}`);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  async function editItem(item) {
+    setLoading(true);
+    setError('');
+    try {
+      const advanceEntries = await getAdvancePaymentsByConsignmentId(item.id);
+      applyConsignmentToForm({ ...item, advanceEntries });
+      setEditingId(item.id ?? null);
+      setViewingItem(null);
+      setActivePage('form');
+      setMessage(`Editing entry #${item.id}`);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (err) {
+      setError(getErrorMessage(err, 'Unable to load advance payments'));
+    } finally {
+      setLoading(false);
+    }
   }
 
   function viewItem(item) {
@@ -280,6 +345,8 @@ export function App() {
     setLoading(true);
     setError('');
     try {
+      const advanceEntries = await getAdvancePaymentsByConsignmentId(id);
+      await Promise.all(advanceEntries.map((entry) => deleteAdvancePayment(entry.id)));
       await deleteConsignment(id);
       setMessage(`Entry #${id} deleted`);
       if (editingId === id) clearForm();
