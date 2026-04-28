@@ -43,6 +43,19 @@ function getEndOfWeek(date) {
   return end;
 }
 
+function normalizeAdvanceEntries(item) {
+  const source = Array.isArray(item?.advanceEntries) && item.advanceEntries.length > 0 ? item.advanceEntries : null;
+  if (source) {
+    return source.map((entry, index) => ({
+      id: entry.id ?? index + 1,
+      amount: entry.amount ?? '',
+      refNo: entry.refNo ?? '',
+    }));
+  }
+
+  return [{ id: 1, amount: item?.advance ?? '', refNo: '' }];
+}
+
 function applyDateFilter(items, filter) {
   if (!Array.isArray(items)) return [];
 
@@ -139,7 +152,35 @@ export function App() {
   }, []);
 
   function updateField(field, value) {
-    setForm((current) => ({ ...current, [field]: value }));
+    setForm((current) => {
+      const nextForm = { ...current, [field]: value };
+
+      if (field === 'viewMode') {
+        if (value === 'GST') {
+          nextForm.imsNo = '';
+        } else if (value === 'IMS') {
+          nextForm.gstNo = '';
+          nextForm.gstType = '';
+        }
+      }
+
+      if (field === 'gstNo') {
+        if (value && value.toString().trim()) {
+          nextForm.viewMode = 'GST';
+          nextForm.imsNo = '';
+        }
+      }
+
+      if (field === 'imsNo') {
+        if (value && value.toString().trim()) {
+          nextForm.viewMode = 'IMS';
+          nextForm.gstNo = '';
+          nextForm.gstType = '';
+        }
+      }
+
+      return nextForm;
+    });
   }
 
   function clearForm() {
@@ -162,9 +203,14 @@ export function App() {
       ledgerDate: toDateTimeLocal(item.ledgerDateTime),
       loadingDate: toDateTimeLocal(item.loadingDateTime),
       deliveryDateTime: toDateTimeLocal(item.deliveryDateTime),
-      weight: item.weight ?? '',
+      netWeight: item.netWeight ?? item.weight ?? '',
+      tareWeight: item.tareWeight ?? '',
+      actualWeight: item.actualWeight ?? '',
+      grossWeight: item.grossWeight ?? item.crossVehicleWeight ?? '',
+      supplierRateType: item.supplierRateType ?? 'fixed_cost',
       supplierAmount: item.supplierAmount ?? '',
       advance: item.advance ?? '',
+      advanceEntries: normalizeAdvanceEntries(item),
       balance: item.balance ?? '',
       ledgerAmount: item.ledgerAmount ?? '',
       customerRate: item.customerRate ?? '',
@@ -176,15 +222,12 @@ export function App() {
       lrDate: toDateTimeLocal(item.lrDateTime),
       invoiceNo: item.invoiceNo ?? '',
       invoiceDate: toDateTimeLocal(item.invoiceDateTime),
-      subSerialNo: item.subSerialNo ?? '',
+      paymentStatus: item.paymentStatus ?? '',
+      dlNo: item.dlNo ?? '',
       ownerPrimaryContact: item.ownerPrimaryContact ?? '',
-      ownerPrimaryWhatsappAvailable: Boolean(item.ownerPrimaryWhatsapp),
       ownerAlternateContact: item.ownerAlternateContact ?? '',
-      ownerAlternateWhatsappAvailable: Boolean(item.ownerAlternateWhatsapp),
       driverPrimaryContact: item.driverPrimaryContact ?? '',
-      driverPrimaryWhatsappAvailable: Boolean(item.driverPrimaryWhatsapp),
       driverAlternateContact: item.driverAlternateContact ?? '',
-      driverAlternateWhatsappAvailable: Boolean(item.driverAlternateWhatsapp),
     });
   }
 

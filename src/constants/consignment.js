@@ -6,7 +6,6 @@ export const emptyConsignmentForm = {
   gstNo: '',
   imsNo: '',
   serialNo: '',
-  subSerialNo: '',
   ledgerDate: '',
   loadingDate: '',
   deliveryDateTime: '',
@@ -16,19 +15,21 @@ export const emptyConsignmentForm = {
   truckType: '',
   ownerName: '',
   ownerPrimaryContact: '',
-  ownerPrimaryWhatsappAvailable: false,
   ownerAlternateContact: '',
-  ownerAlternateWhatsappAvailable: false,
   driverName: '',
+  dlNo: '',
   driverPrimaryContact: '',
-  driverPrimaryWhatsappAvailable: false,
   driverAlternateContact: '',
-  driverAlternateWhatsappAvailable: false,
   fromLocation: '',
   toLocation: '',
-  weight: '',
+  netWeight: '',
+  tareWeight: '',
+  actualWeight: '',
+  grossWeight: '',
+  supplierRateType: 'fixed_cost',
   supplierAmount: '',
   advance: '',
+  advanceEntries: [{ id: 1, amount: '', refNo: '' }],
   balance: '',
   ledgerAmount: '',
   customerRate: '',
@@ -46,10 +47,21 @@ export const emptyConsignmentForm = {
 };
 
 export const truckTypeOptions = ['32 ft SXL', 'Mini', '17ft', '20ft', 'Trailer'];
-export const paymentStatusOptions = ['Pending', 'Partial', 'Paid'];
+export const paymentStatusOptions = ['Advance 1', 'Advance 2', 'Advance 3'];
 export const paymentModeOptions = ['Bank Transfer', 'DD', 'Cheque', 'UPI', 'Cash'];
+export const supplierRateTypeOptions = [
+  { label: 'Fixed Cost', value: 'fixed_cost' },
+  { label: 'Cost per MT', value: 'cost_per_mt' },
+];
+export const PaymentTypeOptions = [
+  { label: 'Driver Payment', value: 'Driver_Payment' },
+  { label: 'Truck Owner', value: 'Truck_Owner' },
+];
 export const numericConsignmentFields = new Set([
-  'weight',
+  'netWeight',
+  'tareWeight',
+  'actualWeight',
+  'grossWeight',
   'supplierAmount',
   'advance',
   'balance',

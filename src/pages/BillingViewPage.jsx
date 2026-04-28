@@ -30,21 +30,22 @@ function entryView(item) {
   return item?.gstNo ? 'GST View' : item?.imsNo ? 'IMS View' : 'Entry View';
 }
 
-function whatsappChip(enabled) {
-  return enabled ? <span className="bill-wa-chip">WA</span> : null;
-}
-
 export function BillingViewPage({ item, onBack, onEdit, onHome }) {
   if (!item) return null;
 
   const additionalCharges = item.additionalCharges ?? 0;
   const expenses = item.expenses ?? 0;
+  const netWeight = item.netWeight ?? item.weight ?? '-';
+  const tareWeight = item.tareWeight ?? '-';
+  const actualWeight = item.actualWeight ?? '-';
+  const grossWeight = item.grossWeight ?? item.crossVehicleWeight ?? '-';
+  const supplierRateLabel = item.supplierRateType === 'cost_per_mt' ? 'Cost per MT' : 'Fixed Cost';
 
   return (
     <section className="bill-view-shell">
       <div className="bill-view-top-actions">
         <button type="button" className="bill-nav-btn" onClick={onBack}>
-          <span aria-hidden="true">←</span>
+          <span aria-hidden="true">&larr;</span>
           <span>Back</span>
         </button>
         <button type="button" className="bill-nav-btn secondary" onClick={() => onEdit(item)}>
@@ -68,7 +69,6 @@ export function BillingViewPage({ item, onBack, onEdit, onHome }) {
             </div>
             <div className="bill-view-badge">
               {entryView(item)}
-              {item.subSerialNo ? ` · Sub S.No ${item.subSerialNo}` : ''}
             </div>
           </div>
         </div>
@@ -98,82 +98,54 @@ export function BillingViewPage({ item, onBack, onEdit, onHome }) {
 
         <div className="bill-view-body">
           <div className="bill-view-grid">
-            <article className="bill-card">
+            <article className="bill-card bill-card-wide">
               <SectionTitle icon="I" title="Basic Info" />
-              <Field label="Customer Name" value={item.customerName} />
-              <Field label="Bill To / Delivery Customer" value={item.billTo} />
-              <Field label={item.gstNo ? 'GST No.' : 'IMS No.'} value={item.gstNo || item.imsNo || '-'} mono />
+              <div className="bill-field-row bill-field-row-3">
+                <Field label="Customer Name" value={item.customerName} />
+                <Field label="Bill To / Delivery Customer" value={item.billTo} />
+                <Field label={item.gstNo ? 'GST No.' : 'IMS No.'} value={item.gstNo || item.imsNo || '-'} mono />
+              </div>
+              <div className="bill-field-row bill-field-row-4">
+                <Field label="Net Weight" value={netWeight} />
+                <Field label="Tare Weight" value={tareWeight} />
+                <Field label="Actual Weight" value={actualWeight} />
+                <Field label="Gross Weight" value={grossWeight} />
+              </div>
               <div className="bill-field-row">
                 <Field label="LR Date" value={formatDateTime(item.lrDateTime)} mono />
                 <Field label="Invoice Date" value={formatDateTime(item.invoiceDateTime)} mono />
               </div>
             </article>
 
-            <article className="bill-card">
+            <article className="bill-card bill-card-half">
               <SectionTitle icon="V" title="Vehicle Info" />
               <div className="bill-field-row">
                 <Field label="Truck No." value={item.truckNo} mono />
                 <Field label="Truck Type" value={item.truckType} />
               </div>
               <Field label="Owner / Transporter" value={item.ownerName} />
-              <Field
-                label="Owner Primary Contact"
-                value={
-                  <>
-                    {item.ownerPrimaryContact || '-'}
-                    {whatsappChip(item.ownerPrimaryWhatsapp)}
-                  </>
-                }
-                mono
-              />
-              <Field
-                label="Owner Alternate Contact"
-                value={
-                  <>
-                    {item.ownerAlternateContact || '-'}
-                    {whatsappChip(item.ownerAlternateWhatsapp)}
-                  </>
-                }
-                mono
-              />
+              <Field label="Owner Primary Contact" value={item.ownerPrimaryContact || '-'} mono />
+              <Field label="Owner Alternate Contact" value={item.ownerAlternateContact || '-'} mono />
             </article>
 
-            <article className="bill-card">
-              <SectionTitle icon="R" title="Driver & Route" />
-              <div className="bill-route-pill">
-                <span>{item.fromLocation || '-'}</span>
-                <span className="arrow">→</span>
-                <span>{item.toLocation || '-'}</span>
-              </div>
-              <Field label="Driver Name" value={item.driverName} />
-              <div className="bill-field-row">
-                <Field
-                  label="Primary Contact"
-                  value={
-                    <>
-                      {item.driverPrimaryContact || '-'}
-                      {whatsappChip(item.driverPrimaryWhatsapp)}
-                    </>
-                  }
-                  mono
-                />
-                <Field
-                  label="Alternate Contact"
-                  value={
-                    <>
-                      {item.driverAlternateContact || '-'}
-                      {whatsappChip(item.driverAlternateWhatsapp)}
-                    </>
-                  }
-                  mono
-                />
-              </div>
-              <Field label="Weight (MT)" value={item.weight ?? '-'} />
+            <article className="bill-card bill-card-half">
+            <SectionTitle icon="R" title="Driver Info" />
+            <div className="bill-route-pill">
+              <span>{item.fromLocation || '-'}</span>
+              <span className="arrow">&rarr;</span>
+              <span>{item.toLocation || '-'}</span>
+            </div>
+            <Field label="Driver Name" value={item.driverName} />
+            <Field label="DL No." value={item.dlNo || '-'} mono />
+            <div className="bill-field-row">
+              <Field label="Primary Contact" value={item.driverPrimaryContact || '-'} mono />
+              <Field label="Alternate Contact" value={item.driverAlternateContact || '-'} mono />
+            </div>
             </article>
 
             <article className="bill-card">
               <SectionTitle icon="S" title="Supplier Billing" />
-              <Field label="Freight to Truck Owner / Supplier" value={money(item.supplierAmount)} amount />
+              <Field label={supplierRateLabel} value={money(item.supplierAmount)} amount />
               <Field label="Advance to Supplier" value={money(item.advance)} amount />
               <Field
                 label="Supplier Payment Status"
@@ -202,8 +174,7 @@ export function BillingViewPage({ item, onBack, onEdit, onHome }) {
             <FinanceItem label="Billed to Customer" value={money(item.customerRate)} />
             <FinanceItem label="Freight (Supplier)" value={money(item.supplierAmount)} />
             <FinanceItem label="Advance Paid" value={money(item.advance)} accent="advance" />
-           <FinanceItem label="Net Freight" value={money(item.netFreight)} accent="netFreight" />
-
+            <FinanceItem label="Net Freight" value={money(item.netFreight)} accent="netFreight" />
             <FinanceItem label="Gross Margin" value={money(item.profit)} accent="profit" />
           </div>
         </div>

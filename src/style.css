@@ -323,25 +323,56 @@ h2 {
   min-width: 0;
 }
 
+.entry-layout {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  min-width: 0;
+}
+
 .form-section {
   padding: 18px;
+  margin: 0;
+  border: 0;
   border-right: 1px solid var(--line);
   min-width: 0;
+  grid-column: span 4;
+}
+
+.form-section-half {
+  grid-column: span 6;
+}
+
+.form-section-third {
+  grid-column: span 4;
 }
 
 .form-section:last-child {
   border-right: 0;
 }
 
-.form-section h2:not(:first-child) {
-  border-top: 1px solid var(--line);
-  margin-top: 16px;
-  padding-top: 16px;
+.form-section-wide {
+  grid-column: 1 / -1;
+}
+
+.form-section legend {
+  display: block;
+  padding: 0;
+  margin: 0 0 16px;
+  color: var(--accent-dark);
+  font-size: 18px;
+  line-height: 1.2;
+  font-weight: 900;
 }
 
 .field-row {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.field-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
 }
 
@@ -431,20 +462,76 @@ h2 {
   resize: vertical;
 }
 
-.whatsapp-check {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 800;
-  margin-top: -3px;
+.gst-no-field {
+  min-width: 0;
 }
 
-.whatsapp-check input {
-  width: 15px;
-  height: 15px;
-  accent-color: var(--accent);
+.gst-no-control {
+  position: relative;
+  display: grid;
+  width: 100%;
+  align-items: center;
+}
+
+.gst-no-prefix {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding-right: 8px;
+  border-right: 1px solid #bdd2dd;
+  background: transparent;
+  color: var(--accent-dark);
+  font-size: 14px;
+  font-weight: 800;
+  pointer-events: none;
+}
+
+.gst-no-control input {
+  width: 100%;
+  padding-left: 82px;
+}
+
+.advance-list {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.advance-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: end;
+}
+
+.advance-entry-field {
+  min-width: 0;
+  margin-bottom: 0;
+}
+
+.advance-entry-field input {
+  width: 100%;
+}
+
+.advance-add-btn {
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.advance-add-btn:hover {
+  filter: brightness(1.03);
 }
 
 .readonly {
@@ -778,6 +865,14 @@ td span {
   background: #f4faf8;
 }
 
+.bill-card-wide {
+  grid-column: 1 / -1;
+}
+
+.bill-card-half {
+  grid-column: span 1;
+}
+
 .bill-section-title {
   display: flex;
   align-items: center;
@@ -859,6 +954,14 @@ td span {
   gap: 12px;
 }
 
+.bill-field-row-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.bill-field-row-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 .bill-route-pill {
   display: inline-flex;
   align-items: center;
@@ -915,21 +1018,9 @@ td span {
   color: #374151;
 }
 
-.bill-wa-chip {
-  display: inline-flex;
-  align-items: center;
-  margin-left: 8px;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: #dcfce7;
-  color: #15803d;
-  font-size: 11px;
-  font-weight: 700;
-}
-
 .bill-finance-bar {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 12px;
   margin-top: 28px;
   padding: 20px 24px;
@@ -1447,13 +1538,8 @@ td span {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .form-section:nth-child(2) {
-    border-right: 0;
-  }
-
-  .form-section:nth-child(3) {
-    grid-column: 1 / -1;
-    border-top: 1px solid var(--line);
+  .entry-layout {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .home-actions {
@@ -1464,20 +1550,27 @@ td span {
     grid-template-columns: 1fr;
     justify-items: end;
   }
+
+  .form-section,
+  .form-section-wide {
+    grid-column: auto;
+  }
+
+  .field-grid-4,
+  .bill-field-row-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 980px) {
   .grid3,
+  .entry-layout,
   .home-panel {
     grid-template-columns: 1fr;
   }
 
   .field-row {
     grid-template-columns: 1fr;
-  }
-
-  .form-section:nth-child(2) {
-    border-right: 0;
   }
 
   .home-actions,
@@ -1533,10 +1626,6 @@ td span {
     min-width: 620px;
   }
 
-  .form-section:nth-child(3) {
-    border-top: 0;
-  }
-
   .pagination {
     flex-direction: column;
     align-items: flex-start;
@@ -1559,6 +1648,21 @@ td span {
 
   .bill-view-header-right {
     text-align: left;
+  }
+
+  .form-section,
+  .form-section-wide,
+  .bill-card-wide,
+  .bill-card-half {
+    grid-column: auto;
+  }
+
+  .advance-row {
+    grid-template-columns: 1fr;
+  }
+
+  .advance-add-btn {
+    justify-self: start;
   }
 }
 
@@ -1710,6 +1814,12 @@ td span {
   .bill-view-grid,
   .bill-finance-bar,
   .bill-field-row {
+    grid-template-columns: 1fr;
+  }
+
+  .field-grid-4,
+  .bill-field-row-3,
+  .bill-field-row-4 {
     grid-template-columns: 1fr;
   }
 
