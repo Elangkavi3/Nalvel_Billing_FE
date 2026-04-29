@@ -1,0 +1,174 @@
+/* ============================================================================
+   BILLING-VIEW-PAGE.CSS - Billing View Page Styles
+   ============================================================================ */
+
+/* BILL VIEW PAGE */
+.bill-view-page {
+  max-width: var(--max-width-content);
+  margin: 0 auto;
+}
+
+.bill-view-top-actions {
+  max-width: var(--max-width-content);
+  margin: var(--spacing-8) auto 0;
+}
+
+/* BILL VIEW HEADER */
+.bill-view-header {
+  padding: var(--spacing-12) var(--spacing-12);
+  background: var(--color-accent-dark);
+  color: #fff;
+}
+
+.bill-view-header-left h1 {
+  margin: 0 0 var(--spacing-8);
+  font-size: var(--font-size-6xl);
+  font-weight: var(--font-weight-black);
+}
+
+.bill-view-header-left p {
+  margin: 0;
+  font-size: var(--font-size-lg-plus);
+  line-height: var(--line-height-loose);
+  color: #cde8e4;
+}
+
+/* BILL VIEW NUMBER */
+.bill-view-number {
+  font-size: var(--font-size-6xl);
+  font-weight: var(--font-weight-black);
+  color: #fff;
+  margin-bottom: var(--spacing-8);
+}
+
+/* BILL VIEW META */
+.bill-view-meta-strip {
+  padding: var(--spacing-8) var(--spacing-12);
+  background: var(--color-soft);
+  border-bottom: var(--border-width-base) solid var(--color-line);
+  display: flex;
+  gap: var(--spacing-12);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.bill-view-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.bill-view-meta-item .lbl {
+  color: var(--color-muted);
+  font-size: var(--font-size-md-plus);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+}
+
+.bill-view-meta-item .val {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-lg-plus);
+  font-weight: var(--font-weight-bold);
+}
+
+/* BILL VIEW BADGE */
+.bill-view-badge {
+  display: inline-block;
+  padding: var(--spacing-2) var(--spacing-6);
+  background: var(--color-accent-dark);
+  color: #fff;
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-md-plus);
+  font-weight: var(--font-weight-bold);
+}
+
+/* BILL VIEW BODY */
+.bill-view-body {
+  padding: var(--spacing-12);
+}
+
+.bill-view-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--spacing-12);
+}
+
+/* BILL CARD */
+.bill-card {
+  padding: var(--spacing-8) var(--spacing-12);
+  border: var(--border-width-base) solid var(--color-line);
+  border-radius: var(--border-radius-md);
+  background: var(--color-soft);
+}
+
+.bill-card h3 {
+  margin: 0 0 var(--spacing-8);
+  color: var(--color-accent-dark);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+}
+
+.bill-card-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: var(--spacing-4) 0;
+  border-bottom: var(--border-width-thin) solid var(--color-line);
+}
+
+.bill-card-row:last-child {
+  border-bottom: none;
+}
+
+.bill-card-row .lbl {
+  color: var(--color-muted);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+}
+
+.bill-card-row .val {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+}
+
+.bill-fin-label {
+  color: var(--color-accent-dark);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-black);
+}
+
+.bill-fin-value {
+  color: var(--color-accent-dark);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-black);
+}
+
+/* BILL VIEW FOOTER */
+.bill-view-footer {
+  padding: var(--spacing-12);
+  background: var(--color-soft);
+  border-top: var(--border-width-base) solid var(--color-line);
+}
+
+.bill-view-footer p {
+  margin: 0 0 var(--spacing-6);
+  color: #6b8080;
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-loose);
+}
+
+.bill-view-footer strong {
+  color: #1c2b2b;
+}
+
+.bill-view-footer-actions {
+  display: flex;
+  gap: var(--spacing-5);
+  flex-wrap: wrap;
+}
+
+.bill-view-footer-actions .btn {
+  margin-top: var(--spacing-8);
+}

@@ -1,0 +1,31 @@
+/* ============================================================================
+   STYLE.CSS - Main Stylesheet Index
+   Imports all modular CSS files in proper dependency order
+   ============================================================================ */
+
+/* 1. CSS VARIABLES & TOKENS */
+@import url("./styles/variables.css");
+
+/* 2. GLOBAL STYLES & BASE */
+@import url("./styles/global.css");
+
+/* 3. COMPONENTS & CONTROLS */
+@import url("./styles/components.css");
+
+/* 4. LAYOUT SYSTEMS */
+@import url("./styles/layout.css");
+
+/* 5. PAGE-SPECIFIC STYLES */
+@import url("./styles/home-page.css");
+@import url("./styles/entry-form-page.css");
+@import url("./styles/saved-data-page.css");
+@import url("./styles/billing-view-page.css");
+@import url("./styles/lr-generation-page.css");
+@import url("./styles/lr-pdf-template.css");
+
+/* 6. RESPONSIVE DESIGN */
+@import url("./styles/responsive.css");
+
+/* ============================================================================
+   END OF STYLESHEET
+   ============================================================================ */

@@ -2,7 +2,12 @@ export function Header({ activePage, editingId, loading, onBack, onClear }) {
   return (
     <section className="topbar">
       <div className="topbar-brand">
-        <span className="brand-text">NALVEL LOGISTICS</span>
+        {/* <span className="brand-text">NALVEL LOGISTICS</span> */}
+          <img className="brand-logo" src="src\assets\Logo.png" alt="Nalvel Logistics Logo"  style={{
+    height: "60px",
+    width: "auto",
+    objectFit: "contain",
+    display: "block"}} />
         <span className="brand-divider">•</span>
         <span className="brand-text">Freight Data Entry</span>
         <span className="brand-divider">•</span>
@@ -10,7 +15,7 @@ export function Header({ activePage, editingId, loading, onBack, onClear }) {
         <div className="nl-avatar">NL</div>
       </div>
       <div className="top-actions">
-        {activePage !== 'home' && activePage !== 'view' && (
+        {activePage !== 'home' && activePage !== 'view' && activePage !== 'lr' && (
           <>
             <button type="button" className="btn secondary" onClick={onClear}>
               Clear

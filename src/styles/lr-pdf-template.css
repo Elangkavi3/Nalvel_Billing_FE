@@ -1,0 +1,389 @@
+/* ============================================================================
+   LR-PDF-TEMPLATE.CSS - LR PDF Template and Print Styles
+   ============================================================================ */
+
+/* PAGE WRAPPER */
+.page-wrapper.lr-template-wrap {
+  background: var(--color-background-secondary);
+  padding: var(--spacing-12);
+  border-radius: var(--border-radius-lg);
+}
+
+.lr-template-wrap .pdf-sheet {
+  background: var(--color-paper);
+  width: min(100%, var(--doc-width));
+  margin: 0 auto;
+  border: var(--border-width-base) solid #ddd;
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-7);
+  font-family: var(--pdf-font-family);
+  color: #111;
+  box-shadow: var(--shadow-light);
+}
+
+.lr-template-wrap .pdf-border {
+  border: 2px solid var(--color-accent-dark);
+  border-radius: var(--border-radius-sm);
+  overflow: hidden;
+  margin-bottom: 0;
+}
+
+.lr-template-wrap .pdf-border-top {
+  border-radius: var(--border-radius-sm) var(--border-radius-sm) 0 0;
+}
+
+/* PDF HEADER */
+.lr-template-wrap .pdf-header {
+  display: flex;
+  align-items: stretch;
+  border-bottom: 1.5px solid var(--color-accent-dark);
+}
+
+.lr-template-wrap .pdf-logo-col {
+  background: var(--color-paper);
+  border-right: 1.5px solid var(--color-accent-dark);
+  padding: var(--spacing-5) var(--spacing-6);
+  width: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.lr-template-wrap .pdf-logo-text {
+  font-size: var(--font-size-sm-plus);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-accent-dark);
+  text-align: center;
+  line-height: var(--line-height-relaxed);
+}
+
+.lr-template-wrap .pdf-logo-sub {
+  font-size: var(--font-size-xs);
+  color: var(--color-accent-dark);
+  text-align: center;
+  margin-top: var(--spacing-1);
+}
+
+.lr-template-wrap .pdf-company-col {
+  flex: 1;
+  padding: var(--spacing-5) var(--spacing-6);
+  text-align: center;
+  border-right: 1.5px solid var(--color-accent-dark);
+}
+
+.lr-template-wrap .pdf-company-name {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-accent-dark);
+}
+
+.lr-template-wrap .pdf-company-addr {
+  font-size: var(--font-size-xs);
+  color: #555;
+  margin-top: var(--spacing-1);
+  line-height: var(--line-height-loose-plus);
+}
+
+.lr-template-wrap .pdf-right-col {
+  width: 160px;
+  display: flex;
+  flex-direction: column;
+}
+
+.lr-template-wrap .pdf-right-row {
+  padding: var(--spacing-2) var(--spacing-5);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-accent-dark);
+  border-bottom: var(--border-width-base) solid var(--color-line);
+}
+
+.lr-template-wrap .pdf-right-row:last-child {
+  border-bottom: none;
+}
+
+/* PDF CN (Consignment Note) SECTION */
+.lr-template-wrap .pdf-cn-row {
+  display: flex;
+  align-items: center;
+  border-bottom: 1.5px solid var(--color-accent-dark);
+}
+
+.lr-template-wrap .pdf-cn-cell {
+  padding: var(--spacing-3) var(--spacing-5);
+  border-right: 1.5px solid var(--color-accent-dark);
+}
+
+.lr-template-wrap .pdf-cn-cell.cn-a {
+  min-width: 110px;
+}
+
+.lr-template-wrap .pdf-cn-cell.cn-b {
+  min-width: 130px;
+}
+
+.lr-template-wrap .pdf-cn-cell.cn-c {
+  flex: 1;
+  border-right: 0;
+}
+
+.lr-template-wrap .pdf-cn-no {
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-black);
+  color: var(--color-accent-dark);
+}
+
+.lr-template-wrap .pdf-cn-label {
+  font-size: var(--font-size-xs);
+  color: #888;
+}
+
+.lr-template-wrap .cn-val,
+.lr-template-wrap .cn-route {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-bold);
+}
+
+/* PDF PARTIES */
+.lr-template-wrap .pdf-parties {
+  display: flex;
+  border-bottom: 1.5px solid var(--color-accent-dark);
+}
+
+.lr-template-wrap .pdf-party {
+  flex: 1;
+  padding: var(--spacing-4) var(--spacing-5);
+  border-right: 1.5px solid var(--color-accent-dark);
+}
+
+.lr-template-wrap .pdf-party:last-child {
+  border-right: 0;
+}
+
+.lr-template-wrap .pdf-sec-label {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-accent-dark);
+  background: var(--color-soft);
+  padding: var(--spacing-1) var(--spacing-2);
+  display: inline-block;
+  margin-bottom: var(--spacing-2);
+}
+
+.lr-template-wrap .pdf-name {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-bold);
+  color: #111;
+}
+
+.lr-template-wrap .pdf-detail {
+  font-size: var(--font-size-xs);
+  color: var(--color-card-detail-text);
+  line-height: var(--line-height-loose-plus);
+}
+
+/* PDF INSURANCE */
+.lr-template-wrap .pdf-insurance {
+  padding: var(--spacing-3) var(--spacing-5);
+  border-bottom: 1.5px solid var(--color-accent-dark);
+  font-size: var(--font-size-xs);
+  color: var(--color-card-detail-text);
+  background: var(--color-soft);
+}
+
+.lr-template-wrap .pdf-insurance b {
+  color: var(--color-accent-dark);
+}
+
+/* PDF MID SECTION */
+.lr-template-wrap .pdf-mid {
+  display: flex;
+  border-bottom: 1.5px solid var(--color-accent-dark);
+}
+
+.lr-template-wrap .pdf-pkg-col {
+  flex: 2;
+  border-right: 1.5px solid var(--color-accent-dark);
+}
+
+.lr-template-wrap .pdf-pkg-col table,
+.lr-template-wrap .pdf-charges-col table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.lr-template-wrap .pdf-pkg-col th {
+  background: var(--color-soft);
+  color: var(--color-accent-dark);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  padding: var(--spacing-3) var(--spacing-4);
+  border-bottom: var(--border-width-base) solid var(--color-line);
+  text-align: left;
+}
+
+.lr-template-wrap .w-pkg {
+  width: 48px;
+}
+
+.lr-template-wrap .w-wt {
+  width: 75px;
+}
+
+.lr-template-wrap .pdf-pkg-col td {
+  font-size: var(--font-size-sm-plus);
+  padding: var(--spacing-3) var(--spacing-4);
+  border-bottom: 0.5px solid #f0e0de;
+  color: var(--color-pdf-text-dark);
+}
+
+.lr-template-wrap .pdf-charges-col {
+  width: 180px;
+}
+
+.lr-template-wrap .pdf-charges-col th {
+  background: var(--color-soft);
+  color: var(--color-accent-dark);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  padding: var(--spacing-2) var(--spacing-4);
+  border-bottom: var(--border-width-base) solid var(--color-line);
+  text-align: center;
+}
+
+.lr-template-wrap .pdf-charges-col td {
+  font-size: var(--font-size-xs);
+  padding: var(--spacing-2) var(--spacing-4);
+  border-bottom: 0.5px solid #f0e0de;
+  color: var(--color-pdf-text-dark);
+}
+
+.lr-template-wrap .pdf-charges-col td:last-child {
+  text-align: right;
+  font-weight: var(--font-weight-semibold);
+}
+
+.lr-template-wrap .txt-center {
+  text-align: center;
+}
+
+.lr-template-wrap .txt-right {
+  text-align: right;
+}
+
+.lr-template-wrap .total-row-pdf td {
+  background: var(--color-soft);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-accent-dark);
+  font-size: var(--font-size-sm-plus);
+}
+
+/* PDF FOOTER */
+.lr-template-wrap .pdf-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: var(--spacing-4) var(--spacing-6);
+  background: #fff8f7;
+}
+
+.lr-template-wrap .pdf-footer-left {
+  font-size: var(--font-size-xs);
+  color: var(--color-pdf-footer-text);
+}
+
+.lr-template-wrap .pdf-footer-note {
+  margin-top: var(--spacing-2);
+  font-size: var(--font-size-xs);
+  color: var(--color-pdf-footer-muted);
+}
+
+.lr-template-wrap .pdf-footer-mid {
+  text-align: center;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-accent-dark);
+}
+
+.lr-template-wrap .pdf-footer-mid span {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-normal);
+  color: #888;
+}
+
+.lr-template-wrap .pdf-sig-line {
+  width: 100px;
+  border-top: var(--border-width-base) solid #999;
+  margin-top: var(--spacing-12);
+  padding-top: var(--spacing-1);
+  font-size: var(--font-size-xs);
+  color: #888;
+  text-align: center;
+}
+
+/* TERMS & CONDITIONS SECTION */
+.lr-template-wrap .terms-section {
+  display: none;
+  border: 2px solid var(--color-accent-dark);
+  border-top: none;
+  border-radius: 0 0 var(--border-radius-sm) var(--border-radius-sm);
+}
+
+.lr-template-wrap .terms-header {
+  background: var(--color-accent-dark);
+  color: #fff;
+  text-align: center;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  padding: var(--spacing-3);
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.lr-template-wrap .terms-applicability {
+  padding: var(--spacing-4) var(--spacing-6);
+  font-size: var(--font-size-xs);
+  color: var(--color-terms-text);
+  line-height: var(--line-height-loose-plus);
+  border-bottom: var(--border-width-base) solid var(--color-line);
+  background: var(--color-soft);
+}
+
+.lr-template-wrap .terms-applicability b {
+  color: var(--color-accent-dark);
+}
+
+.lr-template-wrap .terms-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.lr-template-wrap .terms-col {
+  padding: var(--spacing-4) var(--spacing-6);
+}
+
+.lr-template-wrap .terms-col:first-child {
+  border-right: var(--border-width-base) solid var(--color-line);
+}
+
+.lr-template-wrap .term-item {
+  font-size: var(--font-size-xs);
+  color: var(--color-terms-text);
+  line-height: var(--line-height-loose-plus);
+  margin-bottom: var(--spacing-3);
+}
+
+.lr-template-wrap .term-item b {
+  color: var(--color-accent-dark);
+  font-size: var(--font-size-xs);
+}
+
+.lr-template-wrap .terms-footer {
+  padding: var(--spacing-3) var(--spacing-6);
+  background: var(--color-soft);
+  border-top: var(--border-width-base) solid var(--color-line);
+  font-size: var(--font-size-xs);
+  color: var(--color-accent-dark);
+  font-weight: var(--font-weight-bold);
+  text-align: center;
+}

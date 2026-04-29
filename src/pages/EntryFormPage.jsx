@@ -1,7 +1,7 @@
 import { AutocompleteField } from '../components/forms/AutocompleteField.jsx';
 import { Field } from '../components/forms/Field.jsx';
 import { SelectField } from '../components/forms/SelectField.jsx';
-import { paymentModeOptions, paymentStatusOptions, supplierRateTypeOptions, PaymentTypeOptions} from '../constants/consignment.js';
+import { paymentModeOptions, supplierRateTypeOptions, PaymentTypeOptions } from '../constants/consignment.js';
 
 const mobileProps = {
   inputMode: 'numeric',

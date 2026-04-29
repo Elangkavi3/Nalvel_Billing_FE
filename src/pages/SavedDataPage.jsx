@@ -1,6 +1,16 @@
 import { Pagination } from '../components/common/Pagination.jsx';
 import { money } from '../utils/numbers.js';
 
+function billingLabel(item) {
+  if (item.viewMode === 'IMS' || item.imsNo) return 'IMS No';
+  return 'GST Invoice';
+}
+
+function billingValue(item) {
+  if (item.viewMode === 'IMS' || item.imsNo) return item.imsNo || '-';
+  return item.gstNo || '-';
+}
+
 export function SavedDataPage({
   currentPage,
   filter,
@@ -96,13 +106,12 @@ export function SavedDataPage({
             <tr>
               <th>S.No</th>
               <th>Customer</th>
+              <th>Billing</th>
               <th>Route</th>
               <th>Truck</th>
-              <th>Driver Info</th>
-              <th>Supplier</th>
+              <th>Payable</th>
               <th>Customer Bill</th>
               <th>Profit</th>
-              <th>Payment</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -112,44 +121,39 @@ export function SavedDataPage({
                 <tr key={item.id}>
                   <td>{item.serialNo || item.id}</td>
                   <td>
-                    <strong>{item.customerName}</strong>
-                    <span>{item.billTo}</span>
+                    <strong>{item.customerName || '-'}</strong>
+                    <span>{item.billTo || '-'}</span>
                   </td>
                   <td>
-                    {item.fromLocation} to {item.toLocation}
+                    <strong>{billingLabel(item)}</strong>
+                    <span>{billingValue(item)}</span>
+                  </td>
+                  <td>
+                    <strong>{item.fromLocation || '-'}</strong>
+                    <span>to {item.toLocation || '-'}</span>
                   </td>
                   <td>
                     <strong>{item.truckNo || '-'}</strong>
                     <span>{item.truckType || '-'}</span>
-                    <span>{item.ownerName || '-'}</span>
-                    <span>{item.ownerPrimaryContact || item.ownerAlternateContact || '-'}</span>
                   </td>
                   <td>
-                    <strong>{item.driverName || '-'}</strong>
-                    <span>{item.dlNo || '-'}</span>
-                    <span>{item.driverPrimaryContact || item.driverAlternateContact || '-'}</span>
+                    <strong>{money(item.ledgerAmount)}</strong>
+                    <span>Bal: {money(item.balance)}</span>
                   </td>
                   <td>
-                    <strong>{money(item.supplierAmount)}</strong>
-                    <span>Advance: {money(item.totalAdvance)}</span>
-                    <span>Balance: {money(item.balance)}</span>
+                    <strong>{money(item.customerRate)}</strong>
+                    <span>{item.customerPaymentMode || '-'}</span>
                   </td>
-                  <td>{money(item.customerRate)}</td>
                   <td className="profit-text">{money(item.profit)}</td>
-                  <td>
-                    <strong>{item.paymentType || '-'}</strong>
-                    <span>Truck: {item.truckpaymentMode || '-'}</span>
-                    <span>Customer: {item.customerPaymentMode || '-'}</span>
-                  </td>
                   <td className="action-cell">
-                    <button type="button" className="link-button" onClick={() => onView(item)}>
-                      View
+                    <button type="button" className="icon-action" onClick={() => onView(item)} aria-label={`View entry ${item.serialNo || item.id}`}>
+                      <EyeIcon />
                     </button>
-                    <button type="button" className="link-button" onClick={() => onEdit(item)}>
-                      Edit
+                    <button type="button" className="icon-action" onClick={() => onEdit(item)} aria-label={`Edit entry ${item.serialNo || item.id}`}>
+                      <EditIcon />
                     </button>
-                    <button type="button" className="link-button danger" onClick={() => onDelete(item.id)}>
-                      Delete
+                    <button type="button" className="icon-action danger" onClick={() => onDelete(item.id)} aria-label={`Delete entry ${item.serialNo || item.id}`}>
+                      <TrashIcon />
                     </button>
                   </td>
                 </tr>
@@ -167,5 +171,35 @@ export function SavedDataPage({
 
       <Pagination currentPage={currentPage} totalPages={totalPages} onSetPage={onSetPage} />
     </section>
+  );
+}
+
+function EyeIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+}
+
+function EditIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M4 20h4.5L19 9.5 14.5 5 4 15.5V20Z" />
+      <path d="m13.5 6 4.5 4.5" />
+    </svg>
+  );
+}
+
+function TrashIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M4 7h16" />
+      <path d="M10 11v6" />
+      <path d="M14 11v6" />
+      <path d="M6 7l1 14h10l1-14" />
+      <path d="M9 7V4h6v3" />
+    </svg>
   );
 }
