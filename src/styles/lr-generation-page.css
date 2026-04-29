@@ -47,8 +47,7 @@
   background: var(--soft);
 }
 
-.lr-ui-page .logo-box {
-  background: var(--accent-dark);
+.lr-ui-page .logo-box { 
   color: #fff;
   padding: 8px 12px;
   border-radius: 6px;
@@ -260,6 +259,14 @@
   cursor: pointer;
 }
 
+.lr-ui-page .radio-group input[type="radio"] {
+  appearance: auto;
+  -webkit-appearance: radio;
+  accent-color: #c0392b;
+  width: 16px;
+  height: 16px;
+}
+
 /* TABLES - Packages & Charges */
 .lr-ui-page .pkg-table,
 .lr-ui-page .charge-table {
@@ -421,6 +428,10 @@
   border: none;
   text-decoration: none;
   white-space: nowrap;
+}
+
+.lr-terms-print {
+  display: none;
 }
 
 .lr-ui-page .btn-primary {

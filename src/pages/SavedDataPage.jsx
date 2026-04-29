@@ -38,7 +38,7 @@ export function SavedDataPage({
     setTimeout(() => {
       window.print();
       // Do NOT call setPrintData(null) here yet
-    }, 1000);
+    }, 50);
   };
 
   const hasItems = items.length > 0;
@@ -131,6 +131,15 @@ export function SavedDataPage({
                 onClick={() => setMode("month")}
               >
                 This Month
+              </button>
+              <button
+                type="button"
+                className={
+                  filter.mode === "year" ? "filter-pill active" : "filter-pill"
+                }
+                onClick={() => setMode("year")}
+              >
+                This Year
               </button>
               <button
                 type="button"

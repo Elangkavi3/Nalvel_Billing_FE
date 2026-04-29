@@ -328,7 +328,7 @@
   }
 
   .lr-ui-page .logo-box {
-    max-width: 160px;
+    max-width: 220px;
     margin: 0 auto;
   }
 
@@ -665,7 +665,7 @@
   }
 
   .lr-ui-page .logo-box {
-    max-width: 160px;
+    max-width: 220px;
     margin: 0 auto;
   }
 
@@ -798,8 +798,8 @@
    ============================================================================ */
 @media print {
   @page {
-    size: A4 portrait;
-    margin: 8mm;
+    size: A4 landscape;
+    margin: 5mm;
   }
 
   body {
@@ -858,20 +858,81 @@
     display: none !important;
   }
 
+  .lr-ui-page .lr-lookup-strip {
+    display: none !important;
+  }
+
+  .lr-ui-page {
+    font-size: 10px;
+    padding: 0;
+    zoom: 0.88;
+    transform-origin: top left;
+  }
+
+  .lr-ui-page .lr-ui-header,
+  .lr-ui-page .form-body,
+  .lr-ui-page .row,
+  .lr-ui-page .cell,
+  .lr-ui-page .pkg-table,
+  .lr-ui-page .charge-table,
+  .lr-terms-print {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .lr-ui-page .row {
+    border-bottom: 1px solid #d8e0e8;
+  }
+
+  .lr-ui-page .cell {
+    padding: 6px 8px;
+  }
+
+  .lr-ui-page .field-input {
+    min-height: 28px;
+    padding: 4px 7px;
+    font-size: 11px;
+  }
+
+  .lr-ui-page .section-title {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+
+  .lr-ui-page .pkg-table th,
+  .lr-ui-page .charge-table th {
+    padding: 3px 4px;
+    font-size: 9px;
+  }
+
+  .lr-ui-page .pkg-table td,
+  .lr-ui-page .charge-table td {
+    padding: 2px 4px;
+    height: 22px;
+    font-size: 10px;
+  }
+
+  .lr-ui-page .pkg-table td input,
+  .lr-ui-page .charge-table input {
+    min-height: 20px;
+    padding: 2px 4px;
+    font-size: 10px;
+  }
+
   .lr-template-wrap {
     width: 100%;
-    min-height: 100vh;
+    min-height: auto;
     padding: 0;
     border-radius: 0;
     box-shadow: none;
-    page-break-after: always;
-    break-inside: avoid;
+    page-break-after: auto;
+    break-inside: auto;
   }
 
   .lr-template-wrap .terms-section {
     display: block;
-    page-break-before: always;
-    break-before: page;
+    page-break-before: auto;
+    break-before: auto;
   }
 
   .lr-template-wrap .pdf-sheet {
@@ -881,5 +942,44 @@
     max-width: none;
     margin: 0;
     box-shadow: none;
+  }
+
+  .lr-terms-print {
+    display: block !important;
+    page-break-before: always;
+    break-before: page;
+    page-break-after: always;
+    break-after: page;
+    border: 1px solid #c0392b;
+    margin-top: 0;
+    min-height: calc(100vh - 10mm);
+    padding: 10px;
+    font-size: 10px;
+    line-height: 1.35;
+  }
+
+  .lr-terms-print h2 {
+    margin: 0 0 8px;
+    font-size: 14px;
+    text-align: center;
+    color: #c0392b;
+  }
+
+  .lr-terms-print p {
+    margin: 0 0 6px;
+  }
+
+  .lr-terms-print-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  .lr-terms-print-footer {
+    margin-top: 10px;
+    font-weight: 700;
+    color: #c0392b;
+    text-align: center;
   }
 }

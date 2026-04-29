@@ -9,7 +9,7 @@ export function Header({ activePage, editingId, loading, onBack, onClear }) {
         <NavLink to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
           <img
             className="brand-logo"
-            src="src/assets/Logo.png"
+            src="src/assets/svg/Logo.svg"
             alt="Nalvel Logistics Logo"
             style={{ height: '60px', width: 'auto', objectFit: 'contain', display: 'block' }}
           />
@@ -46,9 +46,11 @@ export function Header({ activePage, editingId, loading, onBack, onClear }) {
       <div className="top-actions">
         {activePage !== 'home' && activePage !== 'view' && activePage !== 'lr' && (
           <>
-            <button type="button" className="btn secondary" onClick={onClear}>
-              Clear
-            </button>
+            {activePage !== 'data' && (
+              <button type="button" className="btn secondary" onClick={onClear}>
+                Clear
+              </button>
+            )}
             <button type="button" className="btn dark" onClick={onBack}>
               Back
             </button>

@@ -120,8 +120,10 @@ export function normalizeConsignment(item) {
     netBalance: item.netpaymentBalance ?? item.netBalance ?? '',
     commission: item.commission ?? '',
     totalAdvance: item.totalAdvance ?? '',
-    invoiceNo: item.customerInvoiceNo ?? item.invoiceNo ?? '',
-    invoiceDateTime: item.customerInvoiceDateTime ?? item.invoiceDateTime ?? '',
+    lrNo: item.lrNo ?? item.lrNumber ?? '',
+    lrDateTime: item.lrDateTime ?? item.lrDate ?? '',
+    invoiceNo: item.customerInvoiceNo ?? item.invoiceNo ?? item.customerInvoiceNumber ?? '',
+    invoiceDateTime: item.customerInvoiceDateTime ?? item.invoiceDateTime ?? item.invoiceDate ?? '',
   };
 }
 

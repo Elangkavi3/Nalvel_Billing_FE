@@ -42,3 +42,32 @@ export function deleteConsignment(id) {
 
   return request(consignmentEndpoints.deleteById(id), { method: 'DELETE' });
 }
+
+function normalizeSummaryData(data) {
+  return normalizeConsignments(data?.data);
+}
+
+export async function getConsignmentsByDateRange(startDate, endDate) {
+  const data = await request(consignmentEndpoints.readByDateRange(startDate, endDate));
+  return normalizeSummaryData(data);
+}
+
+export async function getTodayConsignments() {
+  const data = await request(consignmentEndpoints.readTodaySummary());
+  return normalizeSummaryData(data);
+}
+
+export async function getWeekConsignments() {
+  const data = await request(consignmentEndpoints.readWeekSummary());
+  return normalizeSummaryData(data);
+}
+
+export async function getMonthConsignments() {
+  const data = await request(consignmentEndpoints.readMonthSummary());
+  return normalizeSummaryData(data);
+}
+
+export async function getYearConsignments() {
+  const data = await request(consignmentEndpoints.readYearSummary());
+  return normalizeSummaryData(data);
+}

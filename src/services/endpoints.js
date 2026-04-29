@@ -22,6 +22,7 @@ function toQuery(params) {
 
 const CONSIGNMENT_BASE = '/api/consignment';
 const ADVANCE_PAYMENT_BASE = '/api/advance-payment';
+const LR_BASE = '/api/lr';
 
 export const consignmentEndpoints = {
   create: () => withApiBase(`${CONSIGNMENT_BASE}/save`),
@@ -30,6 +31,11 @@ export const consignmentEndpoints = {
   readByCustomer: (name) => withApiBase(`${CONSIGNMENT_BASE}/byCustomer?${toQuery({ name })}`),
   updateById: (id) => withApiBase(`${CONSIGNMENT_BASE}/update/${id}`),
   deleteById: (id) => withApiBase(`${CONSIGNMENT_BASE}/${id}`),
+  readByDateRange: (startDate, endDate) => withApiBase(`${CONSIGNMENT_BASE}/filter?${toQuery({ startDate, endDate })}`),
+  readTodaySummary: () => withApiBase(`${CONSIGNMENT_BASE}/today`),
+  readWeekSummary: () => withApiBase(`${CONSIGNMENT_BASE}/week`),
+  readMonthSummary: () => withApiBase(`${CONSIGNMENT_BASE}/month`),
+  readYearSummary: () => withApiBase(`${CONSIGNMENT_BASE}/year`),
 };
 
 export const advancePaymentEndpoints = {
@@ -37,4 +43,14 @@ export const advancePaymentEndpoints = {
   readByConsignmentId: (consignmentId) => withApiBase(`${ADVANCE_PAYMENT_BASE}/consignment/${consignmentId}`),
   updateById: (id) => withApiBase(`${ADVANCE_PAYMENT_BASE}/update/${id}`),
   deleteById: (id) => withApiBase(`${ADVANCE_PAYMENT_BASE}/${id}`),
+};
+
+export const lrEndpoints = {
+  create: () => withApiBase(`${LR_BASE}/save`),
+  readAll: () => withApiBase(`${LR_BASE}/allData`),
+  readById: (id) => withApiBase(`${LR_BASE}/${id}`),
+  readPrefillBySavedDataSNo: (savedDataSNo) => withApiBase(`${LR_BASE}/prefill/${encodeURIComponent(savedDataSNo)}`),
+  readByConsignmentId: (consignmentId) => withApiBase(`${LR_BASE}/by-consignment/${consignmentId}`),
+  updateById: (id) => withApiBase(`${LR_BASE}/update/${id}`),
+  deleteById: (id) => withApiBase(`${LR_BASE}/delete/${id}`),
 };

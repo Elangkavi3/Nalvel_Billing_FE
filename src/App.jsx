@@ -11,8 +11,13 @@ import { SavedDataPage } from './pages/SavedDataPage.jsx';
 import {
   deleteConsignment,
   getAllConsignments,
+  getConsignmentsByDateRange,
+  getMonthConsignments,
   saveConsignment,
   searchConsignmentsByCustomer,
+  getTodayConsignments,
+  getWeekConsignments,
+  getYearConsignments,
   updateConsignment,
 } from './services/consignmentApi.js';
 import {
@@ -123,6 +128,8 @@ export function App() {
   const [successPopup, setSuccessPopup] = useState('');
   const [homeFilter, setHomeFilter] = useState({ mode: 'all', from: '', to: '' });
   const [dataFilter, setDataFilter] = useState({ mode: 'all', from: '', to: '' });
+  const [homeFilteredItems, setHomeFilteredItems] = useState([]);
+  const [registerFilteredItems, setRegisterFilteredItems] = useState([]);
 
   // Derive active page from URL path
   const activePage = useMemo(() => {
@@ -152,8 +159,8 @@ export function App() {
     [allItems],
   );
 
-  const homeItems = useMemo(() => applyDateFilter(allItems, homeFilter), [allItems, homeFilter]);
-  const filteredDataItems = useMemo(() => applyDateFilter(items, dataFilter), [items, dataFilter]);
+  const homeItems = homeFilteredItems;
+  const filteredDataItems = registerFilteredItems;
 
   const totalPages = Math.max(1, Math.ceil(filteredDataItems.length / PAGE_SIZE));
   const pagedItems = useMemo(() => {
@@ -180,6 +187,98 @@ export function App() {
   useEffect(() => {
     loadData();
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadHomeByFilter() {
+      try {
+        if (homeFilter.mode === 'all') {
+          if (!cancelled) setHomeFilteredItems(allItems);
+          return;
+        }
+        if (homeFilter.mode === 'today') {
+          const rows = await getTodayConsignments();
+          if (!cancelled) setHomeFilteredItems(rows);
+          return;
+        }
+        if (homeFilter.mode === 'week') {
+          const rows = await getWeekConsignments();
+          if (!cancelled) setHomeFilteredItems(rows);
+          return;
+        }
+        if (homeFilter.mode === 'month') {
+          const rows = await getMonthConsignments();
+          if (!cancelled) setHomeFilteredItems(rows);
+          return;
+        }
+        if (homeFilter.mode === 'year') {
+          const rows = await getYearConsignments();
+          if (!cancelled) setHomeFilteredItems(rows);
+          return;
+        }
+        if (homeFilter.mode === 'range' && homeFilter.from && homeFilter.to) {
+          const rows = await getConsignmentsByDateRange(homeFilter.from, homeFilter.to);
+          if (!cancelled) setHomeFilteredItems(rows);
+          return;
+        }
+        if (!cancelled) setHomeFilteredItems(applyDateFilter(allItems, homeFilter));
+      } catch {
+        if (!cancelled) setHomeFilteredItems(applyDateFilter(allItems, homeFilter));
+      }
+    }
+
+    loadHomeByFilter();
+    return () => {
+      cancelled = true;
+    };
+  }, [allItems, homeFilter]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadRegisterByFilter() {
+      try {
+        if (dataFilter.mode === 'all') {
+          if (!cancelled) setRegisterFilteredItems(items);
+          return;
+        }
+        if (dataFilter.mode === 'today') {
+          const rows = await getTodayConsignments();
+          if (!cancelled) setRegisterFilteredItems(rows);
+          return;
+        }
+        if (dataFilter.mode === 'week') {
+          const rows = await getWeekConsignments();
+          if (!cancelled) setRegisterFilteredItems(rows);
+          return;
+        }
+        if (dataFilter.mode === 'month') {
+          const rows = await getMonthConsignments();
+          if (!cancelled) setRegisterFilteredItems(rows);
+          return;
+        }
+        if (dataFilter.mode === 'year') {
+          const rows = await getYearConsignments();
+          if (!cancelled) setRegisterFilteredItems(rows);
+          return;
+        }
+        if (dataFilter.mode === 'range' && dataFilter.from && dataFilter.to) {
+          const rows = await getConsignmentsByDateRange(dataFilter.from, dataFilter.to);
+          if (!cancelled) setRegisterFilteredItems(rows);
+          return;
+        }
+        if (!cancelled) setRegisterFilteredItems(applyDateFilter(items, dataFilter));
+      } catch {
+        if (!cancelled) setRegisterFilteredItems(applyDateFilter(items, dataFilter));
+      }
+    }
+
+    loadRegisterByFilter();
+    return () => {
+      cancelled = true;
+    };
+  }, [items, dataFilter]);
 
   function updateField(field, value) {
     setForm((current) => {
@@ -255,10 +354,10 @@ export function App() {
       expenses: item.expenses ?? '',
       netFreight: item.netFreight ?? '',
       profit: item.profit ?? '',
-      lrNo: item.lrNo ?? '',
-      lrDate: toDateTimeLocal(item.lrDateTime),
-      invoiceNo: item.invoiceNo ?? '',
-      invoiceDate: toDateTimeLocal(item.invoiceDateTime),
+      lrNo: item.lrNo ?? item.lrNumber ?? '',
+      lrDate: toDateTimeLocal(item.lrDateTime ?? item.lrDate),
+      invoiceNo: item.invoiceNo ?? item.customerInvoiceNo ?? item.customerInvoiceNumber ?? '',
+      invoiceDate: toDateTimeLocal(item.invoiceDateTime ?? item.customerInvoiceDateTime ?? item.invoiceDate),
       paymentStatus: item.paymentStatus ?? '',
       paymentType: item.paymentType ?? '',
       truckpaymentMode: item.truckpaymentMode ?? '',
@@ -465,7 +564,6 @@ export function App() {
           path="/lr"
           element={
             <LRGenerationPage
-              items={allItems}
               onBack={() => navigate('/')}
               onSaved={setMessage}
             />

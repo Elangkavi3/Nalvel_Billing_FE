@@ -90,6 +90,9 @@ export function MasterPage({ items = [], filter, onFilterChange, onNavigate }) {
             <button type="button" className={getFilterButtonClass(filter.mode, 'month')} onClick={() => setMode('month')}>
               This Month
             </button>
+            <button type="button" className={getFilterButtonClass(filter.mode, 'year')} onClick={() => setMode('year')}>
+              This Year
+            </button>
             <button type="button" className={getFilterButtonClass(filter.mode, 'range')} onClick={() => setMode('range')}>
               Date Range
             </button>

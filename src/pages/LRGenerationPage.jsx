@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
+import { lrEndpoints } from '../services/endpoints.js';
+import { request } from '../services/http.js';
+import { toNumber } from '../utils/numbers.js';
 
-const storageKey = 'nalvel_lr_records';
 const TERMS_APPLICABILITY =
   "The provisions set out and referred to in this LR shall apply to all multi-modal transportation being performed by NALVEL LOGISTICS SERVICES. It also applies, if the transport as described on the face of the LR is contrary to the original intentions of the party, performed by one mode of transport only.";
 const TERMS_DEFINITIONS =
@@ -30,6 +32,8 @@ const TERMS_RIGHT = [
 ];
 
 const emptyLRForm = {
+  lrRecordId: '',
+  consignmentId: '',
   sourceSerialNo: '',
   lrNo: '',
   lrDate: '',
@@ -68,32 +72,43 @@ function todayKey() {
   return new Date().toISOString().slice(0, 10);
 }
 
-function findSavedItem(items, serialNo) {
-  const query = String(serialNo || '').trim().toLowerCase();
-  if (!query) return null;
-  return items.find((item) => String(item.serialNo || item.id || '').trim().toLowerCase() === query) || null;
-}
-
-function itemToLR(item, sourceSerialNo) {
+function lrRecordToForm(record, currentForm = {}) {
+  const consignment = record?.consignment || {};
   return {
     ...emptyLRForm,
-    sourceSerialNo,
-    lrNo: item.lrNo || '',
-    lrDate: item.lrDateTime ? String(item.lrDateTime).slice(0, 10) : todayKey(),
-    vehicleNo: item.truckNo || '',
-    consignorName: item.customerName || '',
-    consignorAddress: item.fromLocation || '',
-    consignorGstin: item.gstNo || '',
-    from: item.fromLocation || '',
-    consigneeName: item.billTo || '',
-    consigneeAddress: item.toLocation || '',
-    consigneeGstin: item.imsNo || '',
-    to: item.toLocation || '',
-    description: item.material || '',
-    actualWeight: item.netWeight || item.grossWeight || '',
-    chargedWeight: item.chargebleWeight || item.netWeight || '',
-    freight: item.ledgerAmount || item.supplierAmount || '',
-    total: item.ledgerAmount || '',
+    ...currentForm,
+    lrRecordId: record?.id ?? '',
+    consignmentId: consignment.id ?? currentForm.consignmentId ?? '',
+    sourceSerialNo: record?.savedDataSNo ?? currentForm.sourceSerialNo ?? '',
+    lrNo: record?.cnNo ?? '',
+    lrDate: record?.date ?? todayKey(),
+    vehicleNo: record?.vehicleNo ?? '',
+    consignorName: record?.consignorName ?? '',
+    consignorAddress: record?.consignorAddress ?? '',
+    consignorGstin: record?.consignorGstin ?? '',
+    from: record?.fromLocation ?? currentForm.from ?? '',
+    consigneeName: record?.consigneeName ?? '',
+    consigneeAddress: record?.consigneeAddress ?? '',
+    consigneeGstin: record?.consigneeGstin ?? '',
+    to: record?.toLocation ?? currentForm.to ?? '',
+    insuranceNote: String(record?.customerInsured || '').toLowerCase() === 'yes' ? 'Insurance Covered by Customer' : 'Insurance at Owners Risk',
+    insuranceCompany: record?.insuranceCompany ?? '',
+    policyNo: record?.policyNo ?? '',
+    policyDate: record?.policyDate ?? '',
+    insuranceAmount: record?.insuranceAmount ?? '',
+    risk: record?.riskType ?? '',
+    invoiceValue: record?.declaredValue ?? '',
+    noOfPackages: record?.noOfPkgs ?? '',
+    description: record?.description ?? '',
+    actualWeight: record?.actualWt ?? '',
+    chargedWeight: record?.chargedWt ?? '',
+    freight: record?.freightRs ?? '',
+    surcharge: record?.surchargeRs ?? '',
+    hamali: record?.hamahRs ?? '',
+    escort: record?.escortRs ?? '',
+    bocdd: record?.bodDdRs ?? '',
+    stCharges: record?.stChargesRs ?? '',
+    total: record?.total ?? '',
   };
 }
 
@@ -121,23 +136,125 @@ function composeLRText(form) {
   ].join('\n');
 }
 
-function readStoredLRs() {
-  try {
-    return JSON.parse(localStorage.getItem(storageKey) || '[]');
-  } catch {
-    return [];
+async function fetchAllLrRecords() {
+  const data = await request(lrEndpoints.readAll());
+  return Array.isArray(data) ? data : [];
+}
+
+async function fetchLrByConsignmentId(consignmentId) {
+  if (!consignmentId) return null;
+  return request(lrEndpoints.readByConsignmentId(consignmentId));
+}
+
+async function fetchLrById(id) {
+  if (!id) return null;
+  return request(lrEndpoints.readById(id));
+}
+
+async function fetchLrPrefillBySavedDataSNo(savedDataSNo) {
+  if (!savedDataSNo) return null;
+  return request(lrEndpoints.readPrefillBySavedDataSNo(savedDataSNo));
+}
+
+async function deleteLrById(id) {
+  if (!id) return null;
+  return request(lrEndpoints.deleteById(id), { method: 'DELETE' });
+}
+
+async function saveLRToBackend(form) {
+  async function resolveExistingLrRecordId() {
+    const consignmentId = Number(form.consignmentId);
+    if (consignmentId) {
+      try {
+        const byConsignment = await fetchLrByConsignmentId(consignmentId);
+        if (byConsignment?.id) return byConsignment.id;
+      } catch {
+        // fallback to allData below
+      }
+    }
+
+    try {
+      const lrRecords = await fetchAllLrRecords();
+      const serialNo = String(form.sourceSerialNo || '').trim().toLowerCase();
+      const matched = lrRecords.find((record) => {
+        const recordConsignmentId = Number(record?.consignment?.id || 0);
+        const recordSerial = String(record?.savedDataSNo || '').trim().toLowerCase();
+        return (consignmentId && recordConsignmentId === consignmentId) || (serialNo && recordSerial === serialNo);
+      });
+      return matched?.id ?? '';
+    } catch {
+      return '';
+    }
   }
+
+  const payload = {
+    consignmentId: Number(form.consignmentId),
+    savedDataSNo: form.sourceSerialNo || '',
+    cnNo: form.lrNo || '',
+    date: form.lrDate || null,
+    vehicleNo: form.vehicleNo || '',
+    fromLocation: form.from || '',
+    toLocation: form.to || '',
+    consignorName: form.consignorName || '',
+    consignorGstin: form.consignorGstin || '',
+    consignorAddress: form.consignorAddress || '',
+    consigneeName: form.consigneeName || '',
+    consigneeGstin: form.consigneeGstin || '',
+    consigneeAddress: form.consigneeAddress || '',
+    customerInsured: String(form.insuranceNote || '').toLowerCase().includes('covered') ? 'Yes' : 'No',
+    insuranceCompany: form.insuranceCompany || '',
+    policyNo: form.policyNo || '',
+    policyDate: form.policyDate || null,
+    insuranceAmount: toNumber(form.insuranceAmount),
+    riskType: form.risk || '',
+    declaredValue: toNumber(form.invoiceValue),
+    noOfPkgs: Math.trunc(toNumber(form.noOfPackages)),
+    description: form.description || '',
+    actualWt: toNumber(form.actualWeight),
+    chargedWt: toNumber(form.chargedWeight),
+    freightRatePer: 0,
+    freightRs: toNumber(form.freight),
+    surchargeRatePer: 0,
+    surchargeRs: toNumber(form.surcharge),
+    hamahRatePer: 0,
+    hamahRs: toNumber(form.hamali),
+    escortRatePer: 0,
+    escortRs: toNumber(form.escort),
+    bodDdRatePer: 0,
+    bodDdRs: toNumber(form.bocdd),
+    stChargesRatePer: 0,
+    stChargesRs: toNumber(form.stCharges),
+    total: toNumber(form.total),
+  };
+
+  let targetLrRecordId = form.lrRecordId;
+  if (!targetLrRecordId) {
+    targetLrRecordId = await resolveExistingLrRecordId();
+  }
+
+  const isUpdate = Boolean(targetLrRecordId);
+  const url = isUpdate ? lrEndpoints.updateById(targetLrRecordId) : lrEndpoints.create();
+  const method = isUpdate ? 'PUT' : 'POST';
+
+  const result = await request(url, {
+    method,
+    body: JSON.stringify(payload),
+  });
+
+  let resolvedId = targetLrRecordId;
+  if (!resolvedId && payload.consignmentId) {
+    const byConsignment = await fetchLrByConsignmentId(payload.consignmentId);
+    resolvedId = byConsignment?.id || '';
+  }
+
+  const latest = resolvedId ? await fetchLrById(resolvedId) : null;
+  return { result, lrRecordId: resolvedId, latest };
 }
 
-function saveLRRecord(form) {
-  const records = readStoredLRs();
-  const nextRecord = { ...form, savedAt: new Date().toISOString() };
-  localStorage.setItem(storageKey, JSON.stringify([nextRecord, ...records].slice(0, 100)));
-}
-
-export function LRGenerationPage({ items = [], onBack, onSaved }) {
+export function LRGenerationPage({ onBack, onSaved }) {
   const [form, setForm] = useState(() => ({ ...emptyLRForm, lrDate: todayKey() }));
   const [lookupMessage, setLookupMessage] = useState('');
+  const [savePopup, setSavePopup] = useState('');
 
   const lrText = useMemo(() => composeLRText(form), [form]);
   const mailHref = `mailto:${encodeURIComponent(form.recipientEmail)}?subject=${encodeURIComponent(`LR ${form.lrNo || ''}`)}&body=${encodeURIComponent(lrText)}`;
@@ -146,20 +263,91 @@ export function LRGenerationPage({ items = [], onBack, onSaved }) {
     setForm((current) => ({ ...current, [field]: value }));
   }
 
-  function loadFromSerial() {
-    const item = findSavedItem(items, form.sourceSerialNo);
-    if (!item) {
-      setLookupMessage('No saved entry found for this S.No');
+async function loadFromSerial() {
+    const serialNo = String(form.sourceSerialNo || '').trim();
+    if (!serialNo) {
+      setLookupMessage('Enter Saved Data S.No');
       return;
     }
-    setForm(itemToLR(item, form.sourceSerialNo));
-    setLookupMessage(`Loaded saved entry #${item.serialNo || item.id}`);
+
+    try {
+      const prefill = await fetchLrPrefillBySavedDataSNo(serialNo);
+      const consignmentId = Number(prefill?.consignmentId || 0);
+
+      if (consignmentId) {
+        try {
+          const record = await fetchLrByConsignmentId(consignmentId);
+          if (record?.id) {
+            setForm((current) => lrRecordToForm(record, { ...current, sourceSerialNo: prefill.savedDataSNo || serialNo, consignmentId }));
+            setLookupMessage(`Loaded existing LR from backend for S.No ${prefill.savedDataSNo || serialNo}`);
+            return;
+          }
+        } catch {
+          // No existing LR found for this consignment; fallback to prefill DTO.
+        }
+      }
+
+      setForm((current) => ({
+        ...current,
+        consignmentId: prefill?.consignmentId ?? '',
+        sourceSerialNo: prefill?.savedDataSNo ?? serialNo,
+        lrNo: prefill?.cnNo ?? current.lrNo ?? '',
+        lrDate: prefill?.date ?? current.lrDate ?? todayKey(),
+        vehicleNo: prefill?.vehicleNo ?? current.vehicleNo ?? '',
+        consignorName: prefill?.consignorName ?? current.consignorName ?? '',
+        consignorAddress: prefill?.consignorAddress ?? current.consignorAddress ?? '',
+        consignorGstin: prefill?.consignorGstin ?? current.consignorGstin ?? '',
+        consigneeName: prefill?.consigneeName ?? current.consigneeName ?? '',
+        consigneeAddress: prefill?.consigneeAddress ?? current.consigneeAddress ?? '',
+        consigneeGstin: prefill?.consigneeGstin ?? current.consigneeGstin ?? '',
+      }));
+      setLookupMessage(`No LR found yet. Loaded consignment prefill from backend for S.No ${prefill?.savedDataSNo || serialNo}`);
+    } catch {
+      setLookupMessage(`No backend data found for S.No ${serialNo}`);
+    }
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
-    saveLRRecord(form);
-    onSaved?.(`LR ${form.lrNo || form.sourceSerialNo || ''} stored locally`);
+    setLookupMessage('');
+    if (!form.consignmentId) {
+      setLookupMessage('Please load a saved entry using S.No before Save & Generate CN');
+      return;
+    }
+
+    try {
+      const saved = await saveLRToBackend(form);
+      if (saved?.lrRecordId) {
+        setForm((current) => ({
+          ...current,
+          ...lrRecordToForm(saved.latest || {}, current),
+          lrRecordId: saved.lrRecordId,
+        }));
+      }
+      onSaved?.(`LR ${form.lrNo || form.sourceSerialNo || ''} saved to backend successfully`);
+      setLookupMessage('Saved to backend successfully. Opening print...');
+      setSavePopup('LR data saved');
+      setForm({ ...emptyLRForm, lrDate: todayKey() });
+      setTimeout(() => window.print(), 150);
+    } catch (error) {
+      setLookupMessage(error?.message || 'Unable to save LR in backend');
+    }
+  }
+
+  async function handleDeleteLr() {
+    if (!form.lrRecordId) {
+      setLookupMessage('Load an existing LR record before delete');
+      return;
+    }
+    const confirmed = window.confirm(`Delete LR record #${form.lrRecordId}?`);
+    if (!confirmed) return;
+    try {
+      await deleteLrById(form.lrRecordId);
+      setLookupMessage(`Deleted LR record #${form.lrRecordId}`);
+      setForm({ ...emptyLRForm, lrDate: todayKey() });
+    } catch (error) {
+      setLookupMessage(error?.message || 'Unable to delete LR record');
+    }
   }
 
   return (
@@ -177,8 +365,12 @@ export function LRGenerationPage({ items = [], onBack, onSaved }) {
 
           <div className="lr-ui-header">
             <div className="logo-box">
-              <div className="brand">NALVEL<br />LOGISTICS<br />SERVICES</div>
-              <div className="brand-sub">WE DELIVER EVERYWHERE</div>
+              <img
+            className="brand-logo"
+            src="src/assets/svg/Logo.svg"
+            alt="Nalvel Logistics Logo"
+            style={{ height: '60px', width: 'auto', objectFit: 'contain', display: 'block' }}
+          />
             </div>
             <div className="company-info">
               <h1>NALVEL LOGISTICS SERVICES</h1>
@@ -308,17 +500,72 @@ export function LRGenerationPage({ items = [], onBack, onSaved }) {
             <button type="button" className="btn btn-secondary" onClick={() => window.print()}>
               Print / Save PDF
             </button>
+            <button type="button" className="btn btn-secondary" onClick={handleDeleteLr}>
+              Delete LR
+            </button>
             <a className={form.recipientEmail ? 'btn btn-secondary' : 'btn btn-secondary disabled'} href={form.recipientEmail ? mailHref : undefined}>
               Send Email
             </a>
             <button type="submit" className="btn btn-primary">Save & Generate CN</button>
           </div>
+
+          <section className="lr-terms-print" aria-label="Terms and conditions">
+            <h2>TERMS AND CONDITIONS</h2>
+            <p>
+              <b>APPLICABILITY:</b> {TERMS_APPLICABILITY}
+              <br />
+              <b>{TERMS_DEFINITIONS}</b>
+            </p>
+            <div className="lr-terms-print-grid">
+              <div>
+                {TERMS_LEFT.map((term, index) => (
+                  <p key={`print-left-${index}`}>
+                    <b>{index + 1}.</b> {term}
+                  </p>
+                ))}
+              </div>
+              <div>
+                {TERMS_RIGHT.map((term, index) => (
+                  <p key={`print-right-${index}`}>
+                    <b>{index + 11}.</b> {term}
+                  </p>
+                ))}
+              </div>
+            </div>
+            <div className="lr-terms-print-footer">
+              All disputes subject to Chennai jurisdiction only. | This is a computer generated document.
+            </div>
+          </section>
         </form>
 
         <div className="lr-print-only">
           <LRPreview form={form} />
         </div>
       </div>
+
+      {savePopup && (
+        <section className="success-popup-backdrop" role="presentation" onClick={() => setSavePopup('')}>
+          <div
+            className="success-popup"
+            role="alertdialog"
+            aria-live="assertive"
+            aria-label="LR saved"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="success-popup-icon" aria-hidden="true">
+              <svg viewBox="0 0 64 64" fill="none">
+                <circle cx="32" cy="32" r="30" />
+                <path d="M18 33.5 27.5 43 46 24.5" />
+              </svg>
+            </div>
+            <h2>Success</h2>
+            <p>{savePopup}</p>
+            <button type="button" className="btn primary" onClick={() => setSavePopup('')}>
+              Continue
+            </button>
+          </div>
+        </section>
+      )}
     </section>
   );
 }
