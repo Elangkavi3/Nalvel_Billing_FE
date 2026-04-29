@@ -1,0 +1,218 @@
+/* ============================================================================
+   GLOBAL.CSS - Base Styles, Typography, and Global Elements
+   ============================================================================ */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: linear-gradient(180deg, var(--color-wash) 0%, var(--color-paper) 48%, var(--color-wash) 100%);
+  overflow-x: hidden;
+  color: var(--color-ink);
+  font-family: var(--font-family-base);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* Typography */
+h1,
+h2 {
+  margin: 0;
+  line-height: var(--line-height-snug);
+  letter-spacing: var(--letter-spacing-none);
+}
+
+h1 {
+  font-size: var(--font-size-7xl);
+}
+
+h2 {
+  color: var(--color-accent-dark);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-extrabold);
+  margin-bottom: var(--spacing-6);
+  text-transform: uppercase;
+}
+
+.eyebrow {
+  margin: 0 0 var(--spacing-2);
+  color: var(--color-accent-dark);
+  font-size: var(--font-size-md-plus);
+  font-weight: var(--font-weight-extrabold);
+  letter-spacing: var(--letter-spacing-none);
+  text-transform: uppercase;
+}
+
+.subline {
+  margin: var(--spacing-3) 0 0;
+  color: var(--color-muted);
+}
+
+/* App Shell */
+.app-shell {
+  width: min(var(--max-width-container), calc(100% - var(--spacing-container-h)));
+  margin: 0 auto;
+  padding: var(--spacing-container-v) 0 var(--spacing-container-v-bottom);
+}
+
+/* Flex Utilities */
+.topbar,
+.list-head,
+.top-actions,
+.search-row,
+.action-cell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-6);
+  min-width: 0;
+}
+
+.top-actions,
+.search-row,
+.action-cell {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  min-width: 1040px;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  border-bottom: var(--border-width-base) solid var(--color-line);
+  padding: var(--table-cell-padding);
+  text-align: left;
+  vertical-align: middle;
+  font-size: var(--table-cell-font-size);
+}
+
+th {
+  color: var(--color-accent-dark);
+  font-size: var(--table-header-font-size);
+  text-transform: uppercase;
+}
+
+td span {
+  display: block;
+  margin-top: var(--spacing-3);
+  color: var(--color-muted);
+  font-size: var(--font-size-md-plus);
+}
+
+/* Links & Buttons as Links */
+.link-button {
+  border: 0;
+  background: transparent;
+  color: var(--color-link-button);
+  font-weight: var(--font-weight-black);
+  padding: var(--button-padding-sm);
+}
+
+.link-button.danger {
+  color: var(--color-link-button-danger);
+}
+
+.profit-text {
+  color: var(--color-accent-dark);
+  font-weight: var(--font-weight-black);
+}
+
+/* Icon Actions */
+.icon-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-icon-size);
+  height: var(--size-icon-size);
+  border: none;
+  border-radius: var(--border-radius-base);
+  padding: 0;
+  background: var(--color-soft);
+  color: var(--color-accent-dark);
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.icon-action:hover {
+  background: var(--color-line);
+}
+
+.icon-action svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+}
+
+/* Status Line */
+.status-line {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-8);
+  padding: var(--spacing-8) var(--spacing-8);
+  margin-top: var(--spacing-8);
+  background: var(--color-paper);
+  border: var(--border-width-base) solid var(--color-line);
+  border-radius: var(--border-radius-md);
+  min-height: 48px;
+}
+
+.status-line span {
+  flex: 1;
+  color: var(--color-muted);
+  font-size: var(--font-size-lg);
+}
+
+.status-line strong {
+  color: var(--color-danger);
+  font-size: var(--font-size-lg);
+}
+
+/* Modal/Popup */
+.success-popup {
+  position: fixed;
+  bottom: var(--spacing-8);
+  right: var(--spacing-8);
+  padding: var(--spacing-6) var(--spacing-8);
+  background: var(--color-accent-dark);
+  color: #fff;
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  box-shadow: var(--shadow-base);
+  z-index: var(--z-modal);
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}

@@ -1,0 +1,133 @@
+/* ============================================================================
+   ENTRY-FORM-PAGE.CSS - Entry Form Page Styles
+   ============================================================================ */
+
+/* FORM HEADER */
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--spacing-6);
+  padding: var(--spacing-6) var(--spacing-8);
+  background: var(--color-accent-dark);
+  color: #fff;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-extrabold);
+}
+
+.form-header span:last-child {
+  text-align: right;
+}
+
+.form-header span {
+  color: #cde8e4;
+  font-size: var(--font-size-md-plus);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* FIELDSET */
+fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+/* BILL VIEW SECTION TITLE */
+.bill-section-title {
+  padding: var(--spacing-4) 0;
+  margin: 0 0 var(--spacing-8);
+}
+
+.bill-section-title h2 {
+  margin: 0;
+  color: var(--color-accent-dark);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-black);
+  text-transform: uppercase;
+}
+
+.bill-section-title::after {
+  content: "";
+  display: block;
+  margin-top: var(--spacing-4);
+  height: var(--border-width-thin);
+  background: var(--color-line);
+}
+
+/* BILL FIELD LABELS & VALUES */
+.bill-field-label {
+  color: var(--color-accent-dark);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  margin: 0;
+  padding: var(--spacing-4) 0 var(--spacing-3);
+}
+
+.bill-field-value {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  margin: 0;
+  padding: 0;
+}
+
+/* RADIO GROUP */
+.radio-group {
+  display: flex;
+  gap: var(--spacing-8);
+  align-items: center;
+  margin-top: var(--spacing-4);
+}
+
+.radio-group label {
+  font-size: var(--font-size-lg);
+  color: var(--color-muted);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  cursor: pointer;
+}
+
+/* BUTTON ROWS */
+.btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-4);
+  justify-content: flex-end;
+  margin-top: var(--spacing-8);
+  min-width: 0;
+}
+
+.btn-row .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--size-button-height);
+  padding: var(--spacing-4) var(--spacing-8);
+  border-radius: var(--border-radius-base);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  white-space: nowrap;
+  margin-top: var(--spacing-8);
+}
+
+/* ENTRY PANEL CONTENT */
+.entry-panel {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+.entry-panel > .form-header {
+  grid-column: 1 / -1;
+}
+
+.entry-panel > fieldset {
+  grid-column: 1 / -1;
+  border: 0;
+  padding: 0;
+  margin: 0;
+}

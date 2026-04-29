@@ -166,6 +166,15 @@ export function LRGenerationPage({ items = [], onBack, onSaved }) {
     <section className="lr-page">
       <div className="lr-workspace">
         <form className="lr-form-panel lr-ui-page" onSubmit={handleSubmit}>
+          <div className="lr-lookup-strip">
+            <div className="lr-lookup-field">
+              <div className="cell-label">Saved Data S.No</div>
+              <input className="field-input" value={form.sourceSerialNo} onChange={(event) => updateField('sourceSerialNo', event.target.value)} />
+            </div>
+            <button type="button" className="btn btn-secondary" onClick={loadFromSerial}>Fill</button>
+            {lookupMessage && <div className="lr-lookup-message">{lookupMessage}</div>}
+          </div>
+
           <div className="lr-ui-header">
             <div className="logo-box">
               <div className="brand">NALVEL<br />LOGISTICS<br />SERVICES</div>
@@ -249,14 +258,6 @@ export function LRGenerationPage({ items = [], onBack, onSaved }) {
               <div className="cell">
                 <div className="cell-label">Declared Value (Rs)</div>
                 <input className="field-input mt4" value={form.invoiceValue} onChange={(e) => updateField('invoiceValue', e.target.value)} />
-                <div className="mt10">
-                  <div className="cell-label">Saved Data S.No</div>
-                  <div className="two-col mt4">
-                    <input className="field-input" value={form.sourceSerialNo} onChange={(event) => updateField('sourceSerialNo', event.target.value)} />
-                    <button type="button" className="btn btn-secondary" onClick={loadFromSerial}>Fill</button>
-                  </div>
-                </div>
-                {lookupMessage && <div className="lr-lookup-message mt6">{lookupMessage}</div>}
               </div>
             </div>
 
