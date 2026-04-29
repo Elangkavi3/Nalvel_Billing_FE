@@ -5,12 +5,12 @@
 /* BUTTONS */
 .btn {
   min-height: var(--size-button-height);
-  padding: var(--button-padding-base);
+  border: 1px solid transparent;
   border-radius: var(--border-radius-base);
+  padding: var(--button-padding-base);
   font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--font-weight-extrabold);
   cursor: pointer;
-  border: none;
   text-decoration: none;
   white-space: nowrap;
   transition: var(--transition-base);
@@ -20,7 +20,7 @@
 }
 
 .btn.primary {
-  background: var(--color-accent-dark);
+  background: var(--color-accent);
   color: #fff;
   border: none;
 }
@@ -30,17 +30,17 @@
 }
 
 .btn.secondary {
-  background: var(--color-background-secondary);
-  color: var(--color-text-primary);
-  border: 0.5px solid var(--color-border-secondary);
+  background: #fff;
+  border-color: var(--color-accent);
+  color: var(--color-accent-dark);
 }
 
 .btn.secondary:hover {
-  background: var(--color-line);
+  background: var(--color-soft);
 }
 
 .btn.dark {
-  background: var(--color-accent-dark);
+  background: var(--color-ink);
   color: #fff;
   border: none;
 }
@@ -57,8 +57,8 @@
 }
 
 .btn:disabled {
-  pointer-events: none;
-  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+  opacity: 0.65;
 }
 
 /* FORMS & INPUTS */
