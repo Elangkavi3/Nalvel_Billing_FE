@@ -150,59 +150,76 @@ input[type="checkbox"] {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: start;
-  gap: var(--spacing-6) var(--spacing-xl);
-  margin-top: var(--spacing-0);
+  gap: 12px 18px;
+  margin-top: 0;
 }
 
 .filter-pills {
   display: flex;
-  gap: var(--spacing-5);
+  gap: 10px;
   flex-wrap: wrap;
-  row-gap: var(--spacing-4);
+  row-gap: 8px;
 }
 
 .filter-pill {
-  min-height: var(--size-button-height);
-  border: var(--border-width-base) solid #bdd2dd;
-  border-radius: var(--border-radius-full);
-  background: var(--color-paper);
-  color: var(--color-accent-dark);
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-extrabold);
-  padding: var(--spacing-4) var(--spacing-8);
+  min-height: 38px;
+  border: 1px solid #bdd2dd;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--accent-dark);
+  font-size: 13px;
+  font-weight: 800;
+  padding: 8px 14px;
   cursor: pointer;
-  transition: var(--transition-base);
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
 
 .filter-pill:hover {
-  background: var(--color-soft);
+  background: var(--soft);
 }
 
 .filter-pill.active {
-  background: var(--color-accent-dark);
-  color: #fff;
-  border-color: var(--color-accent-dark);
+  border-color: var(--accent);
+  background: #e7f6f2;
+  color: var(--accent-dark);
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.1);
+}
+
+.filter-range {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--soft);
 }
 
 .filter-date-field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-4);
-  min-width: 160px;
+  display: grid;
+  gap: 4px;
+  min-width: 170px;
 }
 
 .filter-date-field span {
-  color: var(--color-accent-dark);
-  font-size: var(--font-size-md-plus);
-  font-weight: var(--font-weight-bold);
-  text-transform: uppercase;
+  color: var(--accent-dark);
+  font-size: 12px;
+  font-weight: 800;
 }
 
 .filter-date-field input {
-  padding: var(--spacing-4) var(--spacing-5);
-  border: var(--form-input-border);
-  border-radius: var(--border-radius-base);
-  font-size: var(--font-size-lg);
+  min-height: 38px;
+  border: 1px solid #bdd2dd;
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ink);
+  padding: 8px 10px;
+}
+
+.filter-date-field input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+  outline: none;
 }
 
 /* SUMMARY BOX */

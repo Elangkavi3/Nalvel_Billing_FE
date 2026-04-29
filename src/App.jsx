@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { Header } from './components/layout/Header.jsx';
 import { StatusLine } from './components/layout/StatusLine.jsx';
 import { emptyConsignmentForm, PAGE_SIZE } from './constants/consignment.js';
@@ -106,13 +107,15 @@ function applyDateFilter(items, filter) {
 }
 
 export function App() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [form, setForm] = useState(() => ({ ...emptyConsignmentForm }));
   const [items, setItems] = useState([]);
   const [allItems, setAllItems] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [viewingItem, setViewingItem] = useState(null);
   const [searchName, setSearchName] = useState('');
-  const [activePage, setActivePage] = useState('home');
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('Ready to connect');
@@ -120,6 +123,16 @@ export function App() {
   const [successPopup, setSuccessPopup] = useState('');
   const [homeFilter, setHomeFilter] = useState({ mode: 'all', from: '', to: '' });
   const [dataFilter, setDataFilter] = useState({ mode: 'all', from: '', to: '' });
+
+  // Derive active page from URL path
+  const activePage = useMemo(() => {
+    const path = location.pathname;
+    if (path === '/entry') return 'form';
+    if (path === '/register') return 'data';
+    if (path === '/lr') return 'lr';
+    if (path === '/view') return 'view';
+    return 'home';
+  }, [location.pathname]);
 
   const suggestions = useMemo(
     () => ({
@@ -207,7 +220,7 @@ export function App() {
     setViewingItem(null);
     setError('');
     setMessage('New entry');
-    setActivePage('form');
+    navigate('/entry');
   }
 
   function applyConsignmentToForm(item) {
@@ -321,8 +334,8 @@ export function App() {
       applyConsignmentToForm({ ...item, advanceEntries });
       setEditingId(item.id ?? null);
       setViewingItem(null);
-      setActivePage('form');
       setMessage(`Editing entry #${item.id}`);
+      navigate('/entry');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
       setError(getErrorMessage(err, 'Unable to load advance payments'));
@@ -333,8 +346,8 @@ export function App() {
 
   function viewItem(item) {
     setViewingItem(item);
-    setActivePage('view');
     setMessage(`Viewing entry #${item.serialNo || item.id}`);
+    navigate('/view');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -386,64 +399,94 @@ export function App() {
         activePage={activePage}
         editingId={editingId}
         loading={loading}
-        onBack={() => setActivePage('home')}
+        onBack={() => navigate(-1)}
         onClear={clearForm}
       />
 
-      {activePage === 'home' && (
-        <MasterPage items={homeItems} filter={homeFilter} onFilterChange={setHomeFilter} onNavigate={setActivePage} />
-      )}
-
-      {activePage === 'form' && (
-        <EntryFormPage
-          editingId={editingId}
-          form={form}
-          suggestions={suggestions}
-          onBack={() => setActivePage('home')}
-          onSubmit={submitForm}
-          onUpdateField={updateField}
-        />
-      )}
-
       <StatusLine loading={loading} message={message} error={error} />
 
-      {activePage === 'data' && (
-        <SavedDataPage
-          currentPage={currentPage}
-          filter={dataFilter}
-          items={filteredDataItems}
-          loading={loading}
-          pagedItems={pagedItems}
-          searchName={searchName}
-          totalPages={totalPages}
-          onBack={() => setActivePage('home')}
-          onDelete={deleteItem}
-          onEdit={editItem}
-          onFilterChange={setDataFilter}
-          onView={viewItem}
-          onLoadAll={loadData}
-          onSearch={searchByCustomer}
-          onSearchNameChange={setSearchName}
-          onSetPage={setCurrentPage}
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <MasterPage
+              items={homeItems}
+              filter={homeFilter}
+              onFilterChange={setHomeFilter}
+              onNavigate={(page) => {
+                if (page === 'form') navigate('/entry');
+                else if (page === 'data') navigate('/register');
+                else if (page === 'lr') navigate('/lr');
+                else navigate('/');
+              }}
+            />
+          }
         />
-      )}
 
-      {activePage === 'lr' && (
-        <LRGenerationPage
-          items={allItems}
-          onBack={() => setActivePage('home')}
-          onSaved={setMessage}
+        <Route
+          path="/entry"
+          element={
+            <EntryFormPage
+              editingId={editingId}
+              form={form}
+              suggestions={suggestions}
+              onBack={() => navigate('/')}
+              onSubmit={submitForm}
+              onUpdateField={updateField}
+            />
+          }
         />
-      )}
 
-      {activePage === 'view' && (
-        <BillingViewPage
-          item={viewingItem}
-          onBack={() => setActivePage('data')}
-          onEdit={editItem}
-          onHome={() => setActivePage('home')}
+        <Route
+          path="/register"
+          element={
+            <SavedDataPage
+              currentPage={currentPage}
+              filter={dataFilter}
+              items={filteredDataItems}
+              loading={loading}
+              pagedItems={pagedItems}
+              searchName={searchName}
+              totalPages={totalPages}
+              onBack={() => navigate('/')}
+              onDelete={deleteItem}
+              onEdit={editItem}
+              onFilterChange={setDataFilter}
+              onView={viewItem}
+              onLoadAll={loadData}
+              onSearch={searchByCustomer}
+              onSearchNameChange={setSearchName}
+              onSetPage={setCurrentPage}
+            />
+          }
         />
-      )}
+
+        <Route
+          path="/lr"
+          element={
+            <LRGenerationPage
+              items={allItems}
+              onBack={() => navigate('/')}
+              onSaved={setMessage}
+            />
+          }
+        />
+
+        <Route
+          path="/view"
+          element={
+            <BillingViewPage
+              item={viewingItem}
+              onBack={() => navigate('/register')}
+              onEdit={editItem}
+              onHome={() => navigate('/')}
+            />
+          }
+        />
+
+        {/* Catch-all: redirect to home */}
+        <Route path="*" element={<MasterPage items={homeItems} filter={homeFilter} onFilterChange={setHomeFilter} onNavigate={(page) => { if (page === 'form') navigate('/entry'); else if (page === 'data') navigate('/register'); else if (page === 'lr') navigate('/lr'); else navigate('/'); }} />} />
+      </Routes>
 
       {successPopup && (
         <section className="success-popup-backdrop" role="presentation" onClick={() => setSuccessPopup('')}>
