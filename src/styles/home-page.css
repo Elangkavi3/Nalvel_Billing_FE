@@ -66,6 +66,7 @@
 /* HOME ACTIONS */
 .home-actions {
   display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 12px;
   padding: 24px;
   background: #fff;
@@ -193,6 +194,17 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   word-break: break-word;
+  transition: color 0.15s ease;
+}
+
+.brand-text:hover {
+  color: var(--accent-dark);
+}
+
+.brand-text.nav-active {
+  color: var(--accent-dark);
+  border-bottom: 2px solid var(--accent-dark);
+  padding-bottom: 1px;
 }
 
 .brand-divider {
