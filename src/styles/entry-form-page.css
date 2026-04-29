@@ -1,27 +1,34 @@
 /* ============================================================================
    ENTRY-FORM-PAGE.CSS - Entry Form Page Styles
+   Restored from style.css.backup to match original exactly
    ============================================================================ */
 
 /* FORM HEADER */
 .form-header {
   display: flex;
   justify-content: space-between;
-  gap: var(--spacing-6);
-  padding: var(--spacing-6) var(--spacing-8);
-  background: var(--color-accent-dark);
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--accent-dark);
   color: #fff;
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-extrabold);
+  font-size: 13px;
+  font-weight: 800;
 }
 
 .form-header span:last-child {
-  text-align: right;
+  color: #cde8e4;
+  font-weight: 600;
 }
 
-.form-header span {
-  color: #cde8e4;
-  font-size: var(--font-size-md-plus);
-  font-weight: var(--font-weight-semibold);
+/* HEADER BACK BUTTON */
+.header-back {
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 6px;
+  background: transparent;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 6px 10px;
 }
 
 /* FIELDSET */
@@ -31,103 +38,326 @@ fieldset {
   border: 0;
 }
 
-/* BILL VIEW SECTION TITLE */
-.bill-section-title {
-  padding: var(--spacing-4) 0;
-  margin: 0 0 var(--spacing-8);
-}
-
-.bill-section-title h2 {
-  margin: 0;
-  color: var(--color-accent-dark);
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-black);
-  text-transform: uppercase;
-}
-
-.bill-section-title::after {
-  content: "";
+/* FORM SECTION LEGEND */
+.form-section legend {
   display: block;
-  margin-top: var(--spacing-4);
-  height: var(--border-width-thin);
-  background: var(--color-line);
-}
-
-/* BILL FIELD LABELS & VALUES */
-.bill-field-label {
-  color: var(--color-accent-dark);
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-bold);
-  text-transform: uppercase;
-  margin: 0;
-  padding: var(--spacing-4) 0 var(--spacing-3);
-}
-
-.bill-field-value {
-  color: var(--color-text-primary);
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-  margin: 0;
   padding: 0;
+  margin: 0 0 16px;
+  color: var(--accent-dark);
+  font-size: 18px;
+  line-height: 1.2;
+  font-weight: 900;
+}
+
+/* OPTION STACK */
+.option-stack {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+/* INLINE OPTION BLOCK */
+.inline-option-block {
+  margin-bottom: 10px;
 }
 
 /* RADIO GROUP */
 .radio-group {
-  display: flex;
-  gap: var(--spacing-8);
-  align-items: center;
-  margin-top: var(--spacing-4);
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--soft);
 }
 
-.radio-group label {
-  font-size: var(--font-size-lg);
-  color: var(--color-muted);
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-2);
-  cursor: pointer;
+.radio-group legend {
+  padding: 0 6px;
+  color: var(--accent-dark);
+  font-size: 12px;
+  font-weight: 800;
 }
 
-/* BUTTON ROWS */
-.btn-row {
+.radio-options {
   display: flex;
+  gap: 10px;
   flex-wrap: wrap;
-  gap: var(--spacing-4);
-  justify-content: flex-end;
-  margin-top: var(--spacing-8);
+}
+
+.radio-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.radio-option input {
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+/* FIELD */
+.field {
+  display: block;
+  margin-bottom: 10px;
   min-width: 0;
 }
 
-.btn-row .btn {
+.field span {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--accent-dark);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.field input,
+.field select,
+.field textarea,
+.search-row input {
+  width: 100%;
+  min-height: 38px;
+  border: 1px solid #bdd2dd;
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ink);
+  outline: none;
+  padding: 8px 10px;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus,
+.search-row input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+}
+
+.field textarea {
+  min-height: 86px;
+  resize: vertical;
+}
+
+/* GST NO FIELD */
+.gst-no-field {
+  min-width: 0;
+}
+
+.gst-no-control {
+  position: relative;
+  display: grid;
+  width: 100%;
+  align-items: center;
+}
+
+.gst-no-prefix {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  min-height: var(--size-button-height);
-  padding: var(--spacing-4) var(--spacing-8);
-  border-radius: var(--border-radius-base);
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-bold);
-  cursor: pointer;
-  border: none;
-  text-decoration: none;
-  white-space: nowrap;
-  margin-top: var(--spacing-8);
+  min-height: 22px;
+  padding-right: 8px;
+  border-right: 1px solid #bdd2dd;
+  background: transparent;
+  color: var(--accent-dark);
+  font-size: 14px;
+  font-weight: 800;
+  pointer-events: none;
 }
 
-/* ENTRY PANEL CONTENT */
-.entry-panel {
+.gst-no-control input {
+  width: 100%;
+  padding-left: 82px;
+}
+
+/* ADVANCE LIST */
+.advance-list {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 0;
+  gap: 10px;
+  margin-bottom: 10px;
 }
 
-.entry-panel > .form-header {
-  grid-column: 1 / -1;
+.advance-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: end;
 }
 
-.entry-panel > fieldset {
-  grid-column: 1 / -1;
-  border: 0;
-  padding: 0;
+.advance-entry-field {
+  min-width: 0;
+  margin-bottom: 0;
+}
+
+.advance-entry-field input {
+  width: 100%;
+}
+
+.advance-add-btn {
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.advance-add-btn:hover {
+  filter: brightness(1.03);
+}
+
+/* READONLY & PROFIT INPUT */
+.readonly {
+  background: var(--soft) !important;
+  color: var(--accent-dark) !important;
+  font-weight: 800;
+}
+
+.profit-input {
+  background: #dff4ef !important;
+}
+
+/* STATUS LINE */
+.status-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.status-line strong {
+  color: var(--danger);
+}
+
+/* BILL VIEW SECTION TITLE */
+.bill-section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 13px;
+  padding-bottom: 9px;
+  border-bottom: 1px solid #e2eeeb;
+}
+
+.bill-section-title h2 {
   margin: 0;
+  color: #173f3d;
+  font-size: 13px;
+  font-weight: 850;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.bill-section-title::after {
+  content: none;
+}
+
+/* BILL FIELD LABELS & VALUES */
+.bill-field-label {
+  margin-bottom: 3px;
+  color: #607371;
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1.25;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.bill-field-value {
+  overflow-wrap: anywhere;
+  color: #111827;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.bill-field-value.mono {
+  font-family: inherit;
+  font-size: 15px;
+}
+
+.bill-field-value.amount {
+  font-family: inherit;
+  color: #0b5f59;
+  font-size: 16px;
+  font-weight: 850;
+}
+
+/* ENTRY PANEL */
+.entry-panel {
+  margin-top: 20px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+/* BUTTON ROW */
+.btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 1rem;
+  min-width: 0;
+}
+
+/* DISABLED BUTTON */
+.btn.disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+/* LR FORM HEAD */
+.lr-form-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+/* LR LOOKUP ROW */
+.lr-lookup-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: end;
+  margin: 16px 0;
+}
+
+.lr-lookup-message {
+  grid-column: 1 / -1;
+  color: var(--accent-dark);
+  font-size: 13px;
+  font-weight: 750;
+}
+
+/* LR FORM GRID */
+.lr-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.lr-field-wide {
+  grid-column: 1 / -1;
+}
+
+.lr-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
 }

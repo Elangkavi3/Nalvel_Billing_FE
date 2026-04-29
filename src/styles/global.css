@@ -73,22 +73,23 @@ h2 {
 
 /* Flex Utilities */
 .topbar,
-.list-head,
-.top-actions,
-.search-row,
-.action-cell {
+.list-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--spacing-6);
+  gap: var(--gap-xl);
   min-width: 0;
 }
 
 .top-actions,
 .search-row,
 .action-cell {
+  display: flex;
+  align-items: center;
   justify-content: flex-start;
+  gap: var(--spacing-4);
   flex-wrap: wrap;
+  min-width: 0;
 }
 
 /* Tables */
