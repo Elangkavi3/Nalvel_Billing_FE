@@ -172,6 +172,11 @@
   overflow: visible;
 }
 
+.lr-ui-page .insurance-full-row {
+  grid-column: 1 / -1;
+  border-right: none;
+}
+
 .lr-ui-page .cell:last-child {
   border-right: none;
 }
@@ -292,7 +297,7 @@
   border: 0.5px solid var(--line);
   padding: 3px;
   height: 34px;
-  vertical-align: middle;
+  vertical-align: top;
 }
 
 .lr-ui-page .pkg-table td input,
@@ -348,29 +353,56 @@
 }
 
 /* WIDTH UTILITIES */
-.lr-ui-page .w-p70 {
+.lr-ui-page .pkg-col-packages {
   width: 16%;
 }
 
-.lr-ui-page .w-p110 {
-  width: 18%;
+.lr-ui-page .pkg-col-description {
+  width: 56%;
 }
 
-.lr-ui-page .pkg-table th:nth-child(2),
-.lr-ui-page .pkg-table td:nth-child(2) {
-  width: 48%;
+.lr-ui-page .pkg-col-weight {
+  width: 28%;
 }
 
-.lr-ui-page .pkg-table th:nth-child(1),
-.lr-ui-page .pkg-table td:nth-child(1) {
-  width: 16%;
+.lr-ui-page .pkg-vertical-cell {
+  vertical-align: top;
 }
 
-.lr-ui-page .pkg-table th:nth-child(3),
-.lr-ui-page .pkg-table td:nth-child(3),
-.lr-ui-page .pkg-table th:nth-child(4),
-.lr-ui-page .pkg-table td:nth-child(4) {
-  width: 18%;
+.lr-ui-page .pkg-description-cell {
+  padding: 4px;
+}
+
+.lr-ui-page .pkg-description-input {
+  width: 100%;
+  min-height: 108px;
+  border: 1px solid #d4dde8;
+  border-radius: 4px;
+  padding: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  resize: none;
+  color: #0f172a;
+}
+
+.lr-ui-page .pkg-weight-cell {
+  padding: 0;
+}
+
+.lr-ui-page .pkg-weight-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent-dark);
+  text-transform: uppercase;
+  text-align: center;
+  padding: 5px 4px;
+  border-bottom: 0.5px solid var(--line);
+  background: var(--soft);
+}
+
+.lr-ui-page .pkg-weight-cell input {
+  margin: 4px;
+  width: calc(100% - 8px);
 }
 
 .lr-ui-page .charge-table th:nth-child(1),
@@ -781,3 +813,22 @@
 .lr-ui-page .row:last-child .cell:last-child {
   border-bottom: 0;
 }
+
+.lr-ui-page .package-details-cell {
+  display: flex;
+  flex-direction: column;
+}
+
+.lr-ui-page .package-declared-value {
+  margin-top: auto;
+  padding-top: 10px;
+}
+
+.lr-ui-page .insurance-print-spacer {
+  display: none;
+}
+
+.lr-ui-page .print-signature-row {
+  display: none;
+}
+

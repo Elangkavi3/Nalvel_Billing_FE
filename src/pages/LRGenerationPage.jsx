@@ -255,6 +255,7 @@ export function LRGenerationPage({ onBack, onSaved }) {
   const [form, setForm] = useState(() => ({ ...emptyLRForm, lrDate: todayKey() }));
   const [lookupMessage, setLookupMessage] = useState('');
   const [savePopup, setSavePopup] = useState('');
+  const isCustomerInsured = String(form.insuranceNote || '').toLowerCase().includes('covered');
 
   const lrText = useMemo(() => composeLRText(form), [form]);
   const mailHref = `mailto:${encodeURIComponent(form.recipientEmail)}?subject=${encodeURIComponent(`LR ${form.lrNo || ''}`)}&body=${encodeURIComponent(lrText)}`;
@@ -428,52 +429,91 @@ async function loadFromSerial() {
             </div>
 
             <div className="row">
-              <div className="cell cell-flex2">
+              <div className="cell cell-flex2 insurance-full-row">
                 <div className="section-title">INSURANCE DETAILS</div>
                 <div className="mt6">
                   <div className="cell-label">Has the customer insured this consignment?</div>
                   <div className="radio-group">
-                    <label><input type="radio" name="insured" checked={String(form.insuranceNote).toLowerCase().includes('insured')} onChange={() => updateField('insuranceNote', 'Insurance Covered by Customer')} /> Yes - Insured</label>
-                    <label><input type="radio" name="insured" checked={!String(form.insuranceNote).toLowerCase().includes('covered')} onChange={() => updateField('insuranceNote', 'Insurance at Owners Risk')} /> No - Not Insured</label>
+                    <label><input type="radio" name="insured" checked={isCustomerInsured} onChange={() => updateField('insuranceNote', 'Insurance Covered by Customer')} /> Yes - Insured</label>
+                    <label>
+                      <input
+                        type="radio"
+                        name="insured"
+                        checked={!isCustomerInsured}
+                        onChange={() =>
+                          setForm((current) => ({
+                            ...current,
+                            insuranceNote: 'Insurance at Owners Risk',
+                            insuranceCompany: '',
+                            policyNo: '',
+                            policyDate: '',
+                            insuranceAmount: '',
+                            risk: '',
+                          }))
+                        }
+                      />{' '}
+                      No - Not Insured
+                    </label>
                   </div>
                 </div>
-                <div className="three-col mt6">
-                  <div><div className="cell-label">Company</div><input className="field-input" value={form.insuranceCompany} onChange={(e) => updateField('insuranceCompany', e.target.value)} /></div>
-                  <div><div className="cell-label">Policy No.</div><input className="field-input" value={form.policyNo} onChange={(e) => updateField('policyNo', e.target.value)} /></div>
-                  <div><div className="cell-label">Policy Date</div><input className="field-input" type="date" value={form.policyDate} onChange={(e) => updateField('policyDate', e.target.value)} /></div>
-                </div>
-                <div className="two-col mt6">
-                  <div><div className="cell-label">Amount (Rs)</div><input className="field-input" value={form.insuranceAmount} onChange={(e) => updateField('insuranceAmount', e.target.value)} /></div>
-                  <div><div className="cell-label">Risk Type</div><input className="field-input" value={form.risk} onChange={(e) => updateField('risk', e.target.value)} /></div>
-                </div>
-              </div>
-              <div className="cell">
-                <div className="cell-label">Declared Value (Rs)</div>
-                <input className="field-input mt4" value={form.invoiceValue} onChange={(e) => updateField('invoiceValue', e.target.value)} />
+                {isCustomerInsured && (
+                  <>
+                    <div className="three-col mt6">
+                      <div><div className="cell-label">Company</div><input className="field-input" value={form.insuranceCompany} onChange={(e) => updateField('insuranceCompany', e.target.value)} /></div>
+                      <div><div className="cell-label">Policy No.</div><input className="field-input" value={form.policyNo} onChange={(e) => updateField('policyNo', e.target.value)} /></div>
+                      <div><div className="cell-label">Policy Date</div><input className="field-input" type="date" value={form.policyDate} onChange={(e) => updateField('policyDate', e.target.value)} /></div>
+                    </div>
+                    <div className="two-col mt6">
+                      <div><div className="cell-label">Amount (Rs)</div><input className="field-input" value={form.insuranceAmount} onChange={(e) => updateField('insuranceAmount', e.target.value)} /></div>
+                      <div><div className="cell-label">Risk Type</div><input className="field-input" value={form.risk} onChange={(e) => updateField('risk', e.target.value)} /></div>
+                    </div>
+                  </>
+                )}
+                {!isCustomerInsured && <div className="insurance-print-spacer" aria-hidden="true" />}
               </div>
             </div>
 
             <div className="row">
-              <div className="cell cell-flex3">
+              <div className="cell cell-flex3 package-details-cell">
                 <div className="section-title">PACKAGE DETAILS</div>
                 <table className="pkg-table mt6">
                   <thead>
                     <tr>
-                      <th className="w-p70">No. of Pkgs</th>
-                      <th>Description (Said to Contain)</th>
-                      <th className="w-p110">Actual Wt. (KG)</th>
-                      <th className="w-p110">Charged Wt. (KG)</th>
+                      <th className="pkg-col-packages">No. of Packages</th>
+                      <th className="pkg-col-description">Description (Said to Contain)</th>
+                      <th className="pkg-col-weight">Weight in Kgs</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
-                      <td><input value={form.noOfPackages} onChange={(e) => updateField('noOfPackages', e.target.value)} /></td>
-                      <td><input value={form.description} onChange={(e) => updateField('description', e.target.value)} /></td>
-                      <td><input value={form.actualWeight} onChange={(e) => updateField('actualWeight', e.target.value)} /></td>
-                      <td><input value={form.chargedWeight} onChange={(e) => updateField('chargedWeight', e.target.value)} /></td>
+                      <td rowSpan="2" className="pkg-vertical-cell">
+                        <input value={form.noOfPackages} onChange={(e) => updateField('noOfPackages', e.target.value)} />
+                      </td>
+                      <td rowSpan="2" className="pkg-description-cell">
+                        <textarea
+                          className="pkg-description-input"
+                          rows={6}
+                          value={form.description}
+                          onChange={(e) => updateField('description', e.target.value)}
+                        />
+                      </td>
+                      <td className="pkg-weight-cell">
+                        <div className="pkg-weight-label">Actual</div>
+                        <input value={form.actualWeight} onChange={(e) => updateField('actualWeight', e.target.value)} />
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="pkg-weight-cell">
+                        <div className="pkg-weight-label">Charged</div>
+                        <input value={form.chargedWeight} onChange={(e) => updateField('chargedWeight', e.target.value)} />
+                      </td>
                     </tr>
                   </tbody>
                 </table>
+                <div className="mt6 package-declared-value">
+                  <div className="cell-label">Declared Value (Rs) - * As per the Bill Attached.</div>
+                  <input className="field-input mt4" value={form.invoiceValue} onChange={(e) => updateField('invoiceValue', e.target.value)} />
+                </div>
               </div>
               <div className="cell cell-flex12">
                 <div className="section-title">FREIGHT CHARGES</div>
@@ -493,6 +533,10 @@ async function loadFromSerial() {
             </div>
           </div>
 
+          <div className="print-signature-row" aria-hidden="true">
+            <div className="print-signature-line">Booking Incharge</div>
+          </div>
+         
           <div className="btn-row">
             <button type="button" className="btn btn-secondary" onClick={onBack}>
               Back
@@ -589,6 +633,8 @@ function LRText({ label, value, onChange, wide = false }) {
 }
 
 function LRPreview({ form }) {
+  const isCustomerInsured = String(form.insuranceNote || '').toLowerCase().includes('covered');
+
   return (
     <article className="page-wrapper lr-template-wrap">
       <div className="pdf-sheet">
@@ -643,10 +689,6 @@ function LRPreview({ form }) {
             </div>
           </div>
 
-          <div className="pdf-insurance">
-            <b>Insurance:</b> Customer has stated he has <b>NOT</b> insured the consignment. <b>Declared Value:</b> Rs. {form.invoiceValue || '-'}
-          </div>
-
           <div className="pdf-mid">
             <div className="pdf-pkg-col">
               <table>
@@ -660,7 +702,7 @@ function LRPreview({ form }) {
                 </thead>
                 <tbody>
                   <tr>
-                    <td className="txt-center">{form.noOfPackages || '-'}</td>
+                    <td >{form.noOfPackages || '-'}</td>
                     <td>{form.description || '-'}</td>
                     <td className="txt-right">{form.actualWeight || '-'}</td>
                     <td className="txt-right">{form.chargedWeight || '-'}</td>
@@ -686,10 +728,18 @@ function LRPreview({ form }) {
             </div>
           </div>
 
+          {isCustomerInsured && (
+            <div className="pdf-insurance">
+              <b>INSURANCE DETAILS:</b> Company: {form.insuranceCompany || '-'} | Policy No: {form.policyNo || '-'} | Policy Date: {form.policyDate || '-'} | Amount: {form.insuranceAmount || '-'} | Risk Type: {form.risk || '-'}
+            </div>
+          )}
+
           <div className="pdf-footer">
             <div className="pdf-footer-left">
-              <div><b>Declared Value:</b> Rs. {form.invoiceValue || '-'}</div>
-              <div className="pdf-footer-note">* Contents not checked. Insurance at owner's risk.</div>
+              {isCustomerInsured && <div><b>Declared Value:</b> Rs. {form.invoiceValue || '-'}</div>}
+              <div className="pdf-footer-note">
+                * Contents not checked. {isCustomerInsured ? 'Insurance covered by customer.' : "Insurance at owner's risk."}
+              </div>
             </div>
             <div className="pdf-footer-mid">
               - CONSIGNOR COPY -
@@ -731,3 +781,4 @@ function LRPreview({ form }) {
     </article>
   );
 }
+
