@@ -9,7 +9,7 @@ export function Header({ activePage, editingId, loading, onBack, onClear }) {
         <NavLink to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
           <img
             className="brand-logo"
-            src="src/assets/svg/Logo.svg"
+            src="Logo.svg"
             alt="Nalvel Logistics Logo"
             style={{ height: '60px', width: 'auto', objectFit: 'contain', display: 'block' }}
           />

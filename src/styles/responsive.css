@@ -185,12 +185,8 @@
   }
 
   .form-section {
-    border-right: 0;
-    border-bottom: 1px solid var(--line);
-  }
-
-  .form-section:last-child {
-    border-bottom: 0;
+    border-right: 1px solid #d8e1e8;
+    border-bottom: 1px solid #d8e1e8;
   }
 
   .filter-bar {

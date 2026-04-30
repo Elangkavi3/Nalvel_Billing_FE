@@ -367,7 +367,7 @@ async function loadFromSerial() {
             <div className="logo-box">
               <img
             className="brand-logo"
-            src="src/assets/svg/Logo.svg"
+            src="Logo.svg"
             alt="Nalvel Logistics Logo"
             style={{ height: '60px', width: 'auto', objectFit: 'contain', display: 'block' }}
           />

@@ -13,6 +13,9 @@
 .entry-layout {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 14px;
+  padding: 14px;
+  background: #f7fafc;
   min-width: 0;
 }
 
@@ -89,8 +92,10 @@
 .form-section {
   padding: 18px;
   margin: 0;
-  border: 0;
-  border-right: 1px solid var(--line);
+  border: 1px solid #d8e1e8;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
   min-width: 0;
   grid-column: span 4;
 }
@@ -101,10 +106,6 @@
 
 .form-section-third {
   grid-column: span 4;
-}
-
-.form-section:last-child {
-  border-right: 0;
 }
 
 .form-section-wide {
