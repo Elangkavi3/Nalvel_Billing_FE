@@ -189,6 +189,18 @@ export function App() {
   }, []);
 
   useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get("token");
+
+  if (token) {
+    localStorage.setItem("token", token);
+
+    // Optional: clean URL
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+}, []);
+
+  useEffect(() => {
     let cancelled = false;
 
     async function loadHomeByFilter() {
