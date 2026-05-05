@@ -1,7 +1,13 @@
-export async function request(url, options) {
+export async function request(url, options = {}) {
+  const token = localStorage.getItem("token"); // 🔥 get token
+
   const response = await fetch(url, {
-    headers: { 'Content-Type': 'application/json' },
     ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token && { Authorization: `Bearer ${token}` }), // 🔥 ADD THIS
+      ...(options.headers || {}),
+    },
   });
 
   if (!response.ok) {
