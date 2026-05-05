@@ -20,9 +20,9 @@ function toQuery(params) {
   return new URLSearchParams(params).toString();
 }
 
-const CONSIGNMENT_BASE = '/api/consignment';
-const ADVANCE_PAYMENT_BASE = '/api/advance-payment';
-const LR_BASE = '/api/lr';
+const CONSIGNMENT_BASE = '/api/billing/consignment';
+const ADVANCE_PAYMENT_BASE = '/api/billing/advance-payment';
+const LR_BASE = '/api/billing/lr';
 
 export const consignmentEndpoints = {
   create: () => withApiBase(`${CONSIGNMENT_BASE}/save`),
