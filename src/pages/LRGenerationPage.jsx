@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { lrEndpoints } from '../services/endpoints.js';
-import { request } from '../services/http.js';
+import { request } from '../services/lrApi.js';
 import { toNumber } from '../utils/numbers.js';
 
 const TERMS_APPLICABILITY =

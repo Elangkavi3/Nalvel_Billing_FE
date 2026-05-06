@@ -1,27 +1,43 @@
-import { request } from './http.js';
-import { advancePaymentEndpoints } from './endpoints.js';
+import API from "./api";
+import { advancePaymentEndpoints } from "./endpoints";
 
-export async function getAdvancePaymentsByConsignmentId(consignmentId) {
-  if (!consignmentId) return [];
+export async function saveAdvancePayment(
+  consignmentId,
+  data
+) {
+  const response = await API.post(
+    advancePaymentEndpoints.create(consignmentId),
+    data
+  );
 
-  const data = await request(advancePaymentEndpoints.readByConsignmentId(consignmentId));
-  return Array.isArray(data) ? data : [];
+  return response.data;
 }
 
-export function saveAdvancePayment(consignmentId, payload) {
-  return request(advancePaymentEndpoints.create(consignmentId), {
-    method: 'POST',
-    body: JSON.stringify(payload),
-  });
+export async function getAdvancePaymentsByConsignmentId(
+  consignmentId
+) {
+  const response = await API.get(
+    advancePaymentEndpoints.readByConsignmentId(
+      consignmentId
+    )
+  );
+
+  return response.data;
 }
 
-export function updateAdvancePayment(id, payload) {
-  return request(advancePaymentEndpoints.updateById(id), {
-    method: 'PUT',
-    body: JSON.stringify(payload),
-  });
+export async function updateAdvancePayment(id, data) {
+  const response = await API.put(
+    advancePaymentEndpoints.updateById(id),
+    data
+  );
+
+  return response.data;
 }
 
-export function deleteAdvancePayment(id) {
-  return request(advancePaymentEndpoints.deleteById(id), { method: 'DELETE' });
+export async function deleteAdvancePayment(id) {
+  const response = await API.delete(
+    advancePaymentEndpoints.deleteById(id)
+  );
+
+  return response.data;
 }

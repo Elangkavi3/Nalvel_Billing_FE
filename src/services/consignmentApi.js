@@ -1,73 +1,98 @@
-import { request } from './http.js';
-import { consignmentEndpoints } from './endpoints.js';
-import { normalizeConsignment, normalizeConsignments } from '../utils/consignment.js';
+import API from "./api";
+import { consignmentEndpoints } from "./endpoints";
 
 export async function getAllConsignments() {
-  const data = await request(consignmentEndpoints.readAll());
-  return normalizeConsignments(data);
+  const response = await API.get(
+    consignmentEndpoints.readAll()
+  );
+
+  return response.data;
 }
 
 export async function getConsignmentById(id) {
-  const data = await request(consignmentEndpoints.readById(id));
-  return normalizeConsignment(data);
+  const response = await API.get(
+    consignmentEndpoints.readById(id)
+  );
+
+  return response.data;
+}
+
+export async function saveConsignment(data) {
+  const response = await API.post(
+    consignmentEndpoints.create(),
+    data
+  );
+
+  return response.data;
+}
+
+export async function updateConsignment(id, data) {
+  const response = await API.put(
+    consignmentEndpoints.updateById(id),
+    data
+  );
+
+  return response.data;
+}
+
+export async function deleteConsignment(id) {
+  const response = await API.delete(
+    consignmentEndpoints.deleteById(id)
+  );
+
+  return response.data;
 }
 
 export async function searchConsignmentsByCustomer(name) {
-  const data = await request(consignmentEndpoints.readByCustomer(name));
-  return normalizeConsignments(data);
-}
+  const response = await API.get(
+    consignmentEndpoints.readByCustomer(name)
+  );
 
-export function saveConsignment(payload) {
-  return request(consignmentEndpoints.create(), {
-    method: 'POST',
-    body: JSON.stringify(payload),
-  });
-}
-
-export function updateConsignment(id, payload) {
-  if (id === undefined || id === null || id === '') {
-    throw new Error('Update failed: missing consignment id');
-  }
-
-  return request(consignmentEndpoints.updateById(id), {
-    method: 'PUT',
-    body: JSON.stringify(payload),
-  });
-}
-
-export function deleteConsignment(id) {
-  if (id === undefined || id === null || id === '') {
-    throw new Error('Delete failed: missing consignment id');
-  }
-
-  return request(consignmentEndpoints.deleteById(id), { method: 'DELETE' });
-}
-
-function normalizeSummaryData(data) {
-  return normalizeConsignments(data?.data);
-}
-
-export async function getConsignmentsByDateRange(startDate, endDate) {
-  const data = await request(consignmentEndpoints.readByDateRange(startDate, endDate));
-  return normalizeSummaryData(data);
+  return response.data;
 }
 
 export async function getTodayConsignments() {
-  const data = await request(consignmentEndpoints.readTodaySummary());
-  return normalizeSummaryData(data);
+  const response = await API.get(
+    consignmentEndpoints.readTodaySummary()
+  );
+
+  return response.data;
 }
 
 export async function getWeekConsignments() {
-  const data = await request(consignmentEndpoints.readWeekSummary());
-  return normalizeSummaryData(data);
+  const response = await API.get(
+    consignmentEndpoints.readWeekSummary()
+  );
+
+  return response.data;
 }
 
 export async function getMonthConsignments() {
-  const data = await request(consignmentEndpoints.readMonthSummary());
-  return normalizeSummaryData(data);
+  const response = await API.get(
+    consignmentEndpoints.readMonthSummary()
+  );
+
+  return response.data;
 }
 
 export async function getYearConsignments() {
-  const data = await request(consignmentEndpoints.readYearSummary());
-  return normalizeSummaryData(data);
+  const response = await API.get(
+    consignmentEndpoints.readYearSummary()
+  );
+
+  return response.data;
+}
+
+export async function getConsignmentsByDateRange(
+  startDate,
+  endDate
+) {
+  const response = await API.get(
+    consignmentEndpoints.readByDateRange(
+      startDate,
+      endDate
+    )
+  );
+
+  return response.data;
 }

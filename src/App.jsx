@@ -189,6 +189,22 @@ export function App() {
   }, []);
 
   useEffect(() => {
+
+  const token = localStorage.getItem("token");
+
+  const publicRoutes = ["/login"];
+
+  const isPublicRoute = publicRoutes.includes(location.pathname);
+
+  if (!token && !isPublicRoute) {
+
+    window.location.href = "https://nalvel-logistics-services.vercel.app/";
+
+  }
+
+}, [location.pathname]);
+
+  useEffect(() => {
   const params = new URLSearchParams(window.location.search);
   const token = params.get("token");
 
