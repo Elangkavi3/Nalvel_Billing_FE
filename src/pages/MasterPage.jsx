@@ -5,7 +5,16 @@ function getFilterButtonClass(currentMode, mode) {
 }
 
 function getItemDate(item) {
-  return item.ledgerDateTime || item.loadingDateTime || item.deliveryDateTime || item.ledgerDate || item.loadingDate || '';
+  return (
+    item.ledgerDateTime ||
+    item.bookingDate ||
+    item.loadingDateTime ||
+    item.loadingDate ||
+    item.deliveryDateTime ||
+    item.deliveryDate ||
+    item.ledgerDate ||
+    ''
+  );
 }
 
 export function MasterPage({ items = [], filter, onFilterChange, onNavigate }) {

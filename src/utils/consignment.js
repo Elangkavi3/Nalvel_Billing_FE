@@ -12,7 +12,7 @@ function rateTypeLabel(value) {
 }
 
 function billingTypeLabel(value) {
-  return value === 'IMS' ? 'IMS No' : 'GST Invoice';
+  return value === 'IMS' ? 'IMS' : 'GST Invoice';
 }
 
 function paymentTypeValue(value) {
@@ -22,8 +22,11 @@ function paymentTypeValue(value) {
   return value ?? '';
 }
 
-function paymentTypeLabel(value) {
-  return paymentTypeValue(value) === 'Truck_Owner' ? 'Truck Owner' : paymentTypeValue(value) === 'Driver_Payment' ? 'Driver Payment' : value ?? '';
+function supplierPaymentModeValue(value) {
+  const normalized = paymentTypeValue(value);
+  if (normalized === 'Truck_Owner') return 'Owner Payment';
+  if (normalized === 'Driver_Payment') return 'Driver Payment';
+  return value ?? '';
 }
 
 function dateOrNull(value) {
@@ -106,12 +109,12 @@ export function buildConsignmentPayload(form) {
     gstNo: calculatedForm.gstNo ?? '',
     imsNo: calculatedForm.imsNo ?? '',
     bookingCustomerName: calculatedForm.customerName ?? '',
-    bookingDateTime: dateOrNull(calculatedForm.ledgerDate),
-    loadingDateTime: dateOrNull(calculatedForm.loadingDate),
+    bookingDate: dateOrNull(calculatedForm.ledgerDate ?? calculatedForm.bookingDate),
+    loadingDate: dateOrNull(calculatedForm.loadingDate),
     loadingLocation: calculatedForm.fromLocation ?? '',
     deliveryLocation: calculatedForm.toLocation ?? '',
     customerToBill: calculatedForm.billTo ?? '',
-    deliveryDateTime: dateOrNull(calculatedForm.deliveryDateTime),
+    deliveryDate: dateOrNull(calculatedForm.deliveryDateTime ?? calculatedForm.deliveryDate),
     grossWeight: numberField(calculatedForm, 'grossWeight'),
     tareWeight: numberField(calculatedForm, 'tareWeight'),
     netWeight: numberField(calculatedForm, 'netWeight'),
@@ -136,8 +139,10 @@ export function buildConsignmentPayload(form) {
     netpaymentBalance: numberField(calculatedForm, 'netBalance'),
     totalAdvance: numberField(calculatedForm, 'totalAdvance'),
     balance: numberField(calculatedForm, 'balance'),
-    supplierPaymentMode: paymentTypeLabel(calculatedForm.paymentType),
+    balancePaymentStatus: calculatedForm.paymentStatus ?? calculatedForm.balancePaymentStatus ?? '',
+    supplierPaymentMode: supplierPaymentModeValue(calculatedForm.paymentType),
     truckpaymentMode: calculatedForm.truckpaymentMode ?? '',
+    profitAmountType: calculatedForm.profitAmountType ?? '',
     gstType: calculatedForm.gstType ? toNumber(calculatedForm.gstType) : null,
     freightBookingCost: numberField(calculatedForm, 'customerRate'),
     additionalCharges: numberField(calculatedForm, 'additionalCharges'),
@@ -145,9 +150,9 @@ export function buildConsignmentPayload(form) {
     netFreight: numberField(calculatedForm, 'netFreight'),
     profit: numberField(calculatedForm, 'profit'),
     lrNo: calculatedForm.lrNo ?? '',
-    lrDateTime: dateOrNull(calculatedForm.lrDate),
+    lrDate: dateOrNull(calculatedForm.lrDate),
     customerInvoiceNo: calculatedForm.invoiceNo ?? '',
-    customerInvoiceDateTime: dateOrNull(calculatedForm.invoiceDate),
+    customerInvoiceDate: dateOrNull(calculatedForm.invoiceDate),
     customerPaymentMode: calculatedForm.customerPaymentMode ?? '',
     remarks: calculatedForm.remarks ?? '',
   };
@@ -159,19 +164,36 @@ export function normalizeConsignment(item) {
   const supplierRateType = normalizeRateType(item.freightAmountType ?? item.supplierRateType);
   const supplierAmount = supplierRateType === 'cost_per_mt' ? item.costPerMT : item.fixedCost;
   const billingType = String(item.billingType || '');
+  const normalizedBillingType = billingType.toLowerCase();
+  const bookingDate = normalizeDateOnly(item.bookingDate ?? item.bookingDateTime ?? item.ledgerDateTime ?? item.ledgerDate);
+  const loadingDate = normalizeDateOnly(item.loadingDate ?? item.loadingDateTime);
+  const deliveryDate = normalizeDateOnly(item.deliveryDate ?? item.deliveryDateTime);
+  const lrDate = normalizeDateOnly(item.lrDate ?? item.lrDateTime);
+  const invoiceDate = normalizeDateOnly(
+    item.customerInvoiceDate ?? item.customerInvoiceDateTime ?? item.invoiceDateTime ?? item.invoiceDate,
+  );
+  const paymentStatus = item.balancePaymentStatus ?? item.paymentStatus ?? '';
+  const advanceEntriesSource = item.advancePayments ?? item.advanceEntries;
+  const hasGstBilling = item.gstNo || normalizedBillingType.includes('gst');
+  const hasImsBilling = item.imsNo || normalizedBillingType.includes('ims');
+  const viewMode = !hasGstBilling && hasImsBilling ? 'IMS' : 'GST';
 
   return applyCalculatedConsignmentValues({
     ...item,
-    viewMode: item.gstNo || billingType.toLowerCase().includes('gst') ? 'GST' : 'IMS',
+    viewMode,
     customerName: item.bookingCustomerName ?? item.customerName ?? '',
     billTo: item.customerToBill ?? item.billTo ?? '',
     ownerName: item.truckOwnerName ?? item.ownerName ?? '',
     fromLocation: item.loadingLocation ?? item.fromLocation ?? '',
     toLocation: item.deliveryLocation ?? item.toLocation ?? '',
     material: item.materialDescription ?? item.material ?? '',
-    ledgerDateTime: item.bookingDateTime ?? item.ledgerDateTime ?? '',
-    loadingDateTime: item.loadingDateTime ?? item.loadingDate ?? '',
-    deliveryDateTime: item.deliveryDateTime ?? '',
+    bookingDate,
+    ledgerDate: bookingDate,
+    ledgerDateTime: bookingDate,
+    loadingDate,
+    loadingDateTime: loadingDate,
+    deliveryDate,
+    deliveryDateTime: deliveryDate,
     supplierRateType,
     supplierAmount: supplierAmount ?? item.supplierAmount ?? '',
     ledgerAmount: item.payableAmount ?? item.ledgerAmount ?? '',
@@ -182,19 +204,25 @@ export function normalizeConsignment(item) {
     truckpaymentMode: item.truckpaymentMode ?? '',
     customerPaymentMode: item.customerPaymentMode ?? '',
     paymentType: paymentTypeValue(item.supplierPaymentMode ?? item.paymentType),
-    paymentStatus: item.paymentStatus ?? '',
+    balancePaymentStatus: paymentStatus,
+    paymentStatus,
     netBalance: item.netpaymentBalance ?? item.netBalance ?? '',
     commission: item.commission ?? '',
     totalAdvance: item.totalAdvance ?? '',
     lrNo: item.lrNo ?? item.lrNumber ?? '',
-    lrDateTime: item.lrDateTime ?? item.lrDate ?? '',
+    lrDate,
+    lrDateTime: lrDate,
     invoiceNo: item.customerInvoiceNo ?? item.invoiceNo ?? item.customerInvoiceNumber ?? '',
-    invoiceDateTime: item.customerInvoiceDateTime ?? item.invoiceDateTime ?? item.invoiceDate ?? '',
+    customerInvoiceDate: invoiceDate,
+    invoiceDate: invoiceDate,
+    invoiceDateTime: invoiceDate,
+    advanceEntries: Array.isArray(advanceEntriesSource) ? normalizeAdvanceEntries(advanceEntriesSource) : item.advanceEntries,
   });
 }
 
 export function normalizeConsignments(items) {
-  return Array.isArray(items) ? items.map(normalizeConsignment) : [];
+  const rows = Array.isArray(items) ? items : Array.isArray(items?.data) ? items.data : [];
+  return rows.map(normalizeConsignment);
 }
 
 export function normalizeAdvanceEntries(entries) {
@@ -214,7 +242,7 @@ export function buildAdvancePaymentPayload(entry, index, form) {
     amount: toNumber(entry.amount),
     refNo: entry.refNo ?? '',
     paymentMode: form.truckpaymentMode ?? '',
-    paymentType: paymentTypeLabel(form.paymentType),
+    paymentType: supplierPaymentModeValue(form.paymentType),
   };
 }
 

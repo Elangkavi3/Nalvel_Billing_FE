@@ -65,15 +65,15 @@ export function BillingViewPage({ item, onBack, onEdit, onHome }) {
         <div className="bill-view-meta-strip">
           <div className="bill-view-meta-item">
             <span className="lbl">Booking</span>
-            <span className="val">{formatDateOnly(item.ledgerDateTime)}</span>
+            <span className="val">{formatDateOnly(item.ledgerDateTime || item.bookingDate)}</span>
           </div>
           <div className="bill-view-meta-item">
             <span className="lbl">Loading</span>
-            <span className="val">{formatDateOnly(item.loadingDateTime)}</span>
+            <span className="val">{formatDateOnly(item.loadingDateTime || item.loadingDate)}</span>
           </div>
           <div className="bill-view-meta-item">
             <span className="lbl">Delivery</span>
-            <span className="val">{formatDateOnly(item.deliveryDateTime)}</span>
+            <span className="val">{formatDateOnly(item.deliveryDateTime || item.deliveryDate)}</span>
           </div>
           <div className="bill-view-meta-item">
             <span className="lbl">LR No.</span>
@@ -101,8 +101,8 @@ export function BillingViewPage({ item, onBack, onEdit, onHome }) {
                 <Field label="Material Description" value={item.material || '-'} />
               </div>
               <div className="bill-field-row">
-                <Field label="LR Date" value={formatDateOnly(item.lrDateTime)} mono />
-                <Field label="Invoice Date" value={formatDateOnly(item.invoiceDateTime)} mono />
+                <Field label="LR Date" value={formatDateOnly(item.lrDateTime || item.lrDate)} mono />
+                <Field label="Invoice Date" value={formatDateOnly(item.invoiceDateTime || item.customerInvoiceDate || item.invoiceDate)} mono />
               </div>
             </article>
 

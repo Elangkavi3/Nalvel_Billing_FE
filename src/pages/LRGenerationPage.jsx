@@ -79,7 +79,7 @@ function lrRecordToForm(record, currentForm = {}) {
     ...emptyLRForm,
     ...currentForm,
     lrRecordId: record?.id ?? '',
-    consignmentId: consignment.id ?? currentForm.consignmentId ?? '',
+    consignmentId: record?.consignmentId ?? consignment.id ?? currentForm.consignmentId ?? '',
     sourceSerialNo: record?.savedDataSNo ?? currentForm.sourceSerialNo ?? '',
     lrNo: record?.cnNo ?? '',
     lrDate: record?.date ?? todayKey(),
@@ -298,9 +298,11 @@ async function loadFromSerial() {
         vehicleNo: prefill?.vehicleNo ?? current.vehicleNo ?? '',
         consignorName: prefill?.consignorName ?? current.consignorName ?? '',
         consignorAddress: prefill?.consignorAddress ?? current.consignorAddress ?? '',
+        from: current.from || prefill?.fromLocation || prefill?.consignorAddress || '',
         consignorGstin: prefill?.consignorGstin ?? current.consignorGstin ?? '',
         consigneeName: prefill?.consigneeName ?? current.consigneeName ?? '',
         consigneeAddress: prefill?.consigneeAddress ?? current.consigneeAddress ?? '',
+        to: current.to || prefill?.toLocation || prefill?.consigneeAddress || '',
         consigneeGstin: prefill?.consigneeGstin ?? current.consigneeGstin ?? '',
       }));
       setLookupMessage(`No LR found yet. Loaded consignment prefill from backend for S.No ${prefill?.savedDataSNo || serialNo}`);
@@ -431,13 +433,13 @@ async function loadFromSerial() {
               </div>
             </div>
 
-            <div className="row">
+            <div className={`row insurance-print-row${isCustomerInsured ? '' : ' insurance-print-row-hidden'}`}>
               <div className="cell cell-flex2 insurance-full-row">
                 <div className="section-title">INSURANCE DETAILS</div>
                 <div className="mt6">
                   <div className="cell-label">Has the customer insured this consignment?</div>
                   <div className="radio-group">
-                    <label><input type="radio" name="insured" checked={isCustomerInsured} onChange={() => updateField('insuranceNote', 'Insurance Covered by Customer')} /> Yes - Insured</label>
+                    <label><input type="radio" name="insured" checked={isCustomerInsured} onChange={() => updateField('insuranceNote', 'Insurance Covered by Customer')} /> Yes </label>
                     <label>
                       <input
                         type="radio"
@@ -455,7 +457,7 @@ async function loadFromSerial() {
                           }))
                         }
                       />{' '}
-                      No - Not Insured
+                      No 
                     </label>
                   </div>
                 </div>
@@ -693,7 +695,7 @@ function LRPrintDuplicate({ form, copyIndex, copyLabel }) {
           </div>
         </div>
 
-        <div className="row">
+        <div className={`row insurance-print-row${isCustomerInsured ? '' : ' insurance-print-row-hidden'}`}>
           <div className="cell cell-flex2 insurance-full-row">
             <div className="section-title">INSURANCE DETAILS</div>
             <div className="mt6">

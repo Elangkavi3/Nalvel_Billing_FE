@@ -774,9 +774,14 @@
     width: 100%;
   }
 
-  .nl-avatar {
+  .topbar-user {
     margin-left: 0;
     margin-top: 6px;
+  }
+
+  .nl-avatar {
+    margin-left: 0;
+    margin-top: 0;
   }
 }
 
@@ -1104,6 +1109,10 @@
     font-weight: 700;
     color: #c0392b;
     text-align: center;
+  }
+
+  .lr-ui-page .insurance-print-row-hidden {
+    display: none !important;
   }
 
   /* Keep print pagination/top alignment stable whether insurance is Yes/No */

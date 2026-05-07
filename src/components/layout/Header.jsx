@@ -3,6 +3,11 @@ import { NavLink, useNavigate } from 'react-router-dom';
 export function Header({ activePage, editingId, loading, onBack, onClear }) {
   const navigate = useNavigate();
 
+  function handleLogout() {
+    localStorage.removeItem('token');
+    window.location.href = 'https://nalvel-login-app.vercel.app/';
+  }
+
   return (
     <section className="topbar">
       <div className="topbar-brand">
@@ -38,8 +43,13 @@ export function Header({ activePage, editingId, loading, onBack, onClear }) {
         >
           LR Generation
         </NavLink>
-        <div className="nl-avatar" onClick={() => navigate('/')} style={{ cursor: 'pointer' }} title="Home">
-          NL
+        <div className="topbar-user">
+          <div className="nl-avatar" onClick={() => navigate('/')} style={{ cursor: 'pointer' }} title="Home">
+            NL
+          </div>
+          <button type="button" className="topbar-logout" onClick={handleLogout}>
+            Logout
+          </button>
         </div>
       </div>
 

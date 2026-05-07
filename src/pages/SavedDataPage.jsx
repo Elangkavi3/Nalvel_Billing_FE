@@ -309,13 +309,13 @@ export function SavedDataPage({
               </p>
               <p>
                 <strong>Date:</strong>{" "}
-                {formatDateOnly(printData.invoiceDateTime || printData.invoiceDate || printData.date) || new Date().toLocaleDateString("en-GB")}
+                {formatDateOnly(printData.invoiceDateTime || printData.customerInvoiceDate || printData.invoiceDate || printData.date) || new Date().toLocaleDateString("en-GB")}
               </p>
               <p>
                 <strong>Truck Details:</strong> {printData.truckNo || "-"}
               </p>
               <p>
-                <strong>Gross Weight:</strong> {printData.weight || "0.000"} MT
+                <strong>Gross Weight:</strong> {printData.grossWeight || printData.weight || "0.000"} MT
               </p>
             </div>
           </div>

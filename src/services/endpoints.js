@@ -79,7 +79,7 @@ export const lrEndpoints = {
     withApiBase(`${LR_BASE}/${id}`),
 
   readByConsignmentId: (consignmentId) =>
-    withApiBase(`${LR_BASE}/consignment/${consignmentId}`),
+    withApiBase(`${LR_BASE}/by-consignment/${consignmentId}`),
 
   readPrefillBySavedDataSNo: (savedDataSNo) =>
     withApiBase(

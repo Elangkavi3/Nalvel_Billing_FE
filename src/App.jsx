@@ -88,7 +88,14 @@ function applyDateFilter(items, filter) {
   const weekEnd = getEndOfWeek(now);
 
   return items.filter((item) => {
-    const sourceValue = item.ledgerDateTime || item.loadingDateTime || item.deliveryDateTime || item.ledgerDate || item.loadingDate;
+    const sourceValue =
+      item.ledgerDateTime ||
+      item.bookingDate ||
+      item.loadingDateTime ||
+      item.loadingDate ||
+      item.deliveryDateTime ||
+      item.deliveryDate ||
+      item.ledgerDate;
     if (!sourceValue) return filter.mode === 'all';
 
     const parsed = new Date(sourceValue);
@@ -189,10 +196,17 @@ export function App() {
   useEffect(() => {
 
   const token = localStorage.getItem("token");
+  const skipAuthRedirect =
+    import.meta.env.DEV ||
+    import.meta.env.VITE_DISABLE_AUTH_REDIRECT === "true";
 
   const publicRoutes = ["/login"];
 
   const isPublicRoute = publicRoutes.includes(location.pathname);
+
+  if (skipAuthRedirect) {
+    return;
+  }
 
   if (!token && !isPublicRoute) {
 
@@ -356,9 +370,9 @@ export function App() {
       gstType: item.gstType ? String(item.gstType) : '18',
       gstNo: item.gstNo ?? '',
       imsNo: item.imsNo ?? '',
-      ledgerDate: normalizeDateOnly(item.ledgerDateTime),
-      loadingDate: normalizeDateOnly(item.loadingDateTime),
-      deliveryDateTime: normalizeDateOnly(item.deliveryDateTime),
+      ledgerDate: normalizeDateOnly(item.ledgerDate ?? item.ledgerDateTime ?? item.bookingDate),
+      loadingDate: normalizeDateOnly(item.loadingDate ?? item.loadingDateTime),
+      deliveryDateTime: normalizeDateOnly(item.deliveryDateTime ?? item.deliveryDate),
       netWeight: item.netWeight ?? item.weight ?? '',
       tareWeight: item.tareWeight ?? '',
       actualWeight: item.actualWeight ?? '',
@@ -384,8 +398,10 @@ export function App() {
       lrNo: item.lrNo ?? item.lrNumber ?? '',
       lrDate: normalizeDateOnly(item.lrDateTime ?? item.lrDate),
       invoiceNo: item.invoiceNo ?? item.customerInvoiceNo ?? item.customerInvoiceNumber ?? '',
-      invoiceDate: normalizeDateOnly(item.invoiceDateTime ?? item.customerInvoiceDateTime ?? item.invoiceDate),
-      paymentStatus: item.paymentStatus ?? '',
+      invoiceDate: normalizeDateOnly(
+        item.invoiceDate ?? item.invoiceDateTime ?? item.customerInvoiceDate ?? item.customerInvoiceDateTime,
+      ),
+      paymentStatus: item.paymentStatus ?? item.balancePaymentStatus ?? '',
       paymentType: item.paymentType ?? '',
       truckpaymentMode: item.truckpaymentMode ?? '',
       customerPaymentMode: item.customerPaymentMode ?? item.paymentMode ?? '',

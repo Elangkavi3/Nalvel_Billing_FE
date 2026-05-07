@@ -212,6 +212,14 @@
   font-weight: 300;
 }
 
+.topbar-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
 .nl-avatar {
   display: flex;
   align-items: center;
@@ -223,7 +231,22 @@
   color: #fff;
   font-size: 12px;
   font-weight: 900;
-  margin-left: auto;
+}
+
+.topbar-logout {
+  min-height: 32px;
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--accent-dark);
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.topbar-logout:hover {
+  background: var(--soft);
 }
 
 /* HEADER BACK BUTTON */
