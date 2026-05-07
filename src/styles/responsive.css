@@ -810,6 +810,11 @@
     padding: 0 !important;
   }
 
+  .success-popup-backdrop,
+  .success-popup {
+    display: none !important;
+  }
+
   .top-actions,
   .list-panel,
   .status-line {

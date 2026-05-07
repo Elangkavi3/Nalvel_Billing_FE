@@ -275,7 +275,30 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
               onChange={(value) => onUpdateField('commission', value)}
               {...decimalNumberProps}
             />
-            <Field label="Net Payment Balance" value={form.netBalance} onChange={(value) => onUpdateField('netBalance', value)} {...decimalNumberProps} />
+            {/* <Field label="Net Payment Balance" value={form.netBalance} onChange={(value) => onUpdateField('netBalance', value)} {...decimalNumberProps} /> */}
+            <label className="field">
+  <span>Balance</span>
+
+  <div className="status-input-wrapper">
+    <input
+      value={form.balance || ''}
+      readOnly
+      {...decimalNumberProps}
+    />
+
+    <span
+      className={`inline-payment-status ${
+        Number(form.balance || 0) <= 0
+          ? 'paid'
+          : 'pending'
+      }`}
+    >
+      {Number(form.balance || 0) <= 0
+        ? 'PAID'
+        : 'PENDING'}
+    </span>
+  </div>
+</label>
           </div>
           <AdvanceEntriesField entries={form.advanceEntries} onChange={(nextEntries) => onUpdateField('advanceEntries', nextEntries)} />
           <div className="field-row">

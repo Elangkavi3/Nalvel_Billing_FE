@@ -27,6 +27,10 @@ import {
   updateAdvancePayment,
 } from './services/advancePaymentApi.js';
 import {
+  deleteLR,
+  getLRByConsignmentId,
+} from './services/lrApi.js';
+import {
   buildAdvancePaymentPayload,
   buildConsignmentPayload,
   getUniqueValues,
@@ -65,6 +69,61 @@ const contactFields = new Set([
   'driverPrimaryContact',
   'driverAlternateContact',
 ]);
+
+function isNotFoundError(error) {
+  return error?.response?.status === 404;
+}
+
+function responseRows(value) {
+  if (Array.isArray(value)) return value;
+  if (Array.isArray(value?.data)) return value.data;
+  return value ? [value] : [];
+}
+
+async function ignoreMissing(deleteRequest) {
+  try {
+    await deleteRequest();
+  } catch (error) {
+    if (!isNotFoundError(error)) throw error;
+  }
+}
+
+async function runSoft(action) {
+  try {
+    await action();
+    return null;
+  } catch (error) {
+    return error;
+  }
+}
+
+function isNumericLike(value) {
+  if (value === null || value === undefined || value === '') return false;
+  return Number.isFinite(Number(value));
+}
+
+function uniqueCandidates(values) {
+  return [...new Set(values.filter((value) => value !== null && value !== undefined && value !== ''))];
+}
+
+function resolveConsignmentDeleteTargets(itemOrId) {
+  if (itemOrId && typeof itemOrId === 'object') {
+    const numericId = itemOrId.id ?? itemOrId.consignmentId ?? itemOrId.recordId ?? '';
+    const serialNo = itemOrId.serialNo ?? '';
+    const cleanupId = isNumericLike(numericId) ? Number(numericId) : null;
+    const deleteCandidates = uniqueCandidates([
+      cleanupId,
+      numericId,
+      serialNo,
+    ]);
+    const label = serialNo || numericId || '';
+    return { cleanupId, deleteCandidates, label };
+  }
+
+  const cleanupId = isNumericLike(itemOrId) ? Number(itemOrId) : null;
+  const deleteCandidates = uniqueCandidates([cleanupId, itemOrId]);
+  return { cleanupId, deleteCandidates, label: itemOrId };
+}
 
 function normalizeContactNumber(value) {
   return String(value ?? '').replace(/\D/g, '').slice(0, 10);
@@ -435,6 +494,34 @@ export function App() {
     );
   }
 
+  async function deleteAdvancePaymentsForConsignment(consignmentId) {
+    try {
+      const advanceEntries = responseRows(await getAdvancePaymentsByConsignmentId(consignmentId));
+      await Promise.all(
+        advanceEntries
+          .map((entry) => entry?.id)
+          .filter(Boolean)
+          .map((id) => ignoreMissing(() => deleteAdvancePayment(id))),
+      );
+    } catch (error) {
+      if (!isNotFoundError(error)) throw error;
+    }
+  }
+
+  async function deleteLrForConsignment(consignmentId) {
+    try {
+      const lrRecords = responseRows(await getLRByConsignmentId(consignmentId));
+      await Promise.all(
+        lrRecords
+          .map((record) => record?.id)
+          .filter(Boolean)
+          .map((id) => ignoreMissing(() => deleteLR(id))),
+      );
+    } catch (error) {
+      if (!isNotFoundError(error)) throw error;
+    }
+  }
+
   async function submitForm(event) {
     event.preventDefault();
     setLoading(true);
@@ -494,19 +581,41 @@ export function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  async function deleteItem(id) {
-    if (!id) return;
-    const confirmed = window.confirm(`Delete entry #${id}?`);
+  async function deleteItem(itemOrId) {
+    const { cleanupId, deleteCandidates, label } = resolveConsignmentDeleteTargets(itemOrId);
+    if (deleteCandidates.length === 0) {
+      setError('Unable to delete entry: missing backend record id');
+      return;
+    }
+    const displayId = label || deleteCandidates[0];
+    const confirmed = window.confirm(`Delete entry #${displayId}?`);
     if (!confirmed) return;
 
     setLoading(true);
     setError('');
     try {
-      const advanceEntries = await getAdvancePaymentsByConsignmentId(id);
-      await Promise.all(advanceEntries.map((entry) => deleteAdvancePayment(entry.id)));
-      await deleteConsignment(id);
-      setMessage(`Entry #${id} deleted`);
-      if (editingId === id) clearForm();
+      const lrCleanupError = cleanupId ? await runSoft(() => deleteLrForConsignment(cleanupId)) : null;
+      const advanceCleanupError = cleanupId ? await runSoft(() => deleteAdvancePaymentsForConsignment(cleanupId)) : null;
+
+      let deleteError = null;
+      for (const candidate of deleteCandidates) {
+        try {
+          await deleteConsignment(candidate);
+          deleteError = null;
+          break;
+        } catch (error) {
+          deleteError = error;
+          if (!isNotFoundError(error)) throw error;
+        }
+      }
+      if (deleteError) throw deleteError;
+
+      if (lrCleanupError || advanceCleanupError) {
+        setMessage(`Entry #${displayId} deleted (child cleanup skipped where unavailable)`);
+      } else {
+        setMessage(`Entry #${displayId} deleted`);
+      }
+      if (editingId === cleanupId) clearForm();
       await loadData();
     } catch (err) {
       setError(getErrorMessage(err, 'Unable to delete entry'));

@@ -162,6 +162,12 @@ async function deleteLrById(id) {
   return request(lrEndpoints.deleteById(id), { method: 'DELETE' });
 }
 
+function firstLrRecord(value) {
+  if (Array.isArray(value)) return value[0] || null;
+  if (Array.isArray(value?.data)) return value.data[0] || null;
+  return value || null;
+}
+
 async function saveLRToBackend(form) {
   async function resolveExistingLrRecordId() {
     const consignmentId = Number(form.consignmentId);
@@ -314,6 +320,7 @@ async function loadFromSerial() {
   async function handleSubmit(event) {
     event.preventDefault();
     setLookupMessage('');
+    setSavePopup('');
     if (!form.consignmentId) {
       setLookupMessage('Please load a saved entry using S.No before Save & Generate CN');
       return;
@@ -330,10 +337,10 @@ async function loadFromSerial() {
       }
       onSaved?.(`LR ${form.lrNo || form.sourceSerialNo || ''} saved to backend successfully`);
       setLookupMessage('Saved to backend successfully. Opening print...');
-      setSavePopup('LR data saved');
       setTimeout(() => {
         window.print();
         setForm({ ...emptyLRForm, lrDate: todayKey() });
+        setSavePopup('LR data saved');
       }, 150);
     } catch (error) {
       setLookupMessage(error?.message || 'Unable to save LR in backend');
@@ -341,15 +348,25 @@ async function loadFromSerial() {
   }
 
   async function handleDeleteLr() {
-    if (!form.lrRecordId) {
-      setLookupMessage('Load an existing LR record before delete');
+    let targetLrRecordId = form.lrRecordId;
+
+    if (!targetLrRecordId && form.consignmentId) {
+      try {
+        targetLrRecordId = firstLrRecord(await fetchLrByConsignmentId(form.consignmentId))?.id || '';
+      } catch {
+        targetLrRecordId = '';
+      }
+    }
+
+    if (!targetLrRecordId) {
+      setLookupMessage('No existing LR record found to delete');
       return;
     }
-    const confirmed = window.confirm(`Delete LR record #${form.lrRecordId}?`);
+    const confirmed = window.confirm(`Delete LR record #${targetLrRecordId}?`);
     if (!confirmed) return;
     try {
-      await deleteLrById(form.lrRecordId);
-      setLookupMessage(`Deleted LR record #${form.lrRecordId}`);
+      await deleteLrById(targetLrRecordId);
+      setLookupMessage(`Deleted LR record #${targetLrRecordId}`);
       setForm({ ...emptyLRForm, lrDate: todayKey() });
     } catch (error) {
       setLookupMessage(error?.message || 'Unable to delete LR record');

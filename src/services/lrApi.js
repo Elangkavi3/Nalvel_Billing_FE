@@ -42,6 +42,14 @@ export async function getLRById(id) {
   return response.data;
 }
 
+export async function getLRByConsignmentId(consignmentId) {
+  const response = await API.get(
+    lrEndpoints.readByConsignmentId(consignmentId)
+  );
+
+  return response.data;
+}
+
 export async function getPrefillData(savedDataSNo) {
   const response = await API.get(
     lrEndpoints.readPrefillBySavedDataSNo(savedDataSNo)

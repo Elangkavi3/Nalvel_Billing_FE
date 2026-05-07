@@ -198,6 +198,11 @@
   color: #b45309;
 }
 
+.status-pill.paid {
+  background: #dcfce7;
+  color: #166534;
+}
+
 /* HOME FILTER/SAVED FILTER h3 */
 .home-filter-section h3 {
   margin: 0;

@@ -194,7 +194,7 @@ export function SavedDataPage({
             <tbody>
               {hasItems ? (
                 pagedItems.map((item) => (
-                  <tr key={item.id}>
+                  <tr key={item.id ?? item.serialNo}>
                     <td>{item.serialNo || item.id}</td>
                     <td>
                       <strong>{item.customerName || "-"}</strong>
@@ -248,7 +248,7 @@ export function SavedDataPage({
                       <button
                         type="button"
                         className="icon-action danger"
-                        onClick={() => onDelete(item.id)}
+                        onClick={() => onDelete(item)}
                         aria-label={`Delete entry ${item.serialNo || item.id}`}
                       >
                         <TrashIcon />

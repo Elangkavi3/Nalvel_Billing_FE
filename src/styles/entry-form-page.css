@@ -370,3 +370,33 @@ fieldset {
   gap: 10px;
   margin-top: 16px;
 }
+
+/* INLINE PAYMENT STATUS */
+.status-input-wrapper {
+  position: relative;
+}
+
+.status-input-wrapper input {
+  padding-right: 90px;
+}
+
+.inline-payment-status {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.inline-payment-status.paid {
+  background: #d7f5df;
+  color: #0f7b34;
+}
+
+.inline-payment-status.pending {
+  background: #ffe5cc;
+  color: #cc6a00;
+}

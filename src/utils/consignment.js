@@ -37,6 +37,10 @@ function numberField(form, key) {
   return numericConsignmentFields.has(key) ? toNumber(form[key]) : form[key];
 }
 
+function balanceStatus(balance) {
+  return Math.abs(toNumber(balance)) < 0.01 ? 'Paid' : 'Pending';
+}
+
 export function normalizeDateOnly(value) {
   if (!value) return '';
   const text = String(value);
@@ -79,13 +83,18 @@ export function calculateConsignmentValues(form = {}) {
   const netFreight = totalExpense + (totalExpense * gstPercentage) / 100;
   const profit = netFreight - payableAmount;
 
+  const balance = netPaymentBalance - totalAdvance;
+  const paymentStatus = balanceStatus(balance);
+
   return {
     ledgerAmount: payableAmount,
     netBalance: netPaymentBalance,
     customerRate: freightBookingCost,
     expenses: totalExpense,
     totalAdvance,
-    balance: netPaymentBalance - totalAdvance,
+    balance,
+    balancePaymentStatus: paymentStatus,
+    paymentStatus,
     netFreight,
     profit,
   };
@@ -102,6 +111,7 @@ export function buildConsignmentPayload(form) {
   const supplierRateType = normalizeRateType(form.supplierRateType);
   const calculatedForm = applyCalculatedConsignmentValues(form);
   const supplierAmount = numberField(calculatedForm, 'supplierAmount');
+  const paymentStatus = balanceStatus(calculatedForm.balance);
 
   return {
     serialNo: calculatedForm.serialNo ?? '',
@@ -139,7 +149,7 @@ export function buildConsignmentPayload(form) {
     netpaymentBalance: numberField(calculatedForm, 'netBalance'),
     totalAdvance: numberField(calculatedForm, 'totalAdvance'),
     balance: numberField(calculatedForm, 'balance'),
-    balancePaymentStatus: calculatedForm.paymentStatus ?? calculatedForm.balancePaymentStatus ?? '',
+    balancePaymentStatus: paymentStatus,
     supplierPaymentMode: supplierPaymentModeValue(calculatedForm.paymentType),
     truckpaymentMode: calculatedForm.truckpaymentMode ?? '',
     profitAmountType: calculatedForm.profitAmountType ?? '',
