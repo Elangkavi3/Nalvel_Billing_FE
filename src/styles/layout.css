@@ -129,6 +129,10 @@
   gap: 10px;
 }
 
+.field-row-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .field-grid-4 {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));

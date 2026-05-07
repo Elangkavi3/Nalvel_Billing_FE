@@ -1115,4 +1115,17 @@
     display: none !important;
     height: 0;
   }
+
+  .lr-page .lr-edit-form {
+    display: none !important;
+  }
+
+  .lr-page .lr-print-duplicates {
+    display: block !important;
+  }
+
+  .lr-page .lr-print-duplicate:last-child {
+    page-break-after: auto;
+    break-after: auto;
+  }
 }

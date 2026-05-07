@@ -30,13 +30,11 @@ import {
   buildAdvancePaymentPayload,
   buildConsignmentPayload,
   getUniqueValues,
+  applyCalculatedConsignmentValues,
   normalizeAdvanceEntries,
+  normalizeDateOnly,
 } from './utils/consignment.js';
 import { getErrorMessage } from './utils/errors.js';
-
-function toDateTimeLocal(value) {
-  return typeof value === 'string' && value ? value.slice(0, 16) : '';
-}
 
 function formatDateKey(date) {
   const year = date.getFullYear();
@@ -198,7 +196,7 @@ export function App() {
 
   if (!token && !isPublicRoute) {
 
-    window.location.href = "https://nalvel-logistics-services.vercel.app/";
+    window.location.href = "https://nalvel-login-app.vercel.app/";
 
   }
 
@@ -337,7 +335,7 @@ export function App() {
         }
       }
 
-      return nextForm;
+      return applyCalculatedConsignmentValues(nextForm);
     });
   }
 
@@ -351,16 +349,16 @@ export function App() {
   }
 
   function applyConsignmentToForm(item) {
-    setForm({
+    setForm(applyCalculatedConsignmentValues({
       ...emptyConsignmentForm,
       ...item,
       viewMode: item.gstNo ? 'GST' : item.imsNo ? 'IMS' : 'GST',
       gstType: item.gstType ? String(item.gstType) : '18',
       gstNo: item.gstNo ?? '',
       imsNo: item.imsNo ?? '',
-      ledgerDate: toDateTimeLocal(item.ledgerDateTime),
-      loadingDate: toDateTimeLocal(item.loadingDateTime),
-      deliveryDateTime: toDateTimeLocal(item.deliveryDateTime),
+      ledgerDate: normalizeDateOnly(item.ledgerDateTime),
+      loadingDate: normalizeDateOnly(item.loadingDateTime),
+      deliveryDateTime: normalizeDateOnly(item.deliveryDateTime),
       netWeight: item.netWeight ?? item.weight ?? '',
       tareWeight: item.tareWeight ?? '',
       actualWeight: item.actualWeight ?? '',
@@ -370,6 +368,7 @@ export function App() {
       supplierAmount: item.supplierAmount ?? '',
       chargebleWeight: item.chargebleWeight ?? '',
       haltingCharge: item.haltingCharge ?? '',
+      parkingCharge: item.parkingCharge ?? '',
       commission: item.commission ?? '',
       netBalance: item.netBalance ?? '',
       advance: item.advance ?? '',
@@ -383,9 +382,9 @@ export function App() {
       netFreight: item.netFreight ?? '',
       profit: item.profit ?? '',
       lrNo: item.lrNo ?? item.lrNumber ?? '',
-      lrDate: toDateTimeLocal(item.lrDateTime ?? item.lrDate),
+      lrDate: normalizeDateOnly(item.lrDateTime ?? item.lrDate),
       invoiceNo: item.invoiceNo ?? item.customerInvoiceNo ?? item.customerInvoiceNumber ?? '',
-      invoiceDate: toDateTimeLocal(item.invoiceDateTime ?? item.customerInvoiceDateTime ?? item.invoiceDate),
+      invoiceDate: normalizeDateOnly(item.invoiceDateTime ?? item.customerInvoiceDateTime ?? item.invoiceDate),
       paymentStatus: item.paymentStatus ?? '',
       paymentType: item.paymentType ?? '',
       truckpaymentMode: item.truckpaymentMode ?? '',
@@ -395,7 +394,7 @@ export function App() {
       ownerAlternateContact: item.ownerAlternateContact ?? '',
       driverPrimaryContact: item.driverPrimaryContact ?? '',
       driverAlternateContact: item.driverAlternateContact ?? '',
-    });
+    }));
   }
 
   async function syncAdvancePayments(consignmentId, currentForm) {
@@ -432,13 +431,14 @@ export function App() {
       if (invalidContacts.length > 0) {
         throw new Error('Mobile number must be exactly 10 digits');
       }
-      const payload = buildConsignmentPayload(form);
+      const currentForm = applyCalculatedConsignmentValues(form);
+      const payload = buildConsignmentPayload(currentForm);
       const saved = isEditing ? await updateConsignment(targetId, payload) : await saveConsignment(payload);
       const recordId = saved?.id ?? targetId ?? '';
       const successMessage = isEditing ? `Entry #${recordId} updated successfully` : `Entry #${recordId} saved successfully`;
 
       if (recordId) {
-        await syncAdvancePayments(recordId, form);
+        await syncAdvancePayments(recordId, currentForm);
       }
 
       setMessage(successMessage);

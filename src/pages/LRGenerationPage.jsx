@@ -30,6 +30,7 @@ const TERMS_RIGHT = [
   "All demands and claims arising from the LR shall be paid at registered office situated at Chennai. Any dispute, difference and claims arising out of this LR - courts at Chennai alone shall have exclusive jurisdiction to adjudicate all claims.",
   "Any dispute or differences arising from the LR shall be referred to an arbitrator. NALVEL LOGISTICS SERVICES shall be entitled to nominate an arbitrator to adjudicate any dispute, differences or claims. The venue of arbitration shall be at Chennai only.",
 ];
+const LR_COPY_LABELS = ['CONSIGNOR COPY', 'CONSIGNEE COPY', 'DRIVER COPY', 'BOOK COPY'];
 
 const emptyLRForm = {
   lrRecordId: '',
@@ -328,8 +329,10 @@ async function loadFromSerial() {
       onSaved?.(`LR ${form.lrNo || form.sourceSerialNo || ''} saved to backend successfully`);
       setLookupMessage('Saved to backend successfully. Opening print...');
       setSavePopup('LR data saved');
-      setForm({ ...emptyLRForm, lrDate: todayKey() });
-      setTimeout(() => window.print(), 150);
+      setTimeout(() => {
+        window.print();
+        setForm({ ...emptyLRForm, lrDate: todayKey() });
+      }, 150);
     } catch (error) {
       setLookupMessage(error?.message || 'Unable to save LR in backend');
     }
@@ -354,7 +357,7 @@ async function loadFromSerial() {
   return (
     <section className="lr-page">
       <div className="lr-workspace">
-        <form className="lr-form-panel lr-ui-page" onSubmit={handleSubmit}>
+        <form className="lr-form-panel lr-ui-page lr-edit-form" onSubmit={handleSubmit}>
           <div className="lr-lookup-strip">
             <div className="lr-lookup-field">
               <div className="cell-label">Saved Data S.No</div>
@@ -582,6 +585,12 @@ async function loadFromSerial() {
           </section>
         </form>
 
+        <div className="lr-print-duplicates" aria-hidden="true">
+          {LR_COPY_LABELS.map((copyLabel, index) => (
+            <LRPrintDuplicate key={`lr-print-duplicate-${index}`} form={form} copyIndex={index} copyLabel={copyLabel} />
+          ))}
+        </div>
+
         <div className="lr-print-only">
           <LRPreview form={form} />
         </div>
@@ -611,6 +620,201 @@ async function loadFromSerial() {
         </section>
       )}
     </section>
+  );
+}
+
+function LRPrintDuplicate({ form, copyIndex, copyLabel }) {
+  const isCustomerInsured = String(form.insuranceNote || '').toLowerCase().includes('covered');
+  const insuredName = `insured-print-${copyIndex}`;
+
+  return (
+    <form className="lr-form-panel lr-ui-page lr-print-duplicate">
+      <div className="lr-ui-header">
+        <div className="logo-box">
+          <img
+            className="brand-logo"
+            src="Logo.svg"
+            alt="Nalvel Logistics Logo"
+            style={{ height: '60px', width: 'auto', objectFit: 'contain', display: 'block' }}
+          />
+        </div>
+        <div className="company-info">
+          <h1>NALVEL LOGISTICS SERVICES</h1>
+          <p>New No.12, Old No.26, Nallappa Street, Nehru Nagar, Chromepet, Chennai - 600 044</p>
+          <p>Phone: 044-45830699 | nalvellogisticsservices@gmail.com | GSTIN: 33ARXPK1573A2ZT</p>
+        </div>
+        <div className="badge-box">
+          <p>{form.contentsChecked || 'CONTENTS NOT CHECKED'}</p>
+          <p>{form.insuranceNote || 'Insurance at Owners Risk'}</p>
+          <div className="stamp">{copyLabel}</div>
+        </div>
+      </div>
+
+      <div className="form-body">
+        <div className="row">
+          <div className="cell cell-cn">
+            <div className="cell-label">CN No.</div>
+            <div className="cn-badge">{form.lrNo || '-'}</div>
+          </div>
+          <div className="cell cell-date">
+            <div className="cell-label">Date</div>
+            <input className="field-input" type="date" value={form.lrDate} readOnly />
+          </div>
+          <div className="cell cell-vehicle">
+            <div className="cell-label">Vehicle No.</div>
+            <input className="field-input" value={form.vehicleNo} readOnly />
+          </div>
+          <div className="cell">
+            <div className="cell-label">From</div>
+            <input className="field-input" value={form.from} readOnly />
+          </div>
+          <div className="cell">
+            <div className="cell-label">To</div>
+            <input className="field-input" value={form.to} readOnly />
+          </div>
+        </div>
+
+        <div className="row">
+          <div className="cell">
+            <div className="section-title">CONSIGNOR (Sender)</div>
+            <div className="two-col mt6">
+              <div><div className="cell-label">Name</div><input className="field-input" value={form.consignorName} readOnly /></div>
+              <div><div className="cell-label">GSTIN</div><input className="field-input" value={form.consignorGstin} readOnly /></div>
+            </div>
+            <div className="mt6"><div className="cell-label">Address</div><textarea className="field-input no-resize" rows={2} value={form.consignorAddress} readOnly /></div>
+          </div>
+          <div className="cell">
+            <div className="section-title">CONSIGNEE (Receiver)</div>
+            <div className="two-col mt6">
+              <div><div className="cell-label">Name</div><input className="field-input" value={form.consigneeName} readOnly /></div>
+              <div><div className="cell-label">GSTIN</div><input className="field-input" value={form.consigneeGstin} readOnly /></div>
+            </div>
+            <div className="mt6"><div className="cell-label">Address</div><textarea className="field-input no-resize" rows={2} value={form.consigneeAddress} readOnly /></div>
+          </div>
+        </div>
+
+        <div className="row">
+          <div className="cell cell-flex2 insurance-full-row">
+            <div className="section-title">INSURANCE DETAILS</div>
+            <div className="mt6">
+              <div className="cell-label">Has the customer insured this consignment?</div>
+              <div className="radio-group">
+                <label><input type="radio" name={insuredName} checked={isCustomerInsured} readOnly /> Yes - Insured</label>
+                <label>
+                  <input type="radio" name={insuredName} checked={!isCustomerInsured} readOnly />{' '}
+                  No - Not Insured
+                </label>
+              </div>
+            </div>
+            {isCustomerInsured && (
+              <>
+                <div className="three-col mt6">
+                  <div><div className="cell-label">Company</div><input className="field-input" value={form.insuranceCompany} readOnly /></div>
+                  <div><div className="cell-label">Policy No.</div><input className="field-input" value={form.policyNo} readOnly /></div>
+                  <div><div className="cell-label">Policy Date</div><input className="field-input" type="date" value={form.policyDate} readOnly /></div>
+                </div>
+                <div className="two-col mt6">
+                  <div><div className="cell-label">Amount (Rs)</div><input className="field-input" value={form.insuranceAmount} readOnly /></div>
+                  <div><div className="cell-label">Risk Type</div><input className="field-input" value={form.risk} readOnly /></div>
+                </div>
+              </>
+            )}
+            {!isCustomerInsured && <div className="insurance-print-spacer" aria-hidden="true" />}
+          </div>
+        </div>
+
+        <div className="row">
+          <div className="cell cell-flex3 package-details-cell">
+            <div className="section-title">PACKAGE DETAILS</div>
+            <table className="pkg-table mt6">
+              <thead>
+                <tr>
+                  <th className="pkg-col-packages">No. of Packages</th>
+                  <th className="pkg-col-description">Description (Said to Contain)</th>
+                  <th className="pkg-col-weight">Weight in Kgs</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td rowSpan="2" className="pkg-vertical-cell">
+                    <input value={form.noOfPackages} readOnly />
+                  </td>
+                  <td rowSpan="2" className="pkg-description-cell">
+                    <textarea
+                      className="pkg-description-input"
+                      rows={6}
+                      value={form.description}
+                      readOnly
+                    />
+                  </td>
+                  <td className="pkg-weight-cell">
+                    <div className="pkg-weight-label">Actual</div>
+                    <input value={form.actualWeight} readOnly />
+                  </td>
+                </tr>
+                <tr>
+                  <td className="pkg-weight-cell">
+                    <div className="pkg-weight-label">Charged</div>
+                    <input value={form.chargedWeight} readOnly />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div className="mt6 package-declared-value">
+              <div className="cell-label">Declared Value (Rs) - * As per the Bill Attached.</div>
+              <input className="field-input mt4" value={form.invoiceValue} readOnly />
+            </div>
+          </div>
+          <div className="cell cell-flex12">
+            <div className="section-title">FREIGHT CHARGES</div>
+            <table className="charge-table mt6">
+              <thead><tr><th>Charge Type</th><th>Rate Per</th><th>Rs.</th></tr></thead>
+              <tbody>
+                <tr><td>Freight</td><td><input placeholder="-" readOnly /></td><td><input value={form.freight} readOnly /></td></tr>
+                <tr><td>Surcharge</td><td><input placeholder="-" readOnly /></td><td><input value={form.surcharge} readOnly /></td></tr>
+                <tr><td>Hamah</td><td><input placeholder="-" readOnly /></td><td><input value={form.hamali} readOnly /></td></tr>
+                <tr><td>Escort</td><td><input placeholder="-" readOnly /></td><td><input value={form.escort} readOnly /></td></tr>
+                <tr><td>BOD / DD</td><td><input placeholder="-" readOnly /></td><td><input value={form.bocdd} readOnly /></td></tr>
+                <tr><td>St. Charges</td><td><input placeholder="-" readOnly /></td><td><input value={form.stCharges} readOnly /></td></tr>
+                <tr className="total-row"><td colSpan="2">TOTAL</td><td><input value={form.total} readOnly /></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div className="print-signature-row" aria-hidden="true">
+        <div className="print-signature-line">Booking Incharge</div>
+      </div>
+
+      <section className="lr-terms-print" aria-label="Terms and conditions">
+        <h2>TERMS AND CONDITIONS</h2>
+        <p>
+          <b>APPLICABILITY:</b> {TERMS_APPLICABILITY}
+          <br />
+          <b>{TERMS_DEFINITIONS}</b>
+        </p>
+        <div className="lr-terms-print-grid">
+          <div>
+            {TERMS_LEFT.map((term, index) => (
+              <p key={`print-copy-${copyIndex}-left-${index}`}>
+                <b>{index + 1}.</b> {term}
+              </p>
+            ))}
+          </div>
+          <div>
+            {TERMS_RIGHT.map((term, index) => (
+              <p key={`print-copy-${copyIndex}-right-${index}`}>
+                <b>{index + 11}.</b> {term}
+              </p>
+            ))}
+          </div>
+        </div>
+        <div className="lr-terms-print-footer">
+          All disputes subject to Chennai jurisdiction only. | This is a computer generated document.
+        </div>
+      </section>
+    </form>
   );
 }
 

@@ -1,12 +1,13 @@
 import API from "./api";
 import { consignmentEndpoints } from "./endpoints";
+import { normalizeConsignment, normalizeConsignments } from "../utils/consignment";
 
 export async function getAllConsignments() {
   const response = await API.get(
     consignmentEndpoints.readAll()
   );
 
-  return response.data;
+  return normalizeConsignments(response.data);
 }
 
 export async function getConsignmentById(id) {
@@ -14,7 +15,7 @@ export async function getConsignmentById(id) {
     consignmentEndpoints.readById(id)
   );
 
-  return response.data;
+  return normalizeConsignment(response.data);
 }
 
 export async function saveConsignment(data) {
@@ -23,7 +24,7 @@ export async function saveConsignment(data) {
     data
   );
 
-  return response.data;
+  return normalizeConsignment(response.data);
 }
 
 export async function updateConsignment(id, data) {
@@ -32,7 +33,7 @@ export async function updateConsignment(id, data) {
     data
   );
 
-  return response.data;
+  return normalizeConsignment(response.data);
 }
 
 export async function deleteConsignment(id) {
@@ -40,7 +41,7 @@ export async function deleteConsignment(id) {
     consignmentEndpoints.deleteById(id)
   );
 
-  return response.data;
+  return normalizeConsignments(response.data);
 }
 
 export async function searchConsignmentsByCustomer(name) {
@@ -48,7 +49,7 @@ export async function searchConsignmentsByCustomer(name) {
     consignmentEndpoints.readByCustomer(name)
   );
 
-  return response.data;
+  return normalizeConsignments(response.data);
 }
 
 export async function getTodayConsignments() {
@@ -56,7 +57,7 @@ export async function getTodayConsignments() {
     consignmentEndpoints.readTodaySummary()
   );
 
-  return response.data;
+  return normalizeConsignments(response.data);
 }
 
 export async function getWeekConsignments() {
@@ -64,7 +65,7 @@ export async function getWeekConsignments() {
     consignmentEndpoints.readWeekSummary()
   );
 
-  return response.data;
+  return normalizeConsignments(response.data);
 }
 
 export async function getMonthConsignments() {
@@ -72,7 +73,7 @@ export async function getMonthConsignments() {
     consignmentEndpoints.readMonthSummary()
   );
 
-  return response.data;
+  return normalizeConsignments(response.data);
 }
 
 export async function getYearConsignments() {
@@ -80,7 +81,7 @@ export async function getYearConsignments() {
     consignmentEndpoints.readYearSummary()
   );
 
-  return response.data;
+  return normalizeConsignments(response.data);
 }
 
 export async function getConsignmentsByDateRange(
@@ -94,5 +95,5 @@ export async function getConsignmentsByDateRange(
     )
   );
 
-  return response.data;
+  return normalizeConsignments(response.data);
 }

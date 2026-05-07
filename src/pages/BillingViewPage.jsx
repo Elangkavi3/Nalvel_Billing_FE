@@ -1,19 +1,5 @@
 import { money } from '../utils/numbers.js';
-
-function formatDateTime(value) {
-  if (!value) return '-';
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) return String(value);
-
-  return new Intl.DateTimeFormat('en-GB', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  }).format(parsed);
-}
+import { calculateConsignmentValues, formatDateOnly } from '../utils/consignment.js';
 
 function paymentModeLabel(value) {
   return value || '-';
@@ -35,7 +21,8 @@ export function BillingViewPage({ item, onBack, onEdit, onHome }) {
   if (!item) return null;
 
   const additionalCharges = item.additionalCharges ?? 0;
-  const expenses = item.expenses ?? 0;
+  const totals = calculateConsignmentValues(item);
+  const expenses = totals.expenses ?? 0;
   const netWeight = item.netWeight ?? item.weight ?? '-';
   const tareWeight = item.tareWeight ?? '-';
   const grossWeight = item.grossWeight ?? item.crossVehicleWeight ?? '-';
@@ -78,15 +65,15 @@ export function BillingViewPage({ item, onBack, onEdit, onHome }) {
         <div className="bill-view-meta-strip">
           <div className="bill-view-meta-item">
             <span className="lbl">Booking</span>
-            <span className="val">{formatDateTime(item.ledgerDateTime)}</span>
+            <span className="val">{formatDateOnly(item.ledgerDateTime)}</span>
           </div>
           <div className="bill-view-meta-item">
             <span className="lbl">Loading</span>
-            <span className="val">{formatDateTime(item.loadingDateTime)}</span>
+            <span className="val">{formatDateOnly(item.loadingDateTime)}</span>
           </div>
           <div className="bill-view-meta-item">
             <span className="lbl">Delivery</span>
-            <span className="val">{formatDateTime(item.deliveryDateTime)}</span>
+            <span className="val">{formatDateOnly(item.deliveryDateTime)}</span>
           </div>
           <div className="bill-view-meta-item">
             <span className="lbl">LR No.</span>
@@ -114,8 +101,8 @@ export function BillingViewPage({ item, onBack, onEdit, onHome }) {
                 <Field label="Material Description" value={item.material || '-'} />
               </div>
               <div className="bill-field-row">
-                <Field label="LR Date" value={formatDateTime(item.lrDateTime)} mono />
-                <Field label="Invoice Date" value={formatDateTime(item.invoiceDateTime)} mono />
+                <Field label="LR Date" value={formatDateOnly(item.lrDateTime)} mono />
+                <Field label="Invoice Date" value={formatDateOnly(item.invoiceDateTime)} mono />
               </div>
             </article>
 
@@ -134,15 +121,15 @@ export function BillingViewPage({ item, onBack, onEdit, onHome }) {
 
                 <article className="bill-card">
                   <SectionTitle title="Our Rate & Profit" />
-                  {item.gstType && <Field label="GST Type" value={<span className="bill-badge gst">{item.gstType}%</span>} />}
-                  <Field label="Freight Booking Cost" value={money(item.customerRate)} amount />
+                  {item.gstType && <Field label="GST Percentage Used" value={<span className="bill-badge gst">{item.gstType}%</span>} />}
+                  <Field label="Freight Booking Cost" value={money(totals.customerRate)} amount />
                   <div className="bill-field-row">
                     <Field label="Additional Charge" value={money(additionalCharges)} amount />
                     <Field label="Total Expense" value={money(expenses)} amount />
                   </div>
                   <div className="bill-field-row">
-                    <Field label="Net Freight" value={money(item.netFreight)} amount />
-                    <Field label="Profit" value={money(item.profit)} amount />
+                    <Field label="Net Freight" value={money(totals.netFreight)} amount />
+                    <Field label="Profit" value={money(totals.profit)} amount />
                   </div>
                 </article>
               </div>
@@ -167,6 +154,9 @@ export function BillingViewPage({ item, onBack, onEdit, onHome }) {
                   <SectionTitle title="Extra" />
                   <Field label="Customer Payment Mode" value={<span className="bill-badge payment">{paymentModeLabel(item.customerPaymentMode)}</span>} />
                   <Field label="Remarks / Notes" value={item.remarks || '-'} muted />
+                  <Field label="Consignor" value={item.consignorName || item.customerName || '-'} />
+                  <Field label="Consignee" value={item.consigneeName || item.billTo || '-'} />
+                  <Field label="Book Copy" value={item.bookCopy || 'CONSIGNOR COPY'} />
                 </article>
               </div>
 
@@ -176,16 +166,20 @@ export function BillingViewPage({ item, onBack, onEdit, onHome }) {
                   <Field label="Freight Amount Type" value={supplierRateLabel} />
                   <Field label={supplierRateLabel} value={money(item.supplierAmount)} amount />
                   <Field label="Chargeble Weight" value={item.chargebleWeight ?? '-'} />
-                  <Field label="Payable Amount" value={money(item.ledgerAmount)} amount />
+                  <Field label="Payable Amount" value={money(totals.ledgerAmount)} amount />
                   <div className="bill-field-row">
                     <Field label="Halting Charge" value={money(item.haltingCharge)} amount />
-                    <Field label="Commission" value={money(item.commission)} amount />
+                    <Field label="Parking Charge" value={money(item.parkingCharge)} amount />
                   </div>
                   <div className="bill-field-row">
-                    <Field label="Net Payment Balance" value={money(item.netBalance)} amount />
-                    <Field label="Total Advance" value={money(item.totalAdvance)} amount />
+                    <Field label="Commission" value={money(item.commission)} amount />
+                    <Field label="Net Payment Balance" value={money(totals.netBalance)} amount />
                   </div>
-                  <Field label="Balance" value={money(item.balance)} amount />
+                  <div className="bill-field-row">
+                    <Field label="Total Advance" value={money(totals.totalAdvance)} amount />
+                    <Field label="Total Expense" value={money(totals.expenses)} amount />
+                  </div>
+                  <Field label="Balance" value={money(totals.balance)} amount />
                   <Field label="Payment Type Options" value={paymentTypeLabel(item.paymentType)} />
                   <Field label="Truck Pay Mode" value={<span className="bill-badge payment">{paymentModeLabel(item.truckpaymentMode)}</span>} />
                 </article>
@@ -194,12 +188,12 @@ export function BillingViewPage({ item, onBack, onEdit, onHome }) {
           </div>
 
           <div className="bill-finance-bar">
-            <FinanceItem label="Freight Booking Cost" value={money(item.customerRate)} />
-            <FinanceItem label="Payable Amount" value={money(item.ledgerAmount)} />
-            <FinanceItem label="Total Advance" value={money(item.totalAdvance)} accent="advance" />
-            <FinanceItem label="Balance" value={money(item.balance)} accent="netFreight" />
-            <FinanceItem label="Net Freight" value={money(item.netFreight)} accent="netFreight" />
-            <FinanceItem label="Profit" value={money(item.profit)} accent="profit" />
+            <FinanceItem label="Freight Booking Cost" value={money(totals.customerRate)} />
+            <FinanceItem label="Payable Amount" value={money(totals.ledgerAmount)} />
+            <FinanceItem label="Total Expense" value={money(totals.expenses)} />
+            <FinanceItem label="Total Advance" value={money(totals.totalAdvance)} accent="advance" />
+            <FinanceItem label="Net Freight" value={money(totals.netFreight)} accent="netFreight" />
+            <FinanceItem label="Profit" value={money(totals.profit)} accent="profit" />
           </div>
         </div>
 

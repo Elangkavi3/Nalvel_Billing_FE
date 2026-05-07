@@ -1,6 +1,22 @@
 import API from "./api";
 import { lrEndpoints } from "./endpoints";
 
+export async function request(url, options = {}) {
+  const { body, headers, method = "GET", ...rest } = options;
+  const response = await API.request({
+    url,
+    method,
+    data: body ? JSON.parse(body) : undefined,
+    headers: {
+      "Content-Type": "application/json",
+      ...headers,
+    },
+    ...rest,
+  });
+
+  return response.data;
+}
+
 export async function saveLR(data) {
   const response = await API.post(
     lrEndpoints.create(),

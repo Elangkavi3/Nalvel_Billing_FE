@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Pagination } from "../components/common/Pagination.jsx";
 import { money } from "../utils/numbers.js";
+import { calculateConsignmentValues, formatDateOnly } from "../utils/consignment.js";
 
 function billingLabel(item) {
   if (item.viewMode === "IMS" || item.imsNo) return "IMS No";
@@ -211,15 +212,15 @@ export function SavedDataPage({
                       <strong>{item.truckNo || "-"}</strong>
                       <span>{item.truckType || "-"}</span>
                     </td>
-                    <td>
-                      <strong>{money(item.ledgerAmount)}</strong>
-                      <span>Bal: {money(item.balance)}</span>
+                <td>
+                      <strong>{money(calculateConsignmentValues(item).ledgerAmount)}</strong>
+                      <span>Bal: {money(calculateConsignmentValues(item).balance)}</span>
                     </td>
                     <td>
-                      <strong>{money(item.customerRate)}</strong>
+                      <strong>{money(calculateConsignmentValues(item).customerRate)}</strong>
                       <span>{item.customerPaymentMode || "-"}</span>
                     </td>
-                    <td className="profit-text">{money(item.profit)}</td>
+                    <td className="profit-text">{money(calculateConsignmentValues(item).profit)}</td>
                     <td className="action-cell">
                       <button
                         type="button"
@@ -275,6 +276,12 @@ export function SavedDataPage({
 
       {printData && (
         <div className="invoice-print-container">
+          {(() => {
+            const totals = calculateConsignmentValues(printData);
+            const gstPercentage = Number(printData.gstType || 0);
+            const gstAmount = (totals.expenses * gstPercentage) / 100;
+            return (
+          <>
           <div className="invoice-top-header">
             <div className="company-branding">
               <h1>NALVEL LOGISTICS SERVICES</h1>
@@ -302,7 +309,7 @@ export function SavedDataPage({
               </p>
               <p>
                 <strong>Date:</strong>{" "}
-                {printData.date || new Date().toLocaleDateString("en-GB")}
+                {formatDateOnly(printData.invoiceDateTime || printData.invoiceDate || printData.date) || new Date().toLocaleDateString("en-GB")}
               </p>
               <p>
                 <strong>Truck Details:</strong> {printData.truckNo || "-"}
@@ -333,8 +340,15 @@ export function SavedDataPage({
                 <td>996799</td>
                 <td>-</td>
                 <td className="text-right">
-                  {Number(printData.customerRate).toFixed(2)}
+                  {Number(totals.customerRate).toFixed(2)}
                 </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Additional Charge</td>
+                <td></td>
+                <td>-</td>
+                <td className="text-right">{Number(printData.additionalCharges || 0).toFixed(2)}</td>
               </tr>
               <tr>
                 <td></td>
@@ -347,10 +361,10 @@ export function SavedDataPage({
             <tfoot>
               <tr>
                 <td colSpan="4" className="text-right">
-                  GST @ 5%
+                  GST @ {gstPercentage}%
                 </td>
                 <td className="text-right">
-                  {(printData.customerRate * 0.05).toFixed(2)}
+                  {gstAmount.toFixed(2)}
                 </td>
               </tr>
               <tr>
@@ -364,7 +378,7 @@ export function SavedDataPage({
                   <strong>Net Amount</strong>
                 </td>
                 <td className="text-right">
-                  <strong>{(printData.customerRate * 1.05).toFixed(2)}</strong>
+                  <strong>{Number(totals.netFreight).toFixed(2)}</strong>
                 </td>
               </tr>
             </tfoot>
@@ -373,7 +387,7 @@ export function SavedDataPage({
           <p className="amount-words">
             {/* This uses the function we created above */}
             <strong>Amount in Words:</strong> Rupees{" "}
-            {numberToWords(Math.round(printData.customerRate * 1.05))}
+            {numberToWords(Math.round(totals.netFreight))}
           </p>
 
           <div className="invoice-bottom">
@@ -413,6 +427,9 @@ export function SavedDataPage({
               brought our notice within three days from the date of our Invoice.
             </p>
           </div>
+          </>
+            );
+          })()}
         </div>
       )}
     </>
