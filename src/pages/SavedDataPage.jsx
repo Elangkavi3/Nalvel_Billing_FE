@@ -13,6 +13,35 @@ function billingValue(item) {
   return item.gstNo || "-";
 }
 
+function toDateInputValue(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function buildPrintDraft(item) {
+  const invoiceDate =
+    toDateInputValue(
+      item.invoiceDateTime ||
+        item.customerInvoiceDate ||
+        item.invoiceDate ||
+        item.date
+    ) || toDateInputValue(new Date());
+
+  return {
+    ...item,
+    printInvoiceNo: `NALVEL-25/26-${item.serialNo || item.id || ""}`,
+    printInvoiceDate: invoiceDate,
+    printNoOfPkgs: item.printNoOfPkgs || "",
+    printDescription: item.printDescription || item.material || "",
+    printMiscellaneous: item.printMiscellaneous || "",
+  };
+}
+
 export function SavedDataPage({
   currentPage,
   filter,
@@ -35,11 +64,22 @@ export function SavedDataPage({
   const [printData, setPrintData] = useState(null);
 
   const handlePrintAction = (item) => {
-    setPrintData(item);
-    setTimeout(() => {
-      window.print();
-      // Do NOT call setPrintData(null) here yet
-    }, 50);
+    setPrintData(buildPrintDraft(item));
+  };
+
+  const handlePrintFieldChange = (field, value) => {
+    setPrintData((current) => (current ? { ...current, [field]: value } : current));
+  };
+
+  const handlePrintNow = () => {
+    if (typeof onPrint === "function" && printData) {
+      onPrint(printData);
+    }
+    window.print();
+  };
+
+  const handleClosePrintEditor = () => {
+    setPrintData(null);
   };
 
   const hasItems = items.length > 0;
@@ -275,157 +315,330 @@ export function SavedDataPage({
       </section>
 
       {printData && (
+        <section className="invoice-edit-panel" aria-label="Invoice print editor">
+          <div className="invoice-edit-head">
+            <div>
+              <h3>Edit Invoice Before Print</h3>
+              <p>Update values here, then click Print Invoice.</p>
+            </div>
+            <div className="invoice-edit-actions">
+              <button
+                type="button"
+                className="btn ghost"
+                onClick={handleClosePrintEditor}
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                className="btn dark"
+                onClick={handlePrintNow}
+              >
+                Print Invoice
+              </button>
+            </div>
+          </div>
+
+          <div className="invoice-edit-grid">
+            <label className="field">
+              <span>Invoice No</span>
+              <input
+                value={printData.printInvoiceNo || ""}
+                onChange={(event) =>
+                  handlePrintFieldChange("printInvoiceNo", event.target.value)
+                }
+              />
+            </label>
+            <label className="field">
+              <span>Invoice Date</span>
+              <input
+                type="date"
+                value={printData.printInvoiceDate || ""}
+                onChange={(event) =>
+                  handlePrintFieldChange("printInvoiceDate", event.target.value)
+                }
+              />
+            </label>
+            <label className="field">
+              <span>Customer Name</span>
+              <input
+                value={printData.customerName || ""}
+                onChange={(event) =>
+                  handlePrintFieldChange("customerName", event.target.value)
+                }
+              />
+            </label>
+            <label className="field">
+              <span>Bill To</span>
+              <input
+                value={printData.billTo || ""}
+                onChange={(event) =>
+                  handlePrintFieldChange("billTo", event.target.value)
+                }
+              />
+            </label>
+            <label className="field">
+              <span>Customer GST No</span>
+              <input
+                value={printData.gstNo || ""}
+                onChange={(event) =>
+                  handlePrintFieldChange("gstNo", event.target.value)
+                }
+              />
+            </label>
+            <label className="field">
+              <span>No of Pkgs</span>
+              <input
+                value={printData.printNoOfPkgs || ""}
+                onChange={(event) =>
+                  handlePrintFieldChange("printNoOfPkgs", event.target.value)
+                }
+              />
+            </label>
+            <label className="field">
+              <span>Description</span>
+              <input
+                value={printData.printDescription || ""}
+                onChange={(event) =>
+                  handlePrintFieldChange("printDescription", event.target.value)
+                }
+              />
+            </label>
+            <label className="field">
+              <span>Truck No</span>
+              <input
+                value={printData.truckNo || ""}
+                onChange={(event) =>
+                  handlePrintFieldChange("truckNo", event.target.value)
+                }
+              />
+            </label>
+            <label className="field">
+              <span>From</span>
+              <input
+                value={printData.fromLocation || ""}
+                onChange={(event) =>
+                  handlePrintFieldChange("fromLocation", event.target.value)
+                }
+              />
+            </label>
+            <label className="field">
+              <span>To</span>
+              <input
+                value={printData.toLocation || ""}
+                onChange={(event) =>
+                  handlePrintFieldChange("toLocation", event.target.value)
+                }
+              />
+            </label>
+            <label className="field">
+              <span>Gross Weight (MT)</span>
+              <input
+                value={printData.grossWeight || printData.weight || ""}
+                onChange={(event) =>
+                  handlePrintFieldChange("grossWeight", event.target.value)
+                }
+              />
+            </label>
+            <label className="field">
+              <span>Customer Rate</span>
+              <input
+                type="number"
+                step="0.01"
+                value={printData.customerRate ?? ""}
+                onChange={(event) =>
+                  handlePrintFieldChange("customerRate", event.target.value)
+                }
+              />
+            </label>
+            <label className="field">
+              <span>Additional Charge</span>
+              <input
+                type="number"
+                step="0.01"
+                value={printData.additionalCharges ?? ""}
+                onChange={(event) =>
+                  handlePrintFieldChange("additionalCharges", event.target.value)
+                }
+              />
+            </label>
+            <label className="field">
+              <span>GST %</span>
+              <input
+                type="number"
+                step="0.01"
+                value={printData.gstType ?? ""}
+                onChange={(event) =>
+                  handlePrintFieldChange("gstType", event.target.value)
+                }
+              />
+            </label>
+            <label className="field">
+              <span>Miscellaneous</span>
+              <input
+                value={printData.printMiscellaneous || ""}
+                onChange={(event) =>
+                  handlePrintFieldChange("printMiscellaneous", event.target.value)
+                }
+              />
+            </label>
+          </div>
+        </section>
+      )}
+
+      {printData && (
         <div className="invoice-print-container">
           {(() => {
             const totals = calculateConsignmentValues(printData);
             const gstPercentage = Number(printData.gstType || 0);
             const gstAmount = (totals.expenses * gstPercentage) / 100;
+            const grossWeight = printData.grossWeight || printData.weight || "0.000";
+            const routeFrom = printData.fromLocation || "-";
+            const routeTo = printData.toLocation || "-";
+            const showMiscCharge = Number(printData.additionalCharges || 0) !== 0;
+            const customerInvoiceNumber = printData.invoiceNo || "-";
             return (
           <>
-          <div className="invoice-top-header">
-            <div className="company-branding">
-              <h1>NALVEL LOGISTICS SERVICES</h1>
-              <p>New No: 12, Old No. 26, Nallappa Street, Nehru Nagar,</p>
-              <p>Chromepet, Chennai - 600 044</p>
-              <p>GST NO: 33ARXPK1573A2ZT</p>
-              <p>nalvellogisticsservices@gmail.com</p>
+          <div className="invoice-sheet">
+            <div className="invoice-top-header">
+              <div className="company-branding">
+                <h1>NALVEL LOGISTICS SERVICES</h1>
+                <p>New No: 12, Old No. 26, Nallappa Street, Nehru Nagar,</p>
+                <p>Chromepet, Chennai - 600 044</p>
+                <p>GST NO: 33ARXPK1573A2ZT</p>
+                <p>nalvellogisticsservices@gmail.com</p>
+              </div>
+              <div className="invoice-title">
+                <h2>TAX INVOICE</h2>
+              </div>
             </div>
-            <div className="invoice-title">
-              <h2>TAX INVOICE</h2>
-            </div>
-          </div>
 
-          <div className="invoice-meta-grid">
-            <div className="meta-col billing">
-              <strong>To</strong>
-              <p>M/s. {printData.customerName || "-"}</p>
-              <p>{printData.billTo || "-"}</p>
-              <p>GST NO: {printData.gstNo || "-"}</p>
+            <div className="invoice-party-header">
+              <div className="invoice-party-left">
+                <p><strong>To</strong></p>
+                <p><strong>M/s. {printData.customerName || "-"}</strong></p>
+                <p>{printData.billTo || "-"}</p>
+                <p><strong>GST NO:</strong> {printData.gstNo || "-"}</p>
+                <p><strong>Description:</strong> {printData.printDescription || "-"}</p>
+                <p><strong>No of Pkgs:</strong> {printData.printNoOfPkgs || "-"}</p>
+                <p><strong>Invoice No:</strong> {customerInvoiceNumber}</p>
+                <p><strong>Gross Weight:</strong> {grossWeight} M/T</p>
+              </div>
+              <div className="invoice-party-right">
+                <p><strong>Invoice No:</strong> {printData.printInvoiceNo || "-"}</p>
+                <p>
+                  <strong>Date:</strong>{" "}
+                  {formatDateOnly(
+                    printData.printInvoiceDate ||
+                      printData.invoiceDateTime ||
+                      printData.customerInvoiceDate ||
+                      printData.invoiceDate ||
+                      printData.date
+                  ) || new Date().toLocaleDateString("en-GB")}
+                </p>
+                <p><strong>Truck Details:</strong> {printData.truckNo || "-"}</p>
+                <p><strong>Miscellaneous:</strong> {printData.printMiscellaneous || "-"}</p>
+              </div>
             </div>
-            <div className="meta-col details">
-              <p>
-                <strong>Invoice No:</strong> NALVEL-25/26-
-                {printData.serialNo || printData.id}
-              </p>
-              <p>
-                <strong>Date:</strong>{" "}
-                {formatDateOnly(printData.invoiceDateTime || printData.customerInvoiceDate || printData.invoiceDate || printData.date) || new Date().toLocaleDateString("en-GB")}
-              </p>
-              <p>
-                <strong>Truck Details:</strong> {printData.truckNo || "-"}
-              </p>
-              <p>
-                <strong>Gross Weight:</strong> {printData.grossWeight || printData.weight || "0.000"} MT
-              </p>
-            </div>
-          </div>
 
-          <table className="invoice-main-table">
-            <thead>
-              <tr>
-                <th>SI. No</th>
-                <th>Particulars</th>
-                <th>HSN/SAC</th>
-                <th>As Per Receipt</th>
-                <th>Non Receipt</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>1</td>
-                <td>
-                  Transportation Charges ({printData.fromLocation} To{" "}
-                  {printData.toLocation})
-                </td>
-                <td>996799</td>
-                <td>-</td>
-                <td className="text-right">
-                  {Number(totals.customerRate).toFixed(2)}
-                </td>
-              </tr>
-              <tr>
-                <td></td>
-                <td>Additional Charge</td>
-                <td></td>
-                <td>-</td>
-                <td className="text-right">{Number(printData.additionalCharges || 0).toFixed(2)}</td>
-              </tr>
-              <tr>
-                <td></td>
-                <td>Loading/Unloading mamool</td>
-                <td></td>
-                <td>-</td>
-                <td className="text-right">0.00</td>
-              </tr>
-            </tbody>
-            <tfoot>
-              <tr>
-                <td colSpan="4" className="text-right">
-                  GST @ {gstPercentage}%
-                </td>
-                <td className="text-right">
-                  {gstAmount.toFixed(2)}
-                </td>
-              </tr>
-              <tr>
-                <td colSpan="4" className="text-right">
-                  Round off
-                </td>
-                <td className="text-right">.00</td>
-              </tr>
-              <tr>
-                <td colSpan="4" className="text-right">
-                  <strong>Net Amount</strong>
-                </td>
-                <td className="text-right">
-                  <strong>{Number(totals.netFreight).toFixed(2)}</strong>
-                </td>
-              </tr>
-            </tfoot>
-          </table>
+            <table className="invoice-main-table">
+              <thead>
+                <tr>
+                  <th>Sl. No</th>
+                  <th>Particulars</th>
+                  <th>HSN/SAC</th>
+                  <th>As Per Receipt</th>
+                  <th>Non Receipt</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>
+                    Transportation Charges ({routeFrom} To {routeTo})
+                  </td>
+                  <td>996799</td>
+                  <td>-</td>
+                  <td className="text-right">
+                    {Number(totals.customerRate).toFixed(2)}
+                  </td>
+                </tr>
+                {showMiscCharge && (
+                  <tr>
+                    <td></td>
+                    <td>Miscellaneous Charges</td>
+                    <td></td>
+                    <td>-</td>
+                    <td className="text-right">
+                      {Number(printData.additionalCharges || 0).toFixed(2)}
+                    </td>
+                  </tr>
+                )}
+                <tr>
+                  <td></td>
+                  <td>Loading/Unloading mamool</td>
+                  <td></td>
+                  <td>-</td>
+                  <td className="text-right">0.00</td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td>GST @ {gstPercentage}%</td>
+                  <td></td>
+                  <td>-</td>
+                  <td className="text-right">{gstAmount.toFixed(2)}</td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td>Round off</td>
+                  <td></td>
+                  <td>-</td>
+                  <td className="text-right">.00</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colSpan="4" className="text-right">
+                    <strong>Net Amount</strong>
+                  </td>
+                  <td className="text-right">
+                    <strong>{Number(totals.netFreight).toFixed(2)}</strong>
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
 
-          <p className="amount-words">
-            {/* This uses the function we created above */}
-            <strong>Amount in Words:</strong> Rupees{" "}
-            {numberToWords(Math.round(totals.netFreight))}
-          </p>
-
-          <div className="invoice-bottom">
-            <div className="bank-details">
+            <div className="invoice-amount-row">
               <p>
-                <strong>BENIFICIARY NAME:</strong> NALVEL LOGISTICS SERVICES
-              </p>
-              <p>
-                <strong>BANK NAME:</strong> HDFC BANK LTD
-              </p>
-              <p>
-                <strong>BRANCH ADDRESS:</strong> CHITLAPAKKAM
-              </p>
-              <p>
-                <strong>CURRENT ACCOUNT NUMBER:</strong> 50200095254790
-              </p>
-              <p>
-                <strong>IFSC:</strong> HDFC0000260
+                <strong>Amount in Words:</strong> Rupees{" "}
+                {numberToWords(Math.round(totals.netFreight))}
               </p>
             </div>
-            <div className="signature-area">
-              <p>For NALVEL LOGISTICS SERVICES</p>
-              <div className="sig-space" style={{ height: "50px" }}></div>
-              <p>Authorised Signatory</p>
-            </div>
-          </div>
 
-          <div
-            className="terms"
-            style={{ marginTop: "15px", fontSize: "10px" }}
-          >
-            <strong>Terms & Conditions</strong>
-            <p>* Subject to Chennai Jurisdiction only</p>
-            <p>* Cash Payment against receipt only</p>
-            <p>
-              <strong>Note:</strong> Any discrepancies in the Invoice should be
-              brought our notice within three days from the date of our Invoice.
-            </p>
+            <div className="invoice-bottom">
+              <div className="terms-bank-block">
+                <p><strong>Terms & Conditions</strong></p>
+                <p>* Subject to Chennai Jurisdiction only</p>
+                <p>* Cash Payment against receipt only</p>
+                <p>
+                  <strong>Note:</strong> Any discrepancies in the Invoice should
+                  be brought our notice within three days from the date of our
+                  Invoice.
+                </p>
+                <div className="bank-details">
+                  <p><strong>BENIFICIARY NAME:</strong> NALVEL LOGISTICS SERVICES</p>
+                  <p><strong>BANK NAME:</strong> HDFC BANK LTD</p>
+                  <p><strong>BRANCH ADDRESS:</strong> CHITLAPAKKAM</p>
+                  <p><strong>CURRENT ACCOUNT NUMBER:</strong> 50200095254790</p>
+                  <p><strong>IFSC:</strong> HDFC0000260</p>
+                </div>
+              </div>
+              <div className="signature-area">
+                <p>For NALVEL LOGISTICS SERVICES</p>
+                <div className="sig-space" />
+                <p>Authorised Signatory</p>
+              </div>
+            </div>
           </div>
           </>
             );
