@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { lrEndpoints } from '../services/endpoints.js';
-import { request } from '../services/lrApi.js';
+import { deleteLR, getAllLR, request } from '../services/lrApi.js';
 import { toNumber } from '../utils/numbers.js';
 
 const TERMS_APPLICABILITY =
@@ -137,19 +137,31 @@ function composeLRText(form) {
   ].join('\n');
 }
 
+function resolveRecordConsignmentId(record) {
+  const nestedId = record?.consignment?.id;
+  const directId = record?.consignmentId;
+  const value = Number(directId ?? nestedId ?? 0);
+  return Number.isFinite(value) ? value : 0;
+}
+
 async function fetchAllLrRecords() {
-  const data = await request(lrEndpoints.readAll());
+  const data = await getAllLR();
   return Array.isArray(data) ? data : [];
 }
 
 async function fetchLrByConsignmentId(consignmentId) {
   if (!consignmentId) return null;
-  return request(lrEndpoints.readByConsignmentId(consignmentId));
+  const targetId = Number(consignmentId);
+  if (!targetId) return null;
+  const lrRecords = await fetchAllLrRecords();
+  return lrRecords.find((record) => resolveRecordConsignmentId(record) === targetId) || null;
 }
 
 async function fetchLrById(id) {
   if (!id) return null;
-  return request(lrEndpoints.readById(id));
+  const numericId = Number(id);
+  const lrRecords = await fetchAllLrRecords();
+  return lrRecords.find((record) => Number(record?.id) === numericId) || null;
 }
 
 async function fetchLrPrefillBySavedDataSNo(savedDataSNo) {
@@ -159,7 +171,7 @@ async function fetchLrPrefillBySavedDataSNo(savedDataSNo) {
 
 async function deleteLrById(id) {
   if (!id) return null;
-  return request(lrEndpoints.deleteById(id), { method: 'DELETE' });
+  return deleteLR(id);
 }
 
 function firstLrRecord(value) {
@@ -183,10 +195,14 @@ async function saveLRToBackend(form) {
     try {
       const lrRecords = await fetchAllLrRecords();
       const serialNo = String(form.sourceSerialNo || '').trim().toLowerCase();
+      const cnNo = String(form.lrNo || '').trim().toLowerCase();
       const matched = lrRecords.find((record) => {
-        const recordConsignmentId = Number(record?.consignment?.id || 0);
+        const recordConsignmentId = resolveRecordConsignmentId(record);
         const recordSerial = String(record?.savedDataSNo || '').trim().toLowerCase();
-        return (consignmentId && recordConsignmentId === consignmentId) || (serialNo && recordSerial === serialNo);
+        const recordCno = String(record?.cnNo || '').trim().toLowerCase();
+        return (consignmentId && recordConsignmentId === consignmentId)
+          || (serialNo && recordSerial === serialNo)
+          || (cnNo && recordCno === cnNo);
       });
       return matched?.id ?? '';
     } catch {

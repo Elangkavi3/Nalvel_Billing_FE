@@ -28,7 +28,7 @@ import {
 } from './services/advancePaymentApi.js';
 import {
   deleteLR,
-  getLRByConsignmentId,
+  getAllLR,
 } from './services/lrApi.js';
 import {
   buildAdvancePaymentPayload,
@@ -78,6 +78,13 @@ function responseRows(value) {
   if (Array.isArray(value)) return value;
   if (Array.isArray(value?.data)) return value.data;
   return value ? [value] : [];
+}
+
+function resolveLrConsignmentId(record) {
+  const nestedId = record?.consignment?.id;
+  const directId = record?.consignmentId;
+  const value = Number(directId ?? nestedId ?? 0);
+  return Number.isFinite(value) ? value : 0;
 }
 
 async function ignoreMissing(deleteRequest) {
@@ -510,7 +517,9 @@ export function App() {
 
   async function deleteLrForConsignment(consignmentId) {
     try {
-      const lrRecords = responseRows(await getLRByConsignmentId(consignmentId));
+      const targetId = Number(consignmentId);
+      const lrRecords = responseRows(await getAllLR())
+        .filter((record) => resolveLrConsignmentId(record) === targetId);
       await Promise.all(
         lrRecords
           .map((record) => record?.id)

@@ -75,11 +75,8 @@ export const lrEndpoints = {
 
   readAll: () => withApiBase(`${LR_BASE}/allData`),
 
-  readById: (id) =>
-    withApiBase(`${LR_BASE}/${id}`),
-
-  readByConsignmentId: (consignmentId) =>
-    withApiBase(`${LR_BASE}/by-consignment/${consignmentId}`),
+  readByCno: (cnNo) =>
+    withApiBase(`${LR_BASE}/${encodeURIComponent(cnNo)}`),
 
   readPrefillBySavedDataSNo: (savedDataSNo) =>
     withApiBase(
@@ -91,4 +88,8 @@ export const lrEndpoints = {
 
   deleteById: (id) =>
     withApiBase(`${LR_BASE}/delete/${id}`),
+
+  // Some backend deployments expose DELETE /{id} instead of /delete/{id}.
+  deleteByIdFallback: (id) =>
+    withApiBase(`${LR_BASE}/${id}`),
 };
