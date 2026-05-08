@@ -280,7 +280,7 @@
   }
 
   .lr-ui-page .lr-lookup-strip {
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr) auto auto;
   }
 
   .lr-ui-page .lr-lookup-strip .lr-lookup-message {

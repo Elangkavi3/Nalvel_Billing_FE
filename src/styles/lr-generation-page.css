@@ -115,7 +115,7 @@
 /* LR LOOKUP STRIP */
 .lr-ui-page .lr-lookup-strip {
   display: grid;
-  grid-template-columns: minmax(180px, 280px) auto minmax(0, 1fr);
+  grid-template-columns: minmax(180px, 280px) auto auto minmax(0, 1fr);
   align-items: end;
   gap: 10px;
   margin-bottom: 14px;

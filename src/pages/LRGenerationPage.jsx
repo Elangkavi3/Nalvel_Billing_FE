@@ -333,6 +333,34 @@ async function loadFromSerial() {
     }
   }
 
+  async function loadSavedLrFromTable() {
+    const serialNo = String(form.sourceSerialNo || '').trim();
+    if (!serialNo) {
+      setLookupMessage('Enter Saved Data S.No');
+      return;
+    }
+
+    try {
+      const normalizedKey = serialNo.toLowerCase();
+      const lrRecords = await fetchAllLrRecords();
+      const matchedRecord = lrRecords.find((record) => {
+        const recordSerial = String(record?.savedDataSNo || '').trim().toLowerCase();
+        const recordCno = String(record?.cnNo || '').trim().toLowerCase();
+        return recordSerial === normalizedKey || recordCno === normalizedKey;
+      });
+
+      if (!matchedRecord?.id) {
+        setLookupMessage(`No saved LR found in LR table for ${serialNo}`);
+        return;
+      }
+
+      setForm((current) => lrRecordToForm(matchedRecord, { ...current, sourceSerialNo: matchedRecord?.savedDataSNo || serialNo }));
+      setLookupMessage(`Loaded saved LR #${matchedRecord.id} from LR table`);
+    } catch (error) {
+      setLookupMessage(error?.message || 'Unable to load saved LR from LR table');
+    }
+  }
+
   async function handleSubmit(event) {
     event.preventDefault();
     setLookupMessage('');
@@ -399,6 +427,7 @@ async function loadFromSerial() {
               <input className="field-input" value={form.sourceSerialNo} onChange={(event) => updateField('sourceSerialNo', event.target.value)} />
             </div>
             <button type="button" className="btn btn-secondary" onClick={loadFromSerial}>Fill</button>
+            <button type="button" className="btn btn-secondary" onClick={loadSavedLrFromTable}>Load Saved LR</button>
             {lookupMessage && <div className="lr-lookup-message">{lookupMessage}</div>}
           </div>
 
