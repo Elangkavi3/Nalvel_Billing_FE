@@ -78,6 +78,7 @@ export function SavedDataPage({
   onFilterChange,
   onView,
   onLoadAll,
+  onExportExcel,
   onSearch,
   onSearchNameChange,
   onSetPage,
@@ -119,9 +120,19 @@ export function SavedDataPage({
             <p className="subline">Showing maximum 10 records per page</p>
           </div>
           <div className="data-actions">
-            <button type="button" className="btn dark" onClick={onBack}>
-              Back to Home
-            </button>
+            <div className="data-primary-actions">
+              <button type="button" className="btn dark" onClick={onBack}>
+                Back to Home
+              </button>
+              <button
+                type="button"
+                className="btn secondary"
+                onClick={onExportExcel}
+                disabled={loading}
+              >
+                Export Excel
+              </button>
+            </div>
             <form className="search-row" onSubmit={onSearch}>
               <input
                 placeholder="Search exact customer name"

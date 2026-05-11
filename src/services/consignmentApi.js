@@ -2,6 +2,30 @@ import API from "./api";
 import { consignmentEndpoints } from "./endpoints";
 import { normalizeConsignment, normalizeConsignments } from "../utils/consignment";
 
+function resolveExportFilename(headers = {}) {
+  const contentDisposition = headers["content-disposition"] || "";
+  const match = contentDisposition.match(
+    /filename\*=UTF-8''([^;]+)|filename="?([^"]+)"?/i
+  );
+
+  const encodedName = match?.[1] || match?.[2];
+  if (!encodedName) return "consignment_audit.xlsx";
+
+  try {
+    return decodeURIComponent(encodedName.trim());
+  } catch {
+    return encodedName.trim();
+  }
+}
+
+function buildExportParams({ startDate, endDate, customerName }) {
+  const params = {};
+  if (startDate) params.startDate = startDate;
+  if (endDate) params.endDate = endDate;
+  if (customerName) params.customerName = customerName;
+  return params;
+}
+
 export async function getAllConsignments() {
   const response = await API.get(
     consignmentEndpoints.readAll()
@@ -89,11 +113,42 @@ export async function getConsignmentsByDateRange(
   endDate
 ) {
   const response = await API.get(
-    consignmentEndpoints.readByDateRange(
-      startDate,
-      endDate
-    )
+    consignmentEndpoints.readByDateRange(startDate, endDate)
   );
 
   return normalizeConsignments(response.data);
+}
+
+export async function downloadConsignmentsExcel({
+  startDate = "",
+  endDate = "",
+  customerName = "",
+} = {}) {
+  const params = buildExportParams({ startDate, endDate, customerName });
+  console.log("Downloading Excel with params:", params);
+
+  try {
+    const response = await API.get(consignmentEndpoints.exportExcel(), {
+      params,
+      responseType: "blob",
+      withCredentials: true,
+    });
+
+    console.log("Excel export response received");
+
+    const blobData = response.data;
+    const contentDisposition = response.headers["content-disposition"];
+    const fileName = resolveExportFilename({ "content-disposition": contentDisposition });
+    const urlBlob = window.URL.createObjectURL(blobData);
+    const link = document.createElement("a");
+    link.href = urlBlob;
+    link.setAttribute("download", fileName);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(urlBlob);
+  } catch (err) {
+    console.error("Excel export failed", err);
+    throw err;
+  }
 }

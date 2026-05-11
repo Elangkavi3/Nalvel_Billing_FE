@@ -10,6 +10,7 @@ import { LRGenerationPage } from './pages/LRGenerationPage.jsx';
 import { SavedDataPage } from './pages/SavedDataPage.jsx';
 import {
   deleteConsignment,
+  downloadConsignmentsExcel,
   getAllConsignments,
   getConsignmentsByDateRange,
   getMonthConsignments,
@@ -180,6 +181,49 @@ function applyDateFilter(items, filter) {
 
     return true;
   });
+}
+
+function resolveExportDateRange(filter) {
+  const now = new Date();
+
+  if (filter.mode === 'today') {
+    const today = formatDateKey(now);
+    return { startDate: today, endDate: today };
+  }
+
+  if (filter.mode === 'week') {
+    return {
+      startDate: formatDateKey(getStartOfWeek(now)),
+      endDate: formatDateKey(getEndOfWeek(now)),
+    };
+  }
+
+  if (filter.mode === 'month') {
+    const start = new Date(now.getFullYear(), now.getMonth(), 1);
+    const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    return {
+      startDate: formatDateKey(start),
+      endDate: formatDateKey(end),
+    };
+  }
+
+  if (filter.mode === 'year') {
+    const start = new Date(now.getFullYear(), 0, 1);
+    const end = new Date(now.getFullYear(), 11, 31);
+    return {
+      startDate: formatDateKey(start),
+      endDate: formatDateKey(end),
+    };
+  }
+
+  if (filter.mode === 'range') {
+    return {
+      startDate: filter.from || '',
+      endDate: filter.to || '',
+    };
+  }
+
+  return { startDate: '', endDate: '' };
 }
 
 export function App() {
@@ -654,6 +698,24 @@ export function App() {
     }
   }
 
+  async function exportSavedConsignments() {
+    setLoading(true);
+    setError('');
+    try {
+      const { startDate, endDate } = resolveExportDateRange(dataFilter);
+      await downloadConsignmentsExcel({
+        startDate,
+        endDate,
+        customerName: searchName.trim(),
+      });
+      setMessage('Consignment Excel exported successfully');
+    } catch (err) {
+      setError(getErrorMessage(err, 'Unable to export consignment Excel'));
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <main className="app-shell">
       <Header
@@ -715,6 +777,7 @@ export function App() {
               onFilterChange={setDataFilter}
               onView={viewItem}
               onLoadAll={loadData}
+              onExportExcel={exportSavedConsignments}
               onSearch={searchByCustomer}
               onSearchNameChange={setSearchName}
               onSetPage={setCurrentPage}

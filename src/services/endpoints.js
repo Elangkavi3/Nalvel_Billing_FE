@@ -28,6 +28,7 @@ const LR_BASE = "/api/billing/lr";
 export const consignmentEndpoints = {
   create: () => withApiBase(`${CONSIGNMENT_BASE}/save`),
   readAll: () => withApiBase(`${CONSIGNMENT_BASE}/getAllData`),
+  exportExcel: () => withApiBase(`${CONSIGNMENT_BASE}/excel`),
   readById: (id) => withApiBase(`${CONSIGNMENT_BASE}/${id}`),
   readByCustomer: (name) =>
     withApiBase(`${CONSIGNMENT_BASE}/byCustomer?${toQuery({ name })}`),

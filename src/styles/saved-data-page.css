@@ -249,6 +249,13 @@ h2 {
   flex-wrap: wrap;
 }
 
+.data-primary-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 /* TABLE ELEMENTS */
 th {
   color: var(--accent-dark);
