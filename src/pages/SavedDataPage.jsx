@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import { Pagination } from "../components/common/Pagination.jsx";
 import { money } from "../utils/numbers.js";
 import {
@@ -87,31 +87,23 @@ export function SavedDataPage({
   onSetPage,
 }) {
   const [printData, setPrintData] = useState(null);
-  const printEditorRef = useRef(null);
   const hasItems = items.length > 0;
-  const isPrintEditorOpen = Boolean(printData);
 
   function scrollToPrintEditor() {
-    if (!printEditorRef.current) return;
+    const editorNode = document.querySelector(".invoice-edit-panel");
+    if (!editorNode) return;
 
-    printEditorRef.current.scrollIntoView({
+    editorNode.scrollIntoView({
       behavior: "smooth",
       block: "start",
     });
   }
 
-  useEffect(() => {
-    if (!isPrintEditorOpen) return;
-    scrollToPrintEditor();
-  }, [isPrintEditorOpen]);
-
   function handlePrintAction(item) {
     setPrintData(buildPrintDraft(item));
-    if (isPrintEditorOpen) {
-      requestAnimationFrame(() => {
-        scrollToPrintEditor();
-      });
-    }
+    requestAnimationFrame(() => {
+      scrollToPrintEditor();
+    });
   }
 
   function handlePrintFieldChange(field, value) {
@@ -385,14 +377,12 @@ export function SavedDataPage({
 
       {printData && (
         <>
-          <div ref={printEditorRef}>
-            <InvoicePrintEditor
-              printData={printData}
-              onChange={handlePrintFieldChange}
-              onClose={handleClosePrintEditor}
-              onPrint={handlePrintNow}
-            />
-          </div>
+          <InvoicePrintEditor
+            printData={printData}
+            onChange={handlePrintFieldChange}
+            onClose={handleClosePrintEditor}
+            onPrint={handlePrintNow}
+          />
           <InvoicePrintView printData={printData} />
         </>
       )}
