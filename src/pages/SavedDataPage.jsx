@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { Pagination } from "../components/common/Pagination.jsx";
 import { money } from "../utils/numbers.js";
-import { calculateConsignmentValues, formatDateOnly } from "../utils/consignment.js";
+import {
+  calculateConsignmentValues,
+  formatDateOnly,
+} from "../utils/consignment.js";
 
 function billingLabel(item) {
   if (item.viewMode === "IMS" || item.imsNo) return "IMS No";
@@ -48,7 +51,7 @@ function buildPrintDraft(item) {
       item.invoiceDateTime ||
         item.customerInvoiceDate ||
         item.invoiceDate ||
-        item.date
+        item.date,
     ) || toDateInputValue(new Date());
 
   return {
@@ -91,7 +94,9 @@ export function SavedDataPage({
   }
 
   function handlePrintFieldChange(field, value) {
-    setPrintData((current) => (current ? { ...current, [field]: value } : current));
+    setPrintData((current) =>
+      current ? { ...current, [field]: value } : current,
+    );
   }
 
   function handlePrintNow() {
@@ -111,7 +116,13 @@ export function SavedDataPage({
   }
 
   return (
-    <div className={printData ? "saved-data-print-root print-ready" : "saved-data-print-root"}>
+    <div
+      className={
+        printData
+          ? "saved-data-print-root print-ready"
+          : "saved-data-print-root"
+      }
+    >
       <section className="list-panel">
         <div className="list-head">
           <div>
@@ -280,15 +291,23 @@ export function SavedDataPage({
                       <strong>{item.truckNo || "-"}</strong>
                       <span>{item.truckType || "-"}</span>
                     </td>
-                <td>
-                      <strong>{money(calculateConsignmentValues(item).ledgerAmount)}</strong>
-                      <span>Bal: {money(calculateConsignmentValues(item).balance)}</span>
+                    <td>
+                      <strong>
+                        {money(calculateConsignmentValues(item).ledgerAmount)}
+                      </strong>
+                      <span>
+                        Bal: {money(calculateConsignmentValues(item).balance)}
+                      </span>
                     </td>
                     <td>
-                      <strong>{money(calculateConsignmentValues(item).customerRate)}</strong>
+                      <strong>
+                        {money(calculateConsignmentValues(item).customerRate)}
+                      </strong>
                       <span>{item.customerPaymentMode || "-"}</span>
                     </td>
-                    <td className="profit-text">{money(calculateConsignmentValues(item).profit)}</td>
+                    <td className="profit-text">
+                      {money(calculateConsignmentValues(item).profit)}
+                    </td>
                     <td className="action-cell">
                       <button
                         type="button"
@@ -377,22 +396,90 @@ function InvoicePrintEditor({ printData, onChange, onClose, onPrint }) {
       </div>
 
       <div className="invoice-edit-grid">
-        <PrintField label="Invoice No" value={printData.printInvoiceNo || ""} onChange={(value) => onChange("printInvoiceNo", value)} />
-        <PrintField label="Invoice Date" type="date" value={printData.printInvoiceDate || ""} onChange={(value) => onChange("printInvoiceDate", value)} />
-        <PrintField label="Customer Name" value={printData.customerName || ""} onChange={(value) => onChange("customerName", value)} />
-        <PrintField label="Customer Address" value={printData.billTo || ""} onChange={(value) => onChange("billTo", value)} />
-        <PrintField label="Customer GST No" value={printData.gstNo || ""} onChange={(value) => onChange("gstNo", value)} />
-        <PrintField label="No of Pkgs" value={printData.printNoOfPkgs || ""} onChange={(value) => onChange("printNoOfPkgs", value)} />
-        <PrintField label="Description" value={printData.printDescription || ""} onChange={(value) => onChange("printDescription", value)} />
-        <PrintField label="Customer Invoice No" value={printData.invoiceNo || ""} onChange={(value) => onChange("invoiceNo", value)} />
-        <PrintField label="Gross Weight (MT)" value={printData.grossWeight || ""} onChange={(value) => onChange("grossWeight", value)} />
-        <PrintField label="Truck Details" value={printData.truckNo || ""} onChange={(value) => onChange("truckNo", value)} />
-        <PrintField label="From" value={printData.fromLocation || ""} onChange={(value) => onChange("fromLocation", value)} />
-        <PrintField label="To" value={printData.toLocation || ""} onChange={(value) => onChange("toLocation", value)} />
-        <PrintField label="Transportation Amount" type="number" value={printData.customerRate ?? ""} onChange={(value) => onChange("customerRate", value)} />
-        <PrintField label="Miscellaneous Amount" type="number" value={printData.additionalCharges ?? ""} onChange={(value) => onChange("additionalCharges", value)} />
-        <PrintField label="GST %" type="number" value={printData.gstType ?? ""} onChange={(value) => onChange("gstType", value)} />
-        <PrintField label="Miscellaneous Text" value={printData.printMiscellaneous || ""} onChange={(value) => onChange("printMiscellaneous", value)} />
+        <PrintField
+          label="Invoice No"
+          value={printData.printInvoiceNo || ""}
+          onChange={(value) => onChange("printInvoiceNo", value)}
+        />
+        <PrintField
+          label="Invoice Date"
+          type="date"
+          value={printData.printInvoiceDate || ""}
+          onChange={(value) => onChange("printInvoiceDate", value)}
+        />
+        <PrintField
+          label="Customer Name"
+          value={printData.customerName || ""}
+          onChange={(value) => onChange("customerName", value)}
+        />
+        <PrintField
+          label="Customer Address"
+          value={printData.billTo || ""}
+          onChange={(value) => onChange("billTo", value)}
+        />
+        <PrintField
+          label="Customer GST No"
+          value={printData.gstNo || ""}
+          onChange={(value) => onChange("gstNo", value)}
+        />
+        <PrintField
+          label="No of Pkgs"
+          value={printData.printNoOfPkgs || ""}
+          onChange={(value) => onChange("printNoOfPkgs", value)}
+        />
+        <PrintField
+          label="Description"
+          value={printData.printDescription || ""}
+          onChange={(value) => onChange("printDescription", value)}
+        />
+        <PrintField
+          label="Customer Invoice No"
+          value={printData.invoiceNo || ""}
+          onChange={(value) => onChange("invoiceNo", value)}
+        />
+        <PrintField
+          label="Gross Weight (MT)"
+          value={printData.grossWeight || ""}
+          onChange={(value) => onChange("grossWeight", value)}
+        />
+        <PrintField
+          label="Truck Details"
+          value={printData.truckNo || ""}
+          onChange={(value) => onChange("truckNo", value)}
+        />
+        <PrintField
+          label="From"
+          value={printData.fromLocation || ""}
+          onChange={(value) => onChange("fromLocation", value)}
+        />
+        <PrintField
+          label="To"
+          value={printData.toLocation || ""}
+          onChange={(value) => onChange("toLocation", value)}
+        />
+        <PrintField
+          label="Transportation Amount"
+          type="number"
+          value={printData.customerRate ?? ""}
+          onChange={(value) => onChange("customerRate", value)}
+        />
+        <PrintField
+          label="Miscellaneous Amount"
+          type="number"
+          value={printData.additionalCharges ?? ""}
+          onChange={(value) => onChange("additionalCharges", value)}
+        />
+        <PrintField
+          label="GST %"
+          type="number"
+          value={printData.gstType ?? ""}
+          onChange={(value) => onChange("gstType", value)}
+        />
+        <PrintField
+          label="Miscellaneous Text"
+          value={printData.printMiscellaneous || ""}
+          onChange={(value) => onChange("printMiscellaneous", value)}
+        />
       </div>
     </section>
   );
@@ -415,7 +502,10 @@ function PrintField({ label, value, onChange, type = "text" }) {
 function InvoicePrintView({ printData }) {
   const totals = calculateConsignmentValues(printData);
   const gstPercentage = numberOrFallback(printData.gstType);
-  const transportationAmount = numberOrFallback(printData.customerRate, totals.customerRate);
+  const transportationAmount = numberOrFallback(
+    printData.customerRate,
+    totals.customerRate,
+  );
   const miscellaneousAmount = numberOrFallback(printData.additionalCharges);
   const taxableAmount = transportationAmount + miscellaneousAmount;
   const gstAmount = (taxableAmount * gstPercentage) / 100;
@@ -441,99 +531,151 @@ function InvoicePrintView({ printData }) {
 
         <div className="invoice-info-box">
           <div className="invoice-to-block">
-            <p>To</p>
-            <p><strong>M/s. {printData.customerName || "-"}</strong></p>
+            <p className="invoice-to-title">To</p>
+            <p>
+              <strong>M/s. {printData.customerName || "-"}</strong>
+            </p>
             <p>{printData.billTo || "-"}</p>
-            <p><strong>GST NO :</strong> {printData.gstNo || "-"}</p>
+            <p>
+              <strong>GST NO :</strong> {printData.gstNo || "-"}
+            </p>
           </div>
-          <div className="invoice-number-block">
-            <p><strong>Invoice No:</strong> {printData.printInvoiceNo || "-"}</p>
-            <p><strong>Date:</strong> {formatInvoiceDate(printData.printInvoiceDate)}</p>
+          <div className="invoice-number-wrapper">
+            <div className="invoice-number-block">
+              <p>
+                <strong>Invoice No:</strong> {printData.printInvoiceNo || "-"}
+              </p>
+              <p>
+                <strong>Date:</strong>{" "}
+                {formatInvoiceDate(printData.printInvoiceDate)}
+              </p>
+            </div>
+
+            <div className="invoice-empty-block"></div>
           </div>
           <div className="invoice-desc-block">
-            <p><strong>Description :</strong></p>
-            <p>No of Pkgs&nbsp;&nbsp;&nbsp;&nbsp;: {printData.printNoOfPkgs || "-"}</p>
-            <p>Description&nbsp;&nbsp;&nbsp;: {printData.printDescription || "-"}</p>
-            <p>Invoice No&nbsp;&nbsp;&nbsp;&nbsp;: {printData.invoiceNo || "-"}</p>
+            <p className="invoice-desc-title">
+              <strong>Description :</strong>
+            </p>
+            <p>
+              No of Pkgs&nbsp;&nbsp;&nbsp;&nbsp;:{" "}
+              {printData.printNoOfPkgs || "-"}
+            </p>
+            <p>
+              Description&nbsp;&nbsp;&nbsp;: {printData.printDescription || "-"}
+            </p>
+            <p>
+              Invoice No&nbsp;&nbsp;&nbsp;&nbsp;: {printData.invoiceNo || "-"}
+            </p>
             <p>Gross Weight: {grossWeight} MT</p>
           </div>
           <div className="invoice-truck-block">
-            <p><strong>Truck Details :</strong> {printData.truckNo || "-"}</p>
-            <p><strong>Miscellaneous:</strong> {printData.printMiscellaneous || "-"}</p>
+            <div className="truck-top-box">
+              <strong>Truck Details :</strong> {printData.truckNo || "-"}
+            </div>
+
+            <div className="truck-bottom-box">
+              <strong>Miscellaneous:</strong>{" "}
+              {printData.printMiscellaneous || "-"}
+            </div>
           </div>
         </div>
 
         <table className="invoice-main-table">
           <thead>
             <tr>
-              <th>SL. NO</th>
-              <th>PARTICULARS</th>
+              <th>Sl. No</th>
+              <th>Particulars</th>
               <th>HSN/SAC</th>
-              <th>AS PER RECEIPT</th>
-              <th>NON RECEIPT</th>
+              <th>As Per Receipt</th>
+              <th>Non Receipt</th>
             </tr>
           </thead>
           <tbody>
             <tr className="invoice-service-row">
               <td>1</td>
-              <td>Transportation Charges ({routeFrom} To {routeTo})</td>
+              <td>
+                Transportation Charges ({routeFrom} To {routeTo})
+              </td>
               <td>996799</td>
-              <td>-</td>
+              <td></td>
               <td className="text-right">{transportationAmount.toFixed(2)}</td>
             </tr>
             <tr>
               <td></td>
               <td>Miscellaneous Charges</td>
               <td></td>
-              <td>-</td>
-              <td className="text-right">{showMiscAmount ? miscellaneousAmount.toFixed(2) : ""}</td>
+              <td></td>
+              <td className="text-right">
+                {showMiscAmount ? miscellaneousAmount.toFixed(2) : ""}
+              </td>
             </tr>
             <tr>
               <td></td>
               <td>Loading/Unloading mamool</td>
               <td></td>
-              <td>-</td>
+              <td></td>
               <td className="text-right">0.00</td>
             </tr>
             <tr>
               <td></td>
               <td>GST @ {gstPercentage}%</td>
               <td></td>
-              <td>-</td>
+              <td></td>
               <td className="text-right">{gstAmount.toFixed(2)}</td>
             </tr>
             <tr>
               <td></td>
               <td>Round off</td>
               <td></td>
-              <td>-</td>
+              <td></td>
               <td className="text-right">.00</td>
             </tr>
           </tbody>
           <tfoot>
             <tr>
-              <td colSpan="4" className="text-right"><strong>Net Amount</strong></td>
-              <td className="text-right"><strong>{netAmount.toFixed(2)}</strong></td>
+              <td colSpan="4" className="text-right">
+                <strong>Net Amount</strong>
+              </td>
+              <td className="text-right">
+                <strong>{netAmount.toFixed(2)}</strong>
+              </td>
             </tr>
           </tfoot>
         </table>
 
         <div className="invoice-amount-row">
-          <strong>Amount in Words:</strong> Rupees {numberToWords(Math.round(netAmount))}
+          <strong>Amount in Words:</strong> Rupees{" "}
+          {numberToWords(Math.round(netAmount))}
         </div>
 
         <div className="invoice-bottom">
           <div className="terms-bank-block">
-            <p><strong>Terms & Conditions</strong></p>
+            <p>
+              <strong>Terms & Conditions</strong>
+            </p>
             <p>* Subject to Chennai Jurisdiction only</p>
             <p>* Cash Payment against receipt only</p>
-            <p><strong>Note:</strong> Any discrepancies in the Invoice should be brought our notice within three days from the date of our Invoice.</p>
+            <p className="note-line">
+              <strong>Note:</strong> Any discrepancies in the Invoice should be
+              brought our notice within three days from the date of our Invoice.
+            </p>
             <div className="bank-details">
-              <p><strong>BENIFICIARY NAME:</strong> NALVEL LOGISTICS SERVICES</p>
-              <p><strong>BANK NAME:</strong> HDFC BANK LTD</p>
-              <p><strong>BRANCH ADDRESS:</strong> CHITLAPAKKAM</p>
-              <p><strong>CURRENT ACCOUNT NUMBER:</strong> 50200095254790</p>
-              <p><strong>IFSC:</strong> HDFC0000260</p>
+              <p>
+                <strong>BENIFICIARY NAME:</strong> NALVEL LOGISTICS SERVICES
+              </p>
+              <p>
+                <strong>BANK NAME:</strong> HDFC BANK LTD
+              </p>
+              <p>
+                <strong>BRANCH ADDRESS:</strong> CHITLAPAKKAM
+              </p>
+              <p>
+                <strong>CURRENT ACCOUNT NUMBER:</strong> 50200095254790
+              </p>
+              <p>
+                <strong>IFSC:</strong> HDFC0000260
+              </p>
             </div>
           </div>
           <div className="signature-area">
@@ -619,21 +761,46 @@ function numberToWords(num) {
     "Eighteen ",
     "Nineteen ",
   ];
-  const tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+  const tens = [
+    "",
+    "",
+    "Twenty",
+    "Thirty",
+    "Forty",
+    "Fifty",
+    "Sixty",
+    "Seventy",
+    "Eighty",
+    "Ninety",
+  ];
   const text = String(num || 0);
   if (text.length > 9) return "Amount too large";
 
-  const parts = (`000000000${text}`).slice(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
+  const parts = `000000000${text}`
+    .slice(-9)
+    .match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
   if (!parts) return "";
 
   let words = "";
-  words += Number(parts[1]) !== 0 ? `${ones[Number(parts[1])] || `${tens[parts[1][0]]} ${ones[parts[1][1]]}`}Crore ` : "";
-  words += Number(parts[2]) !== 0 ? `${ones[Number(parts[2])] || `${tens[parts[2][0]]} ${ones[parts[2][1]]}`}Lakh ` : "";
-  words += Number(parts[3]) !== 0 ? `${ones[Number(parts[3])] || `${tens[parts[3][0]]} ${ones[parts[3][1]]}`}Thousand ` : "";
-  words += Number(parts[4]) !== 0 ? `${ones[Number(parts[4])] || `${tens[parts[4][0]]} ${ones[parts[4][1]]}`}Hundred ` : "";
-  words += Number(parts[5]) !== 0
-    ? `${words !== "" ? "and " : ""}${ones[Number(parts[5])] || `${tens[parts[5][0]]} ${ones[parts[5][1]]}`}Only`
-    : "Only";
+  words +=
+    Number(parts[1]) !== 0
+      ? `${ones[Number(parts[1])] || `${tens[parts[1][0]]} ${ones[parts[1][1]]}`}Crore `
+      : "";
+  words +=
+    Number(parts[2]) !== 0
+      ? `${ones[Number(parts[2])] || `${tens[parts[2][0]]} ${ones[parts[2][1]]}`}Lakh `
+      : "";
+  words +=
+    Number(parts[3]) !== 0
+      ? `${ones[Number(parts[3])] || `${tens[parts[3][0]]} ${ones[parts[3][1]]}`}Thousand `
+      : "";
+  words +=
+    Number(parts[4]) !== 0
+      ? `${ones[Number(parts[4])] || `${tens[parts[4][0]]} ${ones[parts[4][1]]}`}Hundred `
+      : "";
+  words +=
+    Number(parts[5]) !== 0
+      ? `${words !== "" ? "and " : ""}${ones[Number(parts[5])] || `${tens[parts[5][0]]} ${ones[parts[5][1]]}`}Only`
+      : "Only";
   return words;
 }
-

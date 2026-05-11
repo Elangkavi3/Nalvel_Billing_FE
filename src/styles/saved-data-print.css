@@ -51,7 +51,7 @@
 
 .invoice-sheet {
   width: 190mm;
-  min-height: 270mm;
+  min-height: auto;
   margin: 0 auto;
   background: #fff;
   color: #000;
@@ -93,13 +93,45 @@
   border-right: 1px solid #000;
 }
 
+.invoice-info-box {
+  margin-bottom: -1px;
+}
+
 .invoice-to-block,
-.invoice-number-block,
 .invoice-desc-block,
 .invoice-truck-block {
   min-height: 72px;
   padding: 5px 6px;
   border-bottom: 1px solid #000;
+}
+
+.invoice-to-title {
+  font-size: 16px !important;
+  font-weight: 700;
+  margin-bottom: 6px !important;
+}
+
+.invoice-desc-title {
+  margin-bottom: 10px !important;
+}
+
+.invoice-truck-block {
+  display: flex;
+  flex-direction: column;
+  padding: 0 !important;
+}
+
+.truck-top-box {
+  height: 25%;
+  border-bottom: 1px solid #000;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+}
+
+.truck-bottom-box {
+  height: 75%;
+  padding: 6px;
 }
 
 .invoice-to-block,
@@ -111,10 +143,29 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding-left: 28px;
+  padding: 5px 6px 5px 28px;
 }
 
-.invoice-to-block p,
+.invoice-number-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.invoice-number-block,
+.invoice-empty-block {
+  min-height: 72px;
+  border-bottom: 1px solid #000;
+}
+
+.invoice-empty-block {
+  background: #fff;
+}
+
+.invoice-to-block p {
+  margin: 8px 0;
+  font-size: 10.5px;
+}
+
 .invoice-number-block p,
 .invoice-desc-block p,
 .invoice-truck-block p {
@@ -137,33 +188,34 @@
   vertical-align: top;
 }
 
-.invoice-main-table th {
-  text-align: left;
-  font-weight: 800;
+.invoice-main-table thead th {
+  text-transform: none !important;
+  font-size: 9px;
+  font-weight: 550;
 }
 
 .invoice-service-row td {
-  height: 110px;
+  height: 50px;
 }
 
 .invoice-main-table tbody tr:not(.invoice-service-row) td {
-  height: 28px;
+  height: 20px;
 }
 
 .invoice-main-table th:nth-child(1),
 .invoice-main-table td:nth-child(1) {
-  width: 6%;
+  width: 13mm;
   text-align: center;
 }
 
 .invoice-main-table th:nth-child(2),
 .invoice-main-table td:nth-child(2) {
-  width: 50%;
+  width: 94mm;
 }
 
 .invoice-main-table th:nth-child(3),
 .invoice-main-table td:nth-child(3) {
-  width: 12%;
+  width: 25mm;
   text-align: center;
 }
 
@@ -171,9 +223,24 @@
 .invoice-main-table td:nth-child(4),
 .invoice-main-table th:nth-child(5),
 .invoice-main-table td:nth-child(5) {
-  width: 16%;
+  width: 28mm;
 }
 
+/* Remove inner horizontal lines */
+.invoice-main-table tbody td {
+  border-top: none;
+  border-bottom: none;
+}
+
+/* Keep top border for first row */
+.invoice-main-table tbody tr:first-child td {
+  border-top: 1px solid #000;
+}
+
+/* Keep bottom border for last row */
+.invoice-main-table tbody tr:last-child td {
+  border-bottom: 1px solid #000;
+}
 .text-right {
   text-align: right !important;
 }
@@ -189,11 +256,15 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding-top: 8px;
 }
 
 .terms-bank-block {
   max-width: 72%;
+  margin-top: 100px;
+}
+
+.note-line {
+  white-space: nowrap;
 }
 
 .terms-bank-block p,
@@ -209,13 +280,17 @@
 }
 
 .signature-area {
-  width: 220px;
+  width: 230px;
+  flex-shrink: 0;
   text-align: center;
-  margin-top: 12px;
+}
+
+.signature-area p:first-child {
+  white-space: nowrap;
 }
 
 .sig-space {
-  height: 70px;
+  height: 20px;
 }
 
 @media (max-width: 980px) {
@@ -288,7 +363,7 @@
     width: 197mm !important;
     max-width: 197mm !important;
     min-width: 197mm !important;
-    min-height: 283.5mm !important;
+    min-height: auto !important;
     margin: 0 auto !important;
     overflow: hidden !important;
     box-sizing: border-box !important;
@@ -313,6 +388,11 @@
     letter-spacing: 0.2px !important;
   }
 
+  .saved-data-print-root.print-ready .invoice-to-title {
+    font-size: 18px !important;
+    font-weight: 700 !important;
+  }
+
   .saved-data-print-root.print-ready .company-branding p,
   .saved-data-print-root.print-ready .invoice-title,
   .saved-data-print-root.print-ready .invoice-main-table th,
@@ -325,16 +405,20 @@
   .saved-data-print-root.print-ready .terms-bank-block p,
   .saved-data-print-root.print-ready .bank-details p,
   .saved-data-print-root.print-ready .signature-area p {
-    font-size: 11px !important;
+    font-size: 14px !important;
     line-height: 1.2 !important;
   }
 
   .saved-data-print-root.print-ready .invoice-to-block,
   .saved-data-print-root.print-ready .invoice-number-block,
-  .saved-data-print-root.print-ready .invoice-desc-block,
-  .saved-data-print-root.print-ready .invoice-truck-block {
+  .saved-data-print-root.print-ready .invoice-desc-block {
     min-height: 72px !important;
     padding: 6px 7px !important;
+  }
+
+  .saved-data-print-root.print-ready .invoice-truck-block {
+    min-height: 72px !important;
+    padding: 0 !important;
   }
 
   .saved-data-print-root.print-ready .invoice-number-block {
@@ -345,26 +429,30 @@
     height: 74px !important;
   }
 
-  .saved-data-print-root.print-ready .invoice-main-table tbody tr:not(.invoice-service-row) td {
+  .saved-data-print-root.print-ready
+    .invoice-main-table
+    tbody
+    tr:not(.invoice-service-row)
+    td {
     height: 24px !important;
   }
 
   .saved-data-print-root.print-ready .invoice-bottom {
-    margin-top: auto !important;
     gap: 10px !important;
     padding: 12px 12px 10px !important;
   }
 
   .saved-data-print-root.print-ready .terms-bank-block {
-    max-width: 71% !important;
+    max-width: 63% !important;
+    margin-top: 100px !important;
   }
 
   .saved-data-print-root.print-ready .bank-details {
     margin-top: 12px !important;
   }
 
-  .saved-data-print-root.print-ready .signature-area {
-    min-width: 168px !important;
+  .saved-data-print-root.print-ready .signature-area p:first-child {
+    white-space: nowrap !important;
   }
 
   .saved-data-print-root.print-ready .sig-space {
