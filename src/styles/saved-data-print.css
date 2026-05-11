@@ -1,0 +1,373 @@
+.invoice-edit-panel {
+  margin-top: 14px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f8fcfb;
+}
+
+.invoice-edit-head {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.invoice-edit-head h3 {
+  margin: 0 0 4px;
+  color: var(--accent-dark);
+  font-size: 16px;
+}
+
+.invoice-edit-head p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.invoice-edit-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.invoice-edit-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.invoice-edit-grid .field {
+  margin-bottom: 0;
+}
+
+.invoice-edit-grid .field input {
+  width: 100%;
+}
+
+.invoice-print-container {
+  display: none;
+}
+
+.invoice-sheet {
+  width: 190mm;
+  min-height: 270mm;
+  margin: 0 auto;
+  background: #fff;
+  color: #000;
+  font-family: Arial, sans-serif;
+  font-size: 11px;
+  line-height: 1.15;
+}
+
+.invoice-top-header {
+  text-align: center;
+  border-bottom: 1px solid #000;
+  padding: 8px 10px 6px;
+}
+
+.company-branding h1 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 0;
+  color: #000;
+}
+
+.company-branding p {
+  margin: 1px 0;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.invoice-title {
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.invoice-info-box {
+  display: grid;
+  grid-template-columns: 57% 43%;
+  border-left: 1px solid #000;
+  border-right: 1px solid #000;
+}
+
+.invoice-to-block,
+.invoice-number-block,
+.invoice-desc-block,
+.invoice-truck-block {
+  min-height: 72px;
+  padding: 5px 6px;
+  border-bottom: 1px solid #000;
+}
+
+.invoice-to-block,
+.invoice-desc-block {
+  border-right: 1px solid #000;
+}
+
+.invoice-number-block {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 28px;
+}
+
+.invoice-to-block p,
+.invoice-number-block p,
+.invoice-desc-block p,
+.invoice-truck-block p {
+  margin: 2px 0;
+  font-size: 10.5px;
+}
+
+.invoice-main-table {
+  width: 100%;
+  min-width: 0;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.invoice-main-table th,
+.invoice-main-table td {
+  border: 1px solid #000;
+  padding: 4px 5px;
+  font-size: 10px;
+  vertical-align: top;
+}
+
+.invoice-main-table th {
+  text-align: left;
+  font-weight: 800;
+}
+
+.invoice-service-row td {
+  height: 110px;
+}
+
+.invoice-main-table tbody tr:not(.invoice-service-row) td {
+  height: 28px;
+}
+
+.invoice-main-table th:nth-child(1),
+.invoice-main-table td:nth-child(1) {
+  width: 6%;
+  text-align: center;
+}
+
+.invoice-main-table th:nth-child(2),
+.invoice-main-table td:nth-child(2) {
+  width: 50%;
+}
+
+.invoice-main-table th:nth-child(3),
+.invoice-main-table td:nth-child(3) {
+  width: 12%;
+  text-align: center;
+}
+
+.invoice-main-table th:nth-child(4),
+.invoice-main-table td:nth-child(4),
+.invoice-main-table th:nth-child(5),
+.invoice-main-table td:nth-child(5) {
+  width: 16%;
+}
+
+.text-right {
+  text-align: right !important;
+}
+
+.invoice-amount-row {
+  border: 1px solid #000;
+  border-top: 0;
+  padding: 7px 9px;
+  font-size: 10.5px;
+}
+
+.invoice-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-top: 8px;
+}
+
+.terms-bank-block {
+  max-width: 72%;
+}
+
+.terms-bank-block p,
+.bank-details p,
+.signature-area p {
+  margin: 3px 0;
+  font-size: 10.5px;
+  line-height: 1.25;
+}
+
+.bank-details {
+  margin-top: 22px;
+}
+
+.signature-area {
+  width: 220px;
+  text-align: center;
+  margin-top: 12px;
+}
+
+.sig-space {
+  height: 70px;
+}
+
+@media (max-width: 980px) {
+  .invoice-edit-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .invoice-edit-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .invoice-edit-grid,
+  .invoice-edit-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .invoice-edit-actions {
+    display: grid;
+  }
+}
+
+@media print {
+  @page saved-data-invoice {
+    size: A4 portrait;
+    margin: 6mm;
+  }
+
+  .saved-data-print-root.print-ready .list-panel,
+  .saved-data-print-root.print-ready .invoice-edit-panel,
+  .saved-data-print-root.print-ready .topbar,
+  .saved-data-print-root.print-ready .status-line {
+    display: none !important;
+  }
+
+  .saved-data-print-root.print-ready {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .saved-data-print-root.print-ready .invoice-print-container {
+    display: block !important;
+    visibility: visible !important;
+    position: static !important;
+    inset: auto !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    page: saved-data-invoice;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  .saved-data-print-root.print-ready .invoice-print-container * {
+    visibility: visible !important;
+    color: #000 !important;
+    border-color: #000 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .saved-data-print-root.print-ready .invoice-sheet {
+    width: 197mm !important;
+    max-width: 197mm !important;
+    min-width: 197mm !important;
+    min-height: 283.5mm !important;
+    margin: 0 auto !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .saved-data-print-root.print-ready table,
+  .saved-data-print-root.print-ready .invoice-main-table {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    table-layout: fixed !important;
+  }
+
+  .saved-data-print-root.print-ready .invoice-top-header {
+    padding: 6px 8px 5px !important;
+  }
+
+  .saved-data-print-root.print-ready .company-branding h1 {
+    font-size: 34px !important;
+    letter-spacing: 0.2px !important;
+  }
+
+  .saved-data-print-root.print-ready .company-branding p,
+  .saved-data-print-root.print-ready .invoice-title,
+  .saved-data-print-root.print-ready .invoice-main-table th,
+  .saved-data-print-root.print-ready .invoice-main-table td,
+  .saved-data-print-root.print-ready .invoice-to-block p,
+  .saved-data-print-root.print-ready .invoice-number-block p,
+  .saved-data-print-root.print-ready .invoice-desc-block p,
+  .saved-data-print-root.print-ready .invoice-truck-block p,
+  .saved-data-print-root.print-ready .invoice-amount-row,
+  .saved-data-print-root.print-ready .terms-bank-block p,
+  .saved-data-print-root.print-ready .bank-details p,
+  .saved-data-print-root.print-ready .signature-area p {
+    font-size: 11px !important;
+    line-height: 1.2 !important;
+  }
+
+  .saved-data-print-root.print-ready .invoice-to-block,
+  .saved-data-print-root.print-ready .invoice-number-block,
+  .saved-data-print-root.print-ready .invoice-desc-block,
+  .saved-data-print-root.print-ready .invoice-truck-block {
+    min-height: 72px !important;
+    padding: 6px 7px !important;
+  }
+
+  .saved-data-print-root.print-ready .invoice-number-block {
+    padding-left: 12px !important;
+  }
+
+  .saved-data-print-root.print-ready .invoice-service-row td {
+    height: 74px !important;
+  }
+
+  .saved-data-print-root.print-ready .invoice-main-table tbody tr:not(.invoice-service-row) td {
+    height: 24px !important;
+  }
+
+  .saved-data-print-root.print-ready .invoice-bottom {
+    margin-top: auto !important;
+    gap: 10px !important;
+    padding: 12px 12px 10px !important;
+  }
+
+  .saved-data-print-root.print-ready .terms-bank-block {
+    max-width: 71% !important;
+  }
+
+  .saved-data-print-root.print-ready .bank-details {
+    margin-top: 12px !important;
+  }
+
+  .saved-data-print-root.print-ready .signature-area {
+    min-width: 168px !important;
+  }
+
+  .saved-data-print-root.print-ready .sig-space {
+    height: 48px !important;
+  }
+}

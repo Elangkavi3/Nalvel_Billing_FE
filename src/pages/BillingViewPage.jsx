@@ -26,7 +26,7 @@ export function BillingViewPage({ item, onBack, onEdit, onHome }) {
   const netWeight = item.netWeight ?? item.weight ?? '-';
   const tareWeight = item.tareWeight ?? '-';
   const grossWeight = item.grossWeight ?? item.crossVehicleWeight ?? '-';
-  const supplierRateLabel = item.supplierRateType === 'cost_per_mt' ? 'Cost per MT' : 'Fixed Cost';
+  const supplierRateLabel = item.supplierRateType === 'cost_per_mt' ? 'Cost Per MT' : 'Fixed Cost';
   const billingNumberLabel = item.viewMode === 'IMS' || item.imsNo ? 'IMS No' : 'GST Invoice';
   const billingNumber = item.viewMode === 'IMS' || item.imsNo ? item.imsNo : item.gstNo;
 
@@ -165,7 +165,7 @@ export function BillingViewPage({ item, onBack, onEdit, onHome }) {
                   <SectionTitle title="Supplier Billing" />
                   <Field label="Freight Amount Type" value={supplierRateLabel} />
                   <Field label={supplierRateLabel} value={money(item.supplierAmount)} amount />
-                  <Field label="Chargeble Weight" value={item.chargebleWeight ?? '-'} />
+                  <Field label="Chargeable Weight" value={item.chargeableWeight ?? item.chargebleWeight ?? '-'} />
                   <Field label="Payable Amount" value={money(totals.ledgerAmount)} amount />
                   <div className="bill-field-row">
                     <Field label="Halting Charge" value={money(item.haltingCharge)} amount />

@@ -25,6 +25,7 @@
 
 /* 6. RESPONSIVE DESIGN */
 @import url("./styles/responsive.css");
+@import url("./styles/saved-data-print.css");
 
 /* ============================================================================
    END OF STYLESHEET

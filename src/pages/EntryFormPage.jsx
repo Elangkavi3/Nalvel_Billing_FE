@@ -231,15 +231,15 @@ export function EntryFormPage({ editingId, form, suggestions, onBack, onSubmit, 
           
 
             <Field
-              label={form.supplierRateType === 'cost_per_mt' ? 'Cost per MT' : 'Fixed Cost'}
+              label={form.supplierRateType === 'cost_per_mt' ? 'Cost Per MT' : 'Fixed Cost'}
               value={form.supplierAmount}
               onChange={(value) => onUpdateField('supplierAmount', value)}
               {...decimalNumberProps}
             />
             <Field
-              label="Chargeble Weight"
-              value={form.chargebleWeight}
-              onChange={(value) => onUpdateField('chargebleWeight', value)}
+              label="Chargeable Weight"
+              value={form.chargeableWeight}
+              onChange={(value) => onUpdateField('chargeableWeight', value)}
               {...decimalNumberProps}
             />
           

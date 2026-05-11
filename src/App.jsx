@@ -446,7 +446,7 @@ export function App() {
       material: item.material ?? '',
       supplierRateType: item.supplierRateType ?? 'fixed_cost',
       supplierAmount: item.supplierAmount ?? '',
-      chargebleWeight: item.chargebleWeight ?? '',
+      chargeableWeight: item.chargeableWeight ?? item.chargebleWeight ?? '',
       haltingCharge: item.haltingCharge ?? '',
       parkingCharge: item.parkingCharge ?? '',
       commission: item.commission ?? '',

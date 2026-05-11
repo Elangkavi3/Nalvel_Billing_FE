@@ -8,7 +8,7 @@ function normalizeRateType(value) {
 }
 
 function rateTypeLabel(value) {
-  return normalizeRateType(value) === 'cost_per_mt' ? 'Cost per MT' : 'Fixed Cost';
+  return normalizeRateType(value) === 'cost_per_mt' ? 'Cost Per MT' : 'Fixed Cost';
 }
 
 function billingTypeLabel(value) {
@@ -65,8 +65,9 @@ export function formatDateOnly(value) {
 }
 
 export function calculateConsignmentValues(form = {}) {
+  const supplierRateType = normalizeRateType(form.supplierRateType ?? form.freightAmountType);
   const supplierAmount = Number(form.supplierAmount || 0);
-  const chargebleWeight = Number(form.chargebleWeight || 0);
+  const chargeableWeight = Number(form.chargeableWeight ?? form.chargebleWeight ?? 0);
   const haltingCharge = Number(form.haltingCharge || 0);
   const parkingCharge = Number(form.parkingCharge || 0);
   const commission = Number(form.commission || 0);
@@ -75,7 +76,8 @@ export function calculateConsignmentValues(form = {}) {
     ? form.advanceEntries.reduce((sum, item) => sum + Number(item.amount || 0), 0)
     : Number(form.totalAdvance || 0);
 
-  const payableAmount = supplierAmount * chargebleWeight + haltingCharge + parkingCharge;
+  const baseFreightAmount = supplierRateType === 'cost_per_mt' ? supplierAmount * chargeableWeight : supplierAmount;
+  const payableAmount = baseFreightAmount + haltingCharge + parkingCharge;
   const netPaymentBalance = payableAmount - commission;
   const freightBookingCost = payableAmount;
   const totalExpense = freightBookingCost + additionalCharges;
@@ -108,9 +110,10 @@ export function applyCalculatedConsignmentValues(form = {}) {
 }
 
 export function buildConsignmentPayload(form) {
-  const supplierRateType = normalizeRateType(form.supplierRateType);
+  const supplierRateType = normalizeRateType(form.supplierRateType ?? form.freightAmountType);
   const calculatedForm = applyCalculatedConsignmentValues(form);
   const supplierAmount = numberField(calculatedForm, 'supplierAmount');
+  const chargeableWeight = numberField(calculatedForm, 'chargeableWeight');
   const paymentStatus = balanceStatus(calculatedForm.balance);
 
   return {
@@ -141,7 +144,8 @@ export function buildConsignmentPayload(form) {
     freightAmountType: rateTypeLabel(supplierRateType),
     fixedCost: supplierRateType === 'fixed_cost' ? supplierAmount : 0,
     costPerMT: supplierRateType === 'cost_per_mt' ? supplierAmount : 0,
-    chargebleWeight: numberField(calculatedForm, 'chargebleWeight'),
+    chargeableWeight,
+    chargebleWeight: chargeableWeight,
     payableAmount: numberField(calculatedForm, 'ledgerAmount'),
     haltingCharge: numberField(calculatedForm, 'haltingCharge'),
     parkingCharge: numberField(calculatedForm, 'parkingCharge'),
@@ -206,6 +210,7 @@ export function normalizeConsignment(item) {
     deliveryDateTime: deliveryDate,
     supplierRateType,
     supplierAmount: supplierAmount ?? item.supplierAmount ?? '',
+    chargeableWeight: item.chargeableWeight ?? item.chargebleWeight ?? '',
     ledgerAmount: item.payableAmount ?? item.ledgerAmount ?? '',
     parkingCharge: item.parkingCharge ?? '',
     customerRate: item.freightBookingCost ?? item.customerRate ?? '',

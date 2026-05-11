@@ -29,7 +29,7 @@ export const emptyConsignmentForm = {
   grossWeight: '',
   supplierRateType: 'fixed_cost',
   supplierAmount: '',
-  chargebleWeight: '',
+  chargeableWeight: '',
   haltingCharge: '',
   parkingCharge: '',
   commission: '',
@@ -61,7 +61,7 @@ export const paymentStatusOptions = ['Advance 1', 'Advance 2', 'Advance 3'];
 export const paymentModeOptions = ['Bank Transfer', 'DD', 'Cheque', 'UPI', 'Cash'];
 export const supplierRateTypeOptions = [
   { label: 'Fixed Cost', value: 'fixed_cost' },
-  { label: 'Cost per MT', value: 'cost_per_mt' },
+  { label: 'Cost Per MT', value: 'cost_per_mt' },
 ];
 export const PaymentTypeOptions = [
   { label: 'Driver Payment', value: 'Driver_Payment' },
@@ -73,6 +73,7 @@ export const numericConsignmentFields = new Set([
   'actualWeight',
   'grossWeight',
   'supplierAmount',
+  'chargeableWeight',
   'chargebleWeight',
   'haltingCharge',
   'parkingCharge',
