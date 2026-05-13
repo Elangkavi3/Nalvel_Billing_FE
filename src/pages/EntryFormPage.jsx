@@ -416,7 +416,7 @@ export function EntryFormPage({
             <Field
               label={
                 form.supplierRateType === "cost_per_mt"
-                  ? "Cost Per MT"
+                  ? "Our Cost Per MT"
                   : "Fixed Cost"
               }
               value={form.customerAmount}
@@ -425,7 +425,7 @@ export function EntryFormPage({
             />
 
             <Field
-              label="Chargeable Weight"
+              label="Our Chargeable Weight"
               value={form.customerChargeableWeight}
               onChange={(value) =>
                 onUpdateField("customerChargeableWeight", value)
