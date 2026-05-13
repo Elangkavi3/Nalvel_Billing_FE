@@ -320,7 +320,7 @@ export function EntryFormPage({
             />
             <Field
               label="Payable Amount"
-              value={form.ledgerAmount}
+              value={Math.floor(Number(form.ledgerAmount || 0))}
               onChange={(value) => onUpdateField("ledgerAmount", value)}
               {...decimalNumberProps}
             />
@@ -357,7 +357,7 @@ export function EntryFormPage({
           <div className="field-row">
             <Field
               label="Total Amount Paid"
-              value={form.totalAdvance}
+              value={Math.floor(Number(form.totalAdvance || 0))}
               onChange={(value) => onUpdateField("totalAdvance", value)}
               {...decimalNumberProps}
             />
@@ -366,7 +366,11 @@ export function EntryFormPage({
 
               <div className="status-input-wrapper">
                 <input
-                  value={Number(form.balance || 0) > 0 ? form.balance : 0}
+                  value={
+  Number(form.balance || 0) > 0
+    ? Math.floor(Number(form.balance || 0))
+    : 0
+}
                   readOnly
                   {...decimalNumberProps}
                 />
@@ -383,7 +387,7 @@ export function EntryFormPage({
             {Number(form.balance || 0) < 0 && (
               <Field
                 label="Excess"
-                value={Math.abs(Number(form.balance || 0))}
+                value={Math.floor(Math.abs(Number(form.balance || 0)))}
                 readOnly
                 {...decimalNumberProps}
               />
@@ -449,7 +453,7 @@ export function EntryFormPage({
 
             <Field
               label="Freight Booking Cost"
-              value={customerBaseAmount.toFixed(2)}
+              value={Math.ceil(customerBaseAmount)}
               readOnly
               onChange={(value) => onUpdateField("customerRate", value)}
               {...decimalNumberProps}
@@ -464,7 +468,7 @@ export function EntryFormPage({
             />
             <Field
               label="Total Expense"
-              value={totalExpense.toFixed(2)}
+              value={Math.ceil(totalExpense)}
               readOnly
               onChange={(value) => onUpdateField("expenses", value)}
               {...decimalNumberProps}
@@ -473,14 +477,14 @@ export function EntryFormPage({
           <div className="field-row">
             <Field
               label="Total Freight Amount(incl. GST)"
-              value={totalFreight.toFixed(2)}
+              value={Math.ceil(totalFreight)}
               readOnly
               onChange={(value) => onUpdateField("netFreight", value)}
               {...decimalNumberProps}
             />
             <Field
               label="Profit"
-              value={profit.toFixed(2)}
+              value={Math.ceil(profit)}
               readOnly
               onChange={(value) => onUpdateField("profit", value)}
               {...decimalNumberProps}
