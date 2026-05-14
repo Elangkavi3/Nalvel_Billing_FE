@@ -320,7 +320,7 @@ export function App() {
 
   if (!token && !isPublicRoute) {
 
-    window.location.href = "https://nalvel-login-app.vercel.app/";
+    window.location.href = "http://nalvel.com";
 
   }
 
