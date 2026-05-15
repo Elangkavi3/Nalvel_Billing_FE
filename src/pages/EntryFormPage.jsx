@@ -70,11 +70,14 @@ export function EntryFormPage({
     setActiveStep(0);
   }, [editingId, resetKey]);
 
-  const customerBaseAmount =
-    form.supplierRateType === "cost_per_mt"
-      ? Number(form.customerAmount || 0) *
-        Number(form.customerChargeableWeight || 0)
-      : Number(form.customerAmount || 0);
+  const isCostPerMt = form.supplierRateType === "cost_per_mt";
+  const ourRateAmount = isCostPerMt
+    ? form.profitCostPerMT
+    : form.profitFixedCost;
+  const customerBaseAmount = isCostPerMt
+    ? Number(form.profitCostPerMT || 0) *
+      Number(form.profitChargeableWeight || 0)
+    : Number(form.profitFixedCost || 0);
 
   const additionalCharge = Number(form.additionalCharges || 0);
 
@@ -513,21 +516,22 @@ export function EntryFormPage({
             <legend>Our Rate & Profit</legend>
             <div className="field-row">
               <Field
-                label={
-                  form.supplierRateType === "cost_per_mt"
-                    ? "Our Cost Per MT"
-                    : "Fixed Cost"
+                label={isCostPerMt ? "Our Cost Per MT" : "Our Fixed Cost"}
+                value={ourRateAmount}
+                onChange={(value) =>
+                  onUpdateField(
+                    isCostPerMt ? "profitCostPerMT" : "profitFixedCost",
+                    value,
+                  )
                 }
-                value={form.customerAmount}
-                onChange={(value) => onUpdateField("customerAmount", value)}
                 {...decimalNumberProps}
               />
 
               <Field
                 label="Our Chargeable Weight"
-                value={form.customerChargeableWeight}
+                value={form.profitChargeableWeight}
                 onChange={(value) =>
-                  onUpdateField("customerChargeableWeight", value)
+                  onUpdateField("profitChargeableWeight", value)
                 }
                 {...decimalNumberProps}
               />

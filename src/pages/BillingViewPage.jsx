@@ -27,6 +27,8 @@ export function BillingViewPage({ item, onBack, onEdit, onHome }) {
   const tareWeight = item.tareWeight ?? '-';
   const grossWeight = item.grossWeight ?? item.crossVehicleWeight ?? '-';
   const supplierRateLabel = item.supplierRateType === 'cost_per_mt' ? 'Cost Per MT' : 'Fixed Cost';
+  const ourRateLabel = item.supplierRateType === 'cost_per_mt' ? 'Our Cost Per MT' : 'Our Fixed Cost';
+  const ourRateValue = item.supplierRateType === 'cost_per_mt' ? item.profitCostPerMT : item.profitFixedCost;
   const billingNumberLabel = item.viewMode === 'IMS' || item.imsNo ? 'IMS No' : 'GST Invoice';
   const billingNumber = item.viewMode === 'IMS' || item.imsNo ? item.imsNo : item.gstNo;
 
@@ -121,6 +123,10 @@ export function BillingViewPage({ item, onBack, onEdit, onHome }) {
 
                 <article className="bill-card">
                   <SectionTitle title="Our Rate & Profit" />
+                  <div className="bill-field-row">
+                    <Field label={ourRateLabel} value={money(ourRateValue)} amount />
+                    <Field label="Our Chargeable Weight" value={item.profitChargeableWeight ?? '-'} />
+                  </div>
                   {item.gstType && <Field label="GST Percentage Used" value={<span className="bill-badge gst">{item.gstType}%</span>} />}
                   <Field label="Freight Booking Cost" value={money(totals.customerRate)} amount />
                   <div className="bill-field-row">

@@ -68,6 +68,9 @@ export function calculateConsignmentValues(form = {}) {
   const supplierRateType = normalizeRateType(form.supplierRateType ?? form.freightAmountType);
   const supplierAmount = Number(form.supplierAmount || 0);
   const chargeableWeight = Number(form.chargeableWeight ?? form.chargebleWeight ?? 0);
+  const profitFixedCost = Number(form.profitFixedCost ?? form.customerAmount ?? 0);
+  const profitCostPerMT = Number(form.profitCostPerMT ?? form.customerAmount ?? 0);
+  const profitChargeableWeight = Number(form.profitChargeableWeight ?? form.customerChargeableWeight ?? 0);
   const haltingCharge = Number(form.haltingCharge || 0);
   const parkingCharge = Number(form.parkingCharge || 0);
   const commission = Number(form.commission || 0);
@@ -79,10 +82,15 @@ export function calculateConsignmentValues(form = {}) {
   const baseFreightAmount = supplierRateType === 'cost_per_mt' ? supplierAmount * chargeableWeight : supplierAmount;
   const payableAmount = baseFreightAmount + haltingCharge + parkingCharge;
   const netPaymentBalance = payableAmount - commission;
-  const freightBookingCost = payableAmount;
-  const totalExpense = freightBookingCost + additionalCharges;
+  const calculatedFreightBookingCost =
+    supplierRateType === 'cost_per_mt' ? profitCostPerMT * profitChargeableWeight : profitFixedCost;
+  const freightBookingCost =
+    calculatedFreightBookingCost || Number(form.freightBookingCost ?? form.customerRate ?? 0);
+  const totalExpense = payableAmount;
   const gstPercentage = Number(form.gstType || 0);
-  const netFreight = totalExpense + (totalExpense * gstPercentage) / 100;
+  const taxableFreight = freightBookingCost + additionalCharges;
+  const gstAmount = (taxableFreight * gstPercentage) / 100;
+  const netFreight = taxableFreight + gstAmount;
   const profit = netFreight - payableAmount;
 
   const balance = netPaymentBalance - totalAdvance;
@@ -93,6 +101,7 @@ export function calculateConsignmentValues(form = {}) {
     netBalance: netPaymentBalance,
     customerRate: freightBookingCost,
     expenses: totalExpense,
+    gstAmount,
     totalAdvance,
     balance,
     balancePaymentStatus: paymentStatus,
@@ -156,8 +165,12 @@ export function buildConsignmentPayload(form) {
     balancePaymentStatus: paymentStatus,
     supplierPaymentMode: supplierPaymentModeValue(calculatedForm.paymentType),
     truckpaymentMode: calculatedForm.truckpaymentMode ?? '',
-    profitAmountType: calculatedForm.profitAmountType ?? '',
     gstType: calculatedForm.gstType ? toNumber(calculatedForm.gstType) : null,
+    gstAmount: numberField(calculatedForm, 'gstAmount'),
+    profitFixedCost: supplierRateType === 'fixed_cost' ? numberField(calculatedForm, 'profitFixedCost') : 0,
+    profitCostPerMT: supplierRateType === 'cost_per_mt' ? numberField(calculatedForm, 'profitCostPerMT') : 0,
+    profitChargeableWeight:
+      supplierRateType === 'cost_per_mt' ? numberField(calculatedForm, 'profitChargeableWeight') : 0,
     freightBookingCost: numberField(calculatedForm, 'customerRate'),
     additionalCharges: numberField(calculatedForm, 'additionalCharges'),
     totalExpenses: numberField(calculatedForm, 'expenses'),
@@ -213,8 +226,12 @@ export function normalizeConsignment(item) {
     chargeableWeight: item.chargeableWeight ?? item.chargebleWeight ?? '',
     ledgerAmount: item.payableAmount ?? item.ledgerAmount ?? '',
     parkingCharge: item.parkingCharge ?? '',
+    profitFixedCost: item.profitFixedCost ?? '',
+    profitCostPerMT: item.profitCostPerMT ?? '',
+    profitChargeableWeight: item.profitChargeableWeight ?? '',
     customerRate: item.freightBookingCost ?? item.customerRate ?? '',
     expenses: item.totalExpenses ?? item.expenses ?? '',
+    gstAmount: item.gstAmount ?? '',
     paymentMode: item.customerPaymentMode ?? item.paymentMode ?? '',
     truckpaymentMode: item.truckpaymentMode ?? '',
     customerPaymentMode: item.customerPaymentMode ?? '',
