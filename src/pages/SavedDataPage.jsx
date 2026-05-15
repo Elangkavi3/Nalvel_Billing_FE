@@ -145,9 +145,6 @@ export function SavedDataPage({
           </div>
           <div className="data-actions">
             <div className="data-primary-actions">
-              <button type="button" className="btn dark" onClick={onBack}>
-                Back to Home
-              </button>
               <button
                 type="button"
                 className="btn secondary"

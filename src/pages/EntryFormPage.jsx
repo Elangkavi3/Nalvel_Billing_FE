@@ -131,9 +131,6 @@ export function EntryFormPage({
         <span>
           {editingId ? `Editing #${form.serialNo || editingId}` : "New Entry"}
         </span>
-        <button type="button" className="header-back" onClick={onBack}>
-          Back to Home
-        </button>
       </div>
 
       <nav className="entry-stepper" aria-label="Entry Form Steps">
@@ -258,86 +255,88 @@ export function EntryFormPage({
                 />
               </div>
 
+          <div className="field-row">
+            <div>
               <div className="field-row">
-                <div>
-                  <div className="field-row">
-                    <Field
-                      label="Gross Weight"
-                      value={form.grossWeight}
-                      onChange={(value) => onUpdateField("grossWeight", value)}
-                      {...decimalNumberProps}
-                    />
-                    <Field
-                      label="Tare Weight"
-                      value={form.tareWeight}
-                      onChange={(value) => onUpdateField("tareWeight", value)}
-                      {...decimalNumberProps}
-                    />
-                  </div>
-                  <Field
-                    label="Net Weight"
-                    value={form.netWeight}
-                    onChange={(value) => onUpdateField("netWeight", value)}
-                    {...decimalNumberProps}
-                  />
-                </div>
-                <label className="field">
-                  <span>Material Description</span>
-                  <textarea
-                    rows={5}
-                    autoComplete="off"
-                    value={form.material}
-                    onChange={(event) =>
-                      onUpdateField("material", event.target.value)
-                    }
-                  />
-                </label>
-              </div>
-            </fieldset>
-
-            <fieldset className="form-section form-section-half">
-              <legend>Vehicle Info</legend>
-              <div className="field-row">
-                <AutocompleteField
-                  label="Truck No"
-                  value={form.truckNo}
-                  suggestions={suggestions.truck}
-                  onChange={(value) => onUpdateField("truckNo", value)}
+                <Field
+                  label="Gross Weight"
+                  value={form.grossWeight}
+                  onChange={(value) => onUpdateField("grossWeight", value)}
+                  {...decimalNumberProps}
                 />
-                <AutocompleteField
-                  label="Truck Type"
-                  value={form.truckType}
-                  suggestions={suggestions.truckType}
-                  onChange={(value) => onUpdateField("truckType", value)}
+                <Field
+                  label="Tare Weight"
+                  value={form.tareWeight}
+                  onChange={(value) => onUpdateField("tareWeight", value)}
+                  {...decimalNumberProps}
                 />
               </div>
-              <AutocompleteField
-                label="Owner / Transporter (Name)"
-                value={form.ownerName}
-                suggestions={suggestions.owner}
-                onChange={(value) => onUpdateField("ownerName", value)}
+              <Field
+                label="Net Weight"
+                value={(
+                  Number(form.grossWeight || 0) - Number(form.tareWeight || 0)
+                ).toFixed(2)}
+                readOnly
+                {...decimalNumberProps}
               />
-              <div className="field-row">
-                <AutocompleteField
-                  label="Owner Primary Contact"
-                  value={form.ownerPrimaryContact}
-                  suggestions={suggestions.ownerPrimaryContact}
-                  onChange={(value) =>
-                    onUpdateField("ownerPrimaryContact", value)
-                  }
-                  {...mobileProps}
-                />
-                <AutocompleteField
-                  label="Owner Alternate Contact"
-                  value={form.ownerAlternateContact}
-                  suggestions={suggestions.ownerAlternateContact}
-                  onChange={(value) =>
-                    onUpdateField("ownerAlternateContact", value)
-                  }
-                  {...mobileProps}
-                />
-              </div>
-            </fieldset>
+            </div>
+            <label className="field">
+              <span>Material Description</span>
+              <textarea
+                rows={5}
+                autoComplete="off"
+                value={form.material}
+                onChange={(event) =>
+                  onUpdateField("material", event.target.value)
+                }
+              />
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset className="form-section form-section-half">
+          <legend>Vehicle Info</legend>
+          <div className="field-row">
+            <AutocompleteField
+              label="Truck No"
+              value={form.truckNo}
+              suggestions={suggestions.truck}
+              onChange={(value) =>
+                onUpdateField("truckNo", value.toUpperCase())
+              }
+            />
+            <AutocompleteField
+              label="Truck Type"
+              value={form.truckType}
+              suggestions={suggestions.truckType}
+              onChange={(value) => onUpdateField("truckType", value)}
+            />
+          </div>
+          <AutocompleteField
+            label="Owner / Transporter (Name)"
+            value={form.ownerName}
+            suggestions={suggestions.owner}
+            onChange={(value) => onUpdateField("ownerName", value)}
+          />
+          <div className="field-row">
+            <AutocompleteField
+              label="Owner Primary Contact"
+              value={form.ownerPrimaryContact}
+              suggestions={suggestions.ownerPrimaryContact}
+              onChange={(value) => onUpdateField("ownerPrimaryContact", value)}
+              {...mobileProps}
+            />
+            <AutocompleteField
+              label="Owner Alternate Contact"
+              value={form.ownerAlternateContact}
+              suggestions={suggestions.ownerAlternateContact}
+              onChange={(value) =>
+                onUpdateField("ownerAlternateContact", value)
+              }
+              {...mobileProps}
+            />
+          </div>
+        </fieldset>
 
             <fieldset className="form-section form-section-half">
               <legend>Driver Info</legend>
@@ -409,68 +408,64 @@ export function EntryFormPage({
                 {...decimalNumberProps}
               />
 
-              <Field
-                label="Halting Charge"
-                value={form.haltingCharge}
-                readOnly={isSupplierReadOnly}
-                onChange={(value) => onUpdateField("haltingCharge", value)}
-                {...decimalNumberProps}
-              />
-            </div>
-            <div className="field-row">
-              <Field
-                label="Parking Charge"
-                value={form.parkingCharge}
-                readOnly={isSupplierReadOnly}
-                onChange={(value) => onUpdateField("parkingCharge", value)}
-                {...decimalNumberProps}
-              />
-              <Field
-                label="Payable Amount"
-                value={Math.floor(Number(form.ledgerAmount || 0))}
-                readOnly={isSupplierReadOnly}
-                onChange={(value) => onUpdateField("ledgerAmount", value)}
-                {...decimalNumberProps}
-              />
-            </div>
-            <div className="field-row">
-              <Field
-                label="Commission"
-                value={form.commission}
-                readOnly={isSupplierReadOnly}
-                onChange={(value) => onUpdateField("commission", value)}
-                {...decimalNumberProps}
-              />
-            </div>
-            <AdvanceEntriesField
-              entries={form.advanceEntries}
-              formBalance={form.balance}
-              readOnly={isSupplierReadOnly}
-              onChange={(nextEntries) =>
-                onUpdateField("advanceEntries", nextEntries)
-              }
+            <Field
+              label="Halting Charge"
+              value={form.haltingCharge}
+              onChange={(value) => onUpdateField("haltingCharge", value)}
+              {...decimalNumberProps}
             />
-            <div className="field-row">
-              <Field
-                label="Total Amount Paid"
-                value={Math.floor(Number(form.totalAdvance || 0))}
-                readOnly={isSupplierReadOnly}
-                onChange={(value) => onUpdateField("totalAdvance", value)}
-                {...decimalNumberProps}
-              />
-              <label className="field">
-                <span>Balance</span>
+          </div>
+          <div className="field-row">
+            <Field
+              label="Parking Charge"
+              value={form.parkingCharge}
+              onChange={(value) => onUpdateField("parkingCharge", value)}
+              {...decimalNumberProps}
+            />
+            <Field
+              label="Payable Amount"
+              value={Math.floor(Number(form.ledgerAmount || 0))}
+              readOnly
+              onChange={(value) => onUpdateField("ledgerAmount", value)}
+              {...decimalNumberProps}
+            />
+          </div>
+          <div className="field-row">
+            <Field
+              label="Commission"
+              value={form.commission}
+              onChange={(value) => onUpdateField("commission", value)}
+              {...decimalNumberProps}
+            />
+          </div>
+          <AdvanceEntriesField
+            entries={form.advanceEntries}
+            formBalance={form.balance}
+            onChange={(nextEntries) =>
+              onUpdateField("advanceEntries", nextEntries)
+            }
+          />
+          <div className="field-row">
+            <Field
+              label="Total Amount Paid"
+              value={Math.floor(Number(form.totalAdvance || 0))}
+              readOnly
+              onChange={(value) => onUpdateField("totalAdvance", value)}
+              {...decimalNumberProps}
+            />
+            <label className="field">
+              <span>Balance</span>
 
-                <div className="status-input-wrapper">
-                  <input
-                    value={
-                      Number(form.balance || 0) > 0
-                        ? Math.floor(Number(form.balance || 0))
-                        : 0
-                    }
-                    readOnly
-                    {...decimalNumberProps}
-                  />
+              <div className="status-input-wrapper">
+                <input
+                  value={
+                    Number(form.balance || 0) > 0
+                      ? Math.floor(Number(form.balance || 0))
+                      : 0
+                  }
+                  readOnly
+                  {...decimalNumberProps}
+                />
 
                   <span
                     className={`inline-payment-status ${

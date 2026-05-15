@@ -146,7 +146,11 @@
 }
 
 .lr-ui-page .row:nth-child(1) {
-  grid-template-columns: 130px minmax(140px, 0.9fr) minmax(160px, 1.1fr) minmax(0, 1fr) minmax(0, 1fr);
+ grid-template-columns:
+ 130px
+ minmax(150px,1fr)
+ minmax(0,1fr)
+ minmax(0,1fr);
 }
 
 .lr-ui-page .row:nth-child(2) {
