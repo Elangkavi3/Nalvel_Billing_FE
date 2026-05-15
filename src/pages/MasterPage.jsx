@@ -85,7 +85,7 @@ export function MasterPage({ items = [], filter, onFilterChange, onNavigate }) {
           <h3>Filter consignments by date</h3>
         </div>
 
-        <div className="filter-bar">
+        <div className="filter-bar" style={{marginTop: '10px'}}>
           <div className="filter-pills" role="group" aria-label="Home date filters">
             <button type="button" className={getFilterButtonClass(filter.mode, 'all')} onClick={() => setMode('all')}>
               All
