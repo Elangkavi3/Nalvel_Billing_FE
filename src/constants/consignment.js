@@ -58,6 +58,7 @@ export const emptyConsignmentForm = {
   customerPaymentMode: '',
   paymentType: '',
   remarks: '',
+  additionalFiles: [],
 };
 
 export const truckTypeOptions = ['32 ft SXL', 'Mini', '17ft', '20ft', 'Trailer'];

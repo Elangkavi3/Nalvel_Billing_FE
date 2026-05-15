@@ -7,6 +7,10 @@ import {
   supplierRateTypeOptions,
   PaymentTypeOptions,
 } from "../constants/consignment.js";
+import {
+  deleteAdditionalFile,
+  previewAdditionalFile,
+} from "../services/additionalFileApi.js";
 
 const mobileProps = {
   inputMode: "numeric",
@@ -26,6 +30,8 @@ const decimalNumberProps = {
       .replace(/(\..*?)\..*/g, "$1");
   },
 };
+
+const maxAdditionalFileSize = 50 * 1024 * 1024;
 
 const entryFormSteps = [
   { key: "basic", label: "Basic Info" },
@@ -619,25 +625,40 @@ export function EntryFormPage({
                 onChange={(value) => onUpdateField("invoiceDate", value)}
               />
             </div>
+            <div className="field-row">
+              <fieldset>
+                <legend>Extra</legend>
+                <div className="extra-field-stack">
+                  <SelectField
+                    label="Customer Payment Mode"
+                    value={form.customerPaymentMode}
+                    options={paymentModeOptions}
+                    required
+                    onChange={(value) =>
+                      onUpdateField("customerPaymentMode", value)
+                    }
+                  />
+                  <label className="field">
+                    <span>Remarks / Notes</span>
+                    <textarea
+                      autoComplete="off"
+                      value={form.remarks}
+                      onChange={(event) =>
+                        onUpdateField("remarks", event.target.value)
+                      }
+                    />
+                  </label>
+                </div>
+              </fieldset>
 
-            <legend>Extra</legend>
-            <SelectField
-              label="Customer Payment Mode"
-              value={form.customerPaymentMode}
-              options={paymentModeOptions}
-              required
-              onChange={(value) => onUpdateField("customerPaymentMode", value)}
-            />
-            <label className="field">
-              <span>Remarks / Notes</span>
-              <textarea
-                autoComplete="off"
-                value={form.remarks}
-                onChange={(event) =>
-                  onUpdateField("remarks", event.target.value)
-                }
-              />
-            </label>
+              <fieldset>
+                <legend>Addtional Files</legend>
+                <AdditionalFilesField
+                  files={form.additionalFiles}
+                  onChange={(files) => onUpdateField("additionalFiles", files)}
+                />
+              </fieldset>
+            </div>
           </fieldset>
         )}
       </div>
@@ -766,6 +787,180 @@ function AdvanceEntriesField({ entries, onChange, formBalance, readOnly = false 
           </label>
         </div>
       ))}
+    </div>
+  );
+}
+
+function AdditionalFilesField({ files = [], onChange }) {
+  const rows =
+    Array.isArray(files) && files.length > 0
+      ? files
+      : [{ id: "file-empty-1", file: null, name: "", fileName: "", uploaded: false }];
+
+  function updateRow(index, nextRow) {
+    onChange(rows.map((row, rowIndex) => (rowIndex === index ? nextRow : row)));
+  }
+
+  function removeRow(index) {
+    const nextRows = rows.filter((_, rowIndex) => rowIndex !== index);
+    onChange(
+      nextRows.length > 0
+        ? nextRows
+        : [{ id: "file-empty-1", file: null, name: "", fileName: "", uploaded: false }],
+    );
+  }
+
+  function handleFileSelect(index, file) {
+    if (!file) return;
+
+    if (file.size > maxAdditionalFileSize) {
+      window.alert("Each file must be 50 MB or smaller.");
+      return;
+    }
+
+    const currentRow = rows[index] ?? {};
+    if (currentRow.previewUrl) {
+      window.URL.revokeObjectURL(currentRow.previewUrl);
+    }
+
+    updateRow(index, {
+      ...currentRow,
+      id: currentRow.id || `file-${Date.now()}`,
+      file,
+      name: file.name,
+      fileName: currentRow.fileName || "",
+      size: file.size,
+      contentType: file.type,
+      previewUrl: window.URL.createObjectURL(file),
+      uploaded: false,
+    });
+  }
+
+  function addRow() {
+    onChange([
+      ...rows,
+      { id: `file-${Date.now()}`, file: null, name: "", fileName: "", uploaded: false },
+    ]);
+  }
+
+  function handleFileNameChange(index, fileName) {
+    updateRow(index, { ...rows[index], fileName });
+  }
+
+  async function handlePreview(file) {
+    try {
+      await previewAdditionalFile(file);
+    } catch (error) {
+      window.alert(error?.message || "Unable to preview file");
+    }
+  }
+
+  async function handleDelete(file, index) {
+    const hasSelectedFile = Boolean(
+      file.file || file.url || file.previewUrl || file.uploaded,
+    );
+    if (!hasSelectedFile) {
+      removeRow(index);
+      return;
+    }
+
+    const shouldDelete = window.confirm(
+      `Delete ${file.name || file.fileName || "this file"}?`,
+    );
+    if (!shouldDelete) return;
+
+    try {
+      if (file.uploaded && file.id) {
+        await deleteAdditionalFile(file.id);
+      }
+      if (file.previewUrl) {
+        window.URL.revokeObjectURL(file.previewUrl);
+      }
+      removeRow(index);
+    } catch (error) {
+      window.alert(error?.message || "Unable to delete file");
+    }
+  }
+
+  return (
+    <div className="additional-file-list">
+      {rows.map((file, index) => {
+        const inputId = `additional-file-${file.id || index}`;
+        const hasFile = Boolean(
+          file.file || file.url || file.previewUrl || file.uploaded,
+        );
+        const canDelete = hasFile || rows.length > 1;
+
+        return (
+          <div key={file.id || index} className="additional-file-row">
+            <label className="additional-file-name field">
+              <span>File Name</span>
+              <input
+                type="text"
+                value={file.fileName ?? ""}
+                readOnly={Boolean(file.uploaded)}
+                placeholder={file.name || "Original file name"}
+                onChange={(event) =>
+                  handleFileNameChange(index, event.target.value)
+                }
+              />
+            </label>
+            <label className="additional-file-select" htmlFor={inputId}>
+              <span className="additional-file-label">Select File</span>
+              <span className="additional-file-value">
+                {file.name || "Choose file"}
+              </span>
+              <input
+                id={inputId}
+                type="file"
+                onChange={(event) =>
+                  handleFileSelect(index, event.target.files?.[0])
+                }
+              />
+            </label>
+            <button
+              type="button"
+              className="additional-file-icon-btn"
+              onClick={() => handlePreview(file)}
+              disabled={!hasFile}
+              aria-label={`Preview ${file.name || "selected file"}`}
+              title="Preview"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              className="additional-file-delete-btn"
+              onClick={() => handleDelete(file, index)}
+              disabled={!canDelete}
+              aria-label={`Delete ${file.name || "selected file"}`}
+              title="Delete"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M3 6h18" />
+                <path d="M8 6V4h8v2" />
+                <path d="M6 6l1 15h10l1-15" />
+                <path d="M10 11v6" />
+                <path d="M14 11v6" />
+              </svg>
+            </button>
+            {index === rows.length - 1 && (
+              <button
+                type="button"
+                className="additional-file-add-btn"
+                onClick={addRow}
+                aria-label="Add another file"
+                title="Add another file"
+              >
+                +
+              </button>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }

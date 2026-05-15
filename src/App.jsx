@@ -32,6 +32,10 @@ import {
   getAllLR,
 } from './services/lrApi.js';
 import {
+  getAdditionalFilesByConsignmentId,
+  uploadAdditionalFile,
+} from './services/additionalFileApi.js';
+import {
   buildAdvancePaymentPayload,
   buildConsignmentPayload,
   getUniqueValues,
@@ -526,6 +530,7 @@ export function App() {
       ownerAlternateContact: item.ownerAlternateContact ?? '',
       driverPrimaryContact: item.driverPrimaryContact ?? '',
       driverAlternateContact: item.driverAlternateContact ?? '',
+      additionalFiles: item.additionalFiles ?? [],
     }));
   }
 
@@ -548,6 +553,17 @@ export function App() {
           ? updateAdvancePayment(entry.id, payload)
           : saveAdvancePayment(consignmentId, payload);
       }),
+    );
+  }
+
+  async function syncAdditionalFiles(consignmentId, currentForm) {
+    const pendingFiles = (currentForm.additionalFiles || [])
+      .filter((entry) => entry?.file);
+
+    if (pendingFiles.length === 0) return;
+
+    await Promise.all(
+      pendingFiles.map((entry) => uploadAdditionalFile(consignmentId, entry)),
     );
   }
 
@@ -601,6 +617,7 @@ export function App() {
 
       if (recordId) {
         await syncAdvancePayments(recordId, currentForm);
+        await syncAdditionalFiles(recordId, currentForm);
       }
 
       setMessage(successMessage);
@@ -620,7 +637,13 @@ export function App() {
     setError('');
     try {
       const advanceEntries = await getAdvancePaymentsByConsignmentId(item.id);
-      applyConsignmentToForm({ ...item, advanceEntries });
+      let additionalFiles = [];
+      try {
+        additionalFiles = await getAdditionalFilesByConsignmentId(item.id);
+      } catch (fileError) {
+        if (!isNotFoundError(fileError)) throw fileError;
+      }
+      applyConsignmentToForm({ ...item, advanceEntries, additionalFiles });
       setEditingId(item.id ?? null);
       setViewingItem(null);
       setMessage(`Editing entry #${item.id}`);

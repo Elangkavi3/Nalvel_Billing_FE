@@ -24,6 +24,7 @@ function toQuery(params) {
 const CONSIGNMENT_BASE = "/api/billing/consignment";
 const ADVANCE_PAYMENT_BASE = "/api/billing/advance-payment";
 const LR_BASE = "/api/billing/lr";
+const ADDITIONAL_FILE_BASE = "/api/billing/additional-files";
 
 export const consignmentEndpoints = {
   create: () => withApiBase(`${CONSIGNMENT_BASE}/save`),
@@ -93,4 +94,18 @@ export const lrEndpoints = {
   // Some backend deployments expose DELETE /{id} instead of /delete/{id}.
   deleteByIdFallback: (id) =>
     withApiBase(`${LR_BASE}/${id}`),
+};
+
+export const additionalFileEndpoints = {
+  upload: (consignmentId) =>
+    withApiBase(`${ADDITIONAL_FILE_BASE}/upload/${consignmentId}`),
+
+  readByConsignmentId: (consignmentId) =>
+    withApiBase(`${ADDITIONAL_FILE_BASE}/consignment/${consignmentId}`),
+
+  previewById: (id) =>
+    withApiBase(`${ADDITIONAL_FILE_BASE}/preview/${id}`),
+
+  deleteById: (id) =>
+    withApiBase(`${ADDITIONAL_FILE_BASE}/${id}`),
 };

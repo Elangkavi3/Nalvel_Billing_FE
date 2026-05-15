@@ -287,6 +287,135 @@ fieldset {
   filter: brightness(1.03);
 }
 
+.extra-field-stack {
+  display: grid;
+  gap: 10px;
+}
+
+/* ADDITIONAL FILES */
+.additional-file-list {
+  display: grid;
+  gap: 10px;
+}
+
+.additional-file-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 42px 42px 42px;
+  gap: 8px;
+  align-items: start;
+}
+
+.additional-file-select {
+  display: grid;
+  grid-template-rows: 16px 42px;
+  gap: 4px;
+  min-width: 0;
+}
+
+.additional-file-label {
+  color: var(--accent-dark);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 16px;
+  text-transform: none;
+}
+
+.additional-file-value {
+  min-height: 42px;
+  overflow: hidden;
+  border: 1px solid #bdd2dd;
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 20px;
+  padding: 10px 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.additional-file-name {
+  display: grid;
+  grid-template-rows: 16px 42px;
+  gap: 4px;
+  margin-bottom: 0;
+}
+
+.additional-file-name span {
+  font-size: 12px;
+  line-height: 16px;
+  margin-bottom: 0;
+}
+
+.additional-file-name input {
+  min-height: 42px;
+  padding: 10px 12px;
+}
+
+.additional-file-select input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.additional-file-icon-btn,
+.additional-file-delete-btn,
+.additional-file-add-btn {
+  width: 42px;
+  min-height: 42px;
+  margin-top: 20px;
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--accent-dark);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.additional-file-icon-btn svg,
+.additional-file-delete-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.additional-file-add-btn {
+  background: var(--accent);
+  color: #fff;
+}
+
+.additional-file-delete-btn {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.additional-file-icon-btn:disabled,
+.additional-file-delete-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+@media (max-width: 700px) {
+  .additional-file-row {
+    grid-template-columns: minmax(0, 1fr) 42px 42px 42px;
+  }
+
+  .additional-file-name {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}
+
 /* READONLY & PROFIT INPUT */
 .readonly {
   background: var(--soft) !important;

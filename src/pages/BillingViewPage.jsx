@@ -1,5 +1,10 @@
+import { useEffect, useState } from 'react';
 import { money } from '../utils/numbers.js';
 import { calculateConsignmentValues, formatDateOnly } from '../utils/consignment.js';
+import {
+  getAdditionalFilePreviewUrl,
+  getAdditionalFilesByConsignmentId,
+} from '../services/additionalFileApi.js';
 
 function paymentModeLabel(value) {
   return value || '-';
@@ -18,6 +23,75 @@ function entryView(item) {
 }
 
 export function BillingViewPage({ item, onBack, onEdit, onHome }) {
+  const [additionalFiles, setAdditionalFiles] = useState([]);
+  const [activeFileId, setActiveFileId] = useState('');
+  const [previewUrl, setPreviewUrl] = useState('');
+  const [fileMessage, setFileMessage] = useState('');
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadAdditionalFiles() {
+      if (!item?.id) {
+        setAdditionalFiles([]);
+        setActiveFileId('');
+        return;
+      }
+
+      setFileMessage('');
+      try {
+        const files = await getAdditionalFilesByConsignmentId(item.id);
+        if (cancelled) return;
+        setAdditionalFiles(files);
+        setActiveFileId(files[0]?.id || '');
+      } catch {
+        if (cancelled) return;
+        setAdditionalFiles(item.additionalFiles || []);
+        setActiveFileId(item.additionalFiles?.[0]?.id || '');
+        setFileMessage('Unable to load uploaded files');
+      }
+    }
+
+    loadAdditionalFiles();
+    return () => {
+      cancelled = true;
+    };
+  }, [item]);
+
+  useEffect(() => {
+    let cancelled = false;
+    let revokeUrl = '';
+    const activeFile =
+      additionalFiles.find((file) => String(file.id) === String(activeFileId)) ||
+      additionalFiles[0];
+
+    async function loadPreview() {
+      setPreviewUrl('');
+      if (!activeFile) return;
+
+      try {
+        const result = await getAdditionalFilePreviewUrl(activeFile);
+        if (cancelled) {
+          if (result.shouldRevoke) window.URL.revokeObjectURL(result.url);
+          return;
+        }
+        revokeUrl = result.shouldRevoke ? result.url : '';
+        setPreviewUrl(result.url);
+        setFileMessage('');
+      } catch {
+        if (!cancelled) {
+          setFileMessage('Unable to preview selected file');
+        }
+      }
+    }
+
+    loadPreview();
+    return () => {
+      cancelled = true;
+      if (revokeUrl) window.URL.revokeObjectURL(revokeUrl);
+    };
+  }, [additionalFiles, activeFileId]);
+
   if (!item) return null;
 
   const additionalCharges = item.additionalCharges ?? 0;
@@ -201,6 +275,14 @@ export function BillingViewPage({ item, onBack, onEdit, onHome }) {
             <FinanceItem label="Net Freight" value={money(totals.netFreight)} accent="netFreight" />
             <FinanceItem label="Profit" value={money(totals.profit)} accent="profit" />
           </div>
+
+          <AdditionalFilesPreview
+            files={additionalFiles}
+            activeFileId={activeFileId}
+            previewUrl={previewUrl}
+            message={fileMessage}
+            onSelect={setActiveFileId}
+          />
         </div>
 
         <div className="bill-view-footer">
@@ -237,6 +319,56 @@ function Field({ label, value, mono = false, amount = false, muted = false }) {
       <div className="bill-field-label">{label}</div>
       <div className={className}>{value ?? '-'}</div>
     </div>
+  );
+}
+
+function AdditionalFilesPreview({
+  files,
+  activeFileId,
+  previewUrl,
+  message,
+  onSelect,
+}) {
+  if (!files.length && !message) return null;
+
+  const activeFile =
+    files.find((file) => String(file.id) === String(activeFileId)) || files[0];
+
+  return (
+    <article className="bill-card bill-files-card">
+      <SectionTitle title="Additional Files" />
+      {files.length > 0 && (
+        <div className="bill-files-layout">
+          <div className="bill-files-list">
+            {files.map((file) => (
+              <button
+                key={file.id || file.name}
+                type="button"
+                className={`bill-file-tab${
+                  String(file.id) === String(activeFile?.id) ? ' is-active' : ''
+                }`}
+                onClick={() => onSelect(file.id)}
+              >
+                {file.name || file.fileName || 'Uploaded file'}
+              </button>
+            ))}
+          </div>
+
+          <div className="bill-file-frame-wrap">
+            {previewUrl ? (
+              <iframe
+                className="bill-file-frame"
+                src={previewUrl}
+                title={activeFile?.name || 'Additional file preview'}
+              />
+            ) : (
+              <div className="bill-file-empty">Preview loading...</div>
+            )}
+          </div>
+        </div>
+      )}
+      {message && <p className="bill-file-message">{message}</p>}
+    </article>
   );
 }
 
