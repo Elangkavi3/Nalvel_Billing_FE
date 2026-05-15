@@ -119,6 +119,29 @@ export async function getConsignmentsByDateRange(
   return normalizeConsignments(response.data);
 }
 
+export async function getFilteredConsignments({
+  mode = "all",
+  from = "",
+  to = "",
+  gstSelected = false,
+  imsSelected = false,
+} = {}) {
+  const params = {
+    mode,
+    gstSelected,
+    imsSelected,
+  };
+
+  if (from) params.startDate = from;
+  if (to) params.endDate = to;
+
+  const response = await API.get(
+    consignmentEndpoints.readFilteredData(params)
+  );
+
+  return normalizeConsignments(response.data);
+}
+
 export async function downloadConsignmentsExcel({
   startDate = "",
   endDate = "",

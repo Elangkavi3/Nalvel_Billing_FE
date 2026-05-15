@@ -44,6 +44,8 @@ export const consignmentEndpoints = {
         endDate,
       })}`
     ),
+  readFilteredData: (params) =>
+    withApiBase(`${CONSIGNMENT_BASE}/filterData?${toQuery(params)}`),
   readTodaySummary: () =>
     withApiBase(`${CONSIGNMENT_BASE}/today`),
   readWeekSummary: () =>

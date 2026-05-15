@@ -12,13 +12,9 @@ import {
   deleteConsignment,
   downloadConsignmentsExcel,
   getAllConsignments,
-  getConsignmentsByDateRange,
-  getMonthConsignments,
   saveConsignment,
   searchConsignmentsByCustomer,
-  getTodayConsignments,
-  getWeekConsignments,
-  getYearConsignments,
+  getFilteredConsignments,
   updateConsignment,
 } from './services/consignmentApi.js';
 import {
@@ -187,6 +183,44 @@ function applyDateFilter(items, filter) {
   });
 }
 
+function isGstConsignment(item) {
+  return item?.viewMode === 'GST' || Boolean(item?.gstNo);
+}
+
+function isImsConsignment(item) {
+  return item?.viewMode === 'IMS' || Boolean(item?.imsNo);
+}
+
+function applyBillingTypeFilter(items, filter) {
+  const gstSelected = Boolean(filter.gstSelected);
+  const imsSelected = Boolean(filter.imsSelected);
+
+  if (!gstSelected && !imsSelected) return items;
+
+  return items.filter((item) => (
+    (gstSelected && isGstConsignment(item)) ||
+    (imsSelected && isImsConsignment(item))
+  ));
+}
+
+function normalizeBillingFilter(filter) {
+  const hasNewBillingSelection = filter && ('gstSelected' in filter || 'imsSelected' in filter);
+  if (hasNewBillingSelection) return filter;
+
+  return {
+    ...filter,
+    gstSelected: filter?.billingType === 'gst',
+    imsSelected: filter?.billingType === 'ims',
+  };
+}
+
+function sanitizeBillingFilter(filter) {
+  if (!filter) return filter;
+  const next = { ...filter };
+  delete next.billingType;
+  return next;
+}
+
 function resolveExportDateRange(filter) {
   const now = new Date();
 
@@ -246,8 +280,8 @@ export function App() {
   const [message, setMessage] = useState('Ready to connect');
   const [error, setError] = useState('');
   const [successPopup, setSuccessPopup] = useState('');
-  const [homeFilter, setHomeFilter] = useState({ mode: 'all', from: '', to: '' });
-  const [dataFilter, setDataFilter] = useState({ mode: 'all', from: '', to: '' });
+  const [homeFilter, setHomeFilter] = useState({ mode: 'all', from: '', to: '', gstSelected: false, imsSelected: false });
+  const [dataFilter, setDataFilter] = useState({ mode: 'all', from: '', to: '', gstSelected: false, imsSelected: false });
   const [homeFilteredItems, setHomeFilteredItems] = useState([]);
   const [registerFilteredItems, setRegisterFilteredItems] = useState([]);
 
@@ -344,42 +378,26 @@ export function App() {
 }, []);
 
   useEffect(() => {
+    setHomeFilter((current) => sanitizeBillingFilter(normalizeBillingFilter(current)));
+    setDataFilter((current) => sanitizeBillingFilter(normalizeBillingFilter(current)));
+  }, []);
+
+  useEffect(() => {
     let cancelled = false;
 
     async function loadHomeByFilter() {
+      const effectiveFilter = normalizeBillingFilter(homeFilter);
       try {
-        if (homeFilter.mode === 'all') {
-          if (!cancelled) setHomeFilteredItems(allItems);
-          return;
-        }
-        if (homeFilter.mode === 'today') {
-          const rows = await getTodayConsignments();
-          if (!cancelled) setHomeFilteredItems(rows);
-          return;
-        }
-        if (homeFilter.mode === 'week') {
-          const rows = await getWeekConsignments();
-          if (!cancelled) setHomeFilteredItems(rows);
-          return;
-        }
-        if (homeFilter.mode === 'month') {
-          const rows = await getMonthConsignments();
-          if (!cancelled) setHomeFilteredItems(rows);
-          return;
-        }
-        if (homeFilter.mode === 'year') {
-          const rows = await getYearConsignments();
-          if (!cancelled) setHomeFilteredItems(rows);
-          return;
-        }
-        if (homeFilter.mode === 'range' && homeFilter.from && homeFilter.to) {
-          const rows = await getConsignmentsByDateRange(homeFilter.from, homeFilter.to);
-          if (!cancelled) setHomeFilteredItems(rows);
-          return;
-        }
-        if (!cancelled) setHomeFilteredItems(applyDateFilter(allItems, homeFilter));
+        const rows = await getFilteredConsignments({
+          mode: effectiveFilter.mode,
+          from: effectiveFilter.from,
+          to: effectiveFilter.to,
+          gstSelected: effectiveFilter.gstSelected,
+          imsSelected: effectiveFilter.imsSelected,
+        });
+        if (!cancelled) setHomeFilteredItems(rows);
       } catch {
-        if (!cancelled) setHomeFilteredItems(applyDateFilter(allItems, homeFilter));
+        if (!cancelled) setHomeFilteredItems(applyBillingTypeFilter(applyDateFilter(allItems, effectiveFilter), effectiveFilter));
       }
     }
 
@@ -391,41 +409,26 @@ export function App() {
 
   useEffect(() => {
     let cancelled = false;
+    setCurrentPage(1);
 
     async function loadRegisterByFilter() {
+      const effectiveFilter = normalizeBillingFilter(dataFilter);
       try {
-        if (dataFilter.mode === 'all') {
-          if (!cancelled) setRegisterFilteredItems(items);
+        if (searchName.trim()) {
+          if (!cancelled) setRegisterFilteredItems(applyBillingTypeFilter(applyDateFilter(items, effectiveFilter), effectiveFilter));
           return;
         }
-        if (dataFilter.mode === 'today') {
-          const rows = await getTodayConsignments();
-          if (!cancelled) setRegisterFilteredItems(rows);
-          return;
-        }
-        if (dataFilter.mode === 'week') {
-          const rows = await getWeekConsignments();
-          if (!cancelled) setRegisterFilteredItems(rows);
-          return;
-        }
-        if (dataFilter.mode === 'month') {
-          const rows = await getMonthConsignments();
-          if (!cancelled) setRegisterFilteredItems(rows);
-          return;
-        }
-        if (dataFilter.mode === 'year') {
-          const rows = await getYearConsignments();
-          if (!cancelled) setRegisterFilteredItems(rows);
-          return;
-        }
-        if (dataFilter.mode === 'range' && dataFilter.from && dataFilter.to) {
-          const rows = await getConsignmentsByDateRange(dataFilter.from, dataFilter.to);
-          if (!cancelled) setRegisterFilteredItems(rows);
-          return;
-        }
-        if (!cancelled) setRegisterFilteredItems(applyDateFilter(items, dataFilter));
+
+        const rows = await getFilteredConsignments({
+          mode: effectiveFilter.mode,
+          from: effectiveFilter.from,
+          to: effectiveFilter.to,
+          gstSelected: effectiveFilter.gstSelected,
+          imsSelected: effectiveFilter.imsSelected,
+        });
+        if (!cancelled) setRegisterFilteredItems(rows);
       } catch {
-        if (!cancelled) setRegisterFilteredItems(applyDateFilter(items, dataFilter));
+        if (!cancelled) setRegisterFilteredItems(applyBillingTypeFilter(applyDateFilter(items, effectiveFilter), effectiveFilter));
       }
     }
 
@@ -433,7 +436,7 @@ export function App() {
     return () => {
       cancelled = true;
     };
-  }, [items, dataFilter]);
+  }, [items, dataFilter, searchName]);
 
   function updateField(field, value) {
     setForm((current) => {

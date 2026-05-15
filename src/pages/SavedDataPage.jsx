@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Pagination } from "../components/common/Pagination.jsx";
+import { DateBillingFilters } from "../components/common/DateBillingFilters.jsx";
 import { money } from "../utils/numbers.js";
 import {
   calculateConsignmentValues,
@@ -120,14 +121,6 @@ export function SavedDataPage({
     setPrintData(null);
   }
 
-  function setMode(mode) {
-    onFilterChange((current) => ({ ...current, mode }));
-  }
-
-  function setRangeValue(key, value) {
-    onFilterChange((current) => ({ ...current, mode: "range", [key]: value }));
-  }
-
   return (
     <div
       className={
@@ -180,89 +173,13 @@ export function SavedDataPage({
         </div>
 
         <div className="saved-filter-section">
-          <div className="filter-bar">
-            <div
-              className="filter-pills"
-              role="group"
-              aria-label="Saved data date filters"
-            >
-              <button
-                type="button"
-                className={
-                  filter.mode === "all" ? "filter-pill active" : "filter-pill"
-                }
-                onClick={() => setMode("all")}
-              >
-                All
-              </button>
-              <button
-                type="button"
-                className={
-                  filter.mode === "today" ? "filter-pill active" : "filter-pill"
-                }
-                onClick={() => setMode("today")}
-              >
-                Today
-              </button>
-              <button
-                type="button"
-                className={
-                  filter.mode === "week" ? "filter-pill active" : "filter-pill"
-                }
-                onClick={() => setMode("week")}
-              >
-                This Week
-              </button>
-              <button
-                type="button"
-                className={
-                  filter.mode === "month" ? "filter-pill active" : "filter-pill"
-                }
-                onClick={() => setMode("month")}
-              >
-                This Month
-              </button>
-              <button
-                type="button"
-                className={
-                  filter.mode === "year" ? "filter-pill active" : "filter-pill"
-                }
-                onClick={() => setMode("year")}
-              >
-                This Year
-              </button>
-              <button
-                type="button"
-                className={
-                  filter.mode === "range" ? "filter-pill active" : "filter-pill"
-                }
-                onClick={() => setMode("range")}
-              >
-                Date Range
-              </button>
-            </div>
-
-            <div className="filter-range">
-              <label className="filter-date-field">
-                <span>From</span>
-                <input
-                  type="date"
-                  value={filter.from}
-                  onChange={(event) =>
-                    setRangeValue("from", event.target.value)
-                  }
-                />
-              </label>
-              <label className="filter-date-field">
-                <span>To</span>
-                <input
-                  type="date"
-                  value={filter.to}
-                  onChange={(event) => setRangeValue("to", event.target.value)}
-                />
-              </label>
-            </div>
-          </div>
+          <DateBillingFilters
+            filter={filter}
+            onFilterChange={onFilterChange}
+            showBillingFilters
+            dateGroupLabel="Saved data date filters"
+            billingGroupLabel="Saved data billing filters"
+          />
         </div>
 
         <div className="table-wrap">
