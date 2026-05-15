@@ -146,6 +146,10 @@
     grid-template-columns: 1fr;
   }
 
+  .entry-stepper {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .topbar,
   .list-head,
   .data-actions,
@@ -492,6 +496,21 @@
   .home-table-section {
     padding-left: 14px;
     padding-right: 14px;
+  }
+
+  .entry-stepper {
+    grid-template-columns: 1fr;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .entry-step-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .entry-step-actions .btn {
+    width: 100%;
   }
 
   .form-section {

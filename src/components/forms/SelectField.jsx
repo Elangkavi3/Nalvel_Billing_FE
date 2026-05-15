@@ -1,8 +1,14 @@
-export function SelectField({ label, value, options, onChange, required = false }) {
+export function SelectField({ label, value, options, onChange, required = false, disabled = false }) {
   return (
     <label className="field">
       <span>{label}</span>
-      <select value={value} required={required} onChange={(event) => onChange(event.target.value)}>
+      <select
+        value={value}
+        required={required}
+        disabled={disabled}
+        className={disabled ? 'readonly' : undefined}
+        onChange={(event) => onChange(event.target.value)}
+      >
         <option value="" disabled>
           Select {label}
         </option>

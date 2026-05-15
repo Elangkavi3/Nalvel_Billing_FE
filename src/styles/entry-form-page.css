@@ -31,6 +31,71 @@
   padding: 6px 10px;
 }
 
+/* ENTRY STEPPER */
+.entry-stepper {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+  background: #f4faf8;
+}
+
+.entry-step {
+  min-height: 48px;
+  border: 1px solid #c9d9e2;
+  border-radius: 10px;
+  background: #fff;
+  color: #3f5965;
+  font-weight: 700;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: flex-start;
+  text-align: left;
+  transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease;
+}
+
+.entry-step:disabled {
+  cursor: not-allowed;
+}
+
+.entry-step.is-upcoming {
+  opacity: 0.72;
+}
+
+.entry-step.is-complete {
+  border-color: #7db9a3;
+  background: #ecf8f3;
+  color: #0f5d4f;
+}
+
+.entry-step.is-active {
+  border-color: var(--accent);
+  background: #e6f4f1;
+  color: #0a5a53;
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.11);
+}
+
+.entry-step-index {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.entry-step-label {
+  font-size: 13px;
+  line-height: 1.2;
+}
+
 /* FIELDSET */
 fieldset {
   margin: 0;
@@ -309,6 +374,15 @@ fieldset {
   border-radius: 8px;
   box-shadow: var(--shadow);
   overflow: hidden;
+}
+
+/* STEP ACTIONS */
+.entry-step-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 14px 14px;
 }
 
 /* BUTTON ROW */

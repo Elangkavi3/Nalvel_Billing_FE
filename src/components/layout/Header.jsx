@@ -5,7 +5,7 @@ export function Header({ activePage, editingId, loading, onBack, onClear }) {
 
   function handleLogout() {
     localStorage.removeItem('token');
-    window.location.href = 'https://nalvel-login-app.vercel.app/';
+    window.location.href = 'http://nalvel.com/';
   }
 
   return (

@@ -231,6 +231,7 @@ export function App() {
   const location = useLocation();
 
   const [form, setForm] = useState(() => ({ ...emptyConsignmentForm }));
+  const [entryFormResetKey, setEntryFormResetKey] = useState(0);
   const [items, setItems] = useState([]);
   const [allItems, setAllItems] = useState([]);
   const [editingId, setEditingId] = useState(null);
@@ -320,7 +321,7 @@ export function App() {
 
   if (!token && !isPublicRoute) {
 
-    window.location.href = "https://nalvel-login-app.vercel.app/";
+    window.location.href = "http://nalvel.com";
 
   }
 
@@ -465,6 +466,7 @@ export function App() {
 
   function clearForm() {
     setForm({ ...emptyConsignmentForm });
+    setEntryFormResetKey((current) => current + 1);
     setEditingId(null);
     setViewingItem(null);
     setError('');
@@ -751,6 +753,7 @@ export function App() {
           element={
             <EntryFormPage
               editingId={editingId}
+              resetKey={entryFormResetKey}
               form={form}
               suggestions={suggestions}
               onBack={() => navigate('/')}

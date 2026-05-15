@@ -1,4 +1,12 @@
-export function Field({ label, value, onChange = () => {}, type = 'text', required = false, readOnly = false }) {
+export function Field({
+  label,
+  value,
+  onChange = () => {},
+  type = 'text',
+  required = false,
+  readOnly = false,
+  ...inputProps
+}) {
   return (
     <label className="field">
       <span>{label}</span>
@@ -10,6 +18,7 @@ export function Field({ label, value, onChange = () => {}, type = 'text', requir
         readOnly={readOnly}
         className={readOnly ? 'readonly' : undefined}
         onChange={(event) => onChange(event.target.value)}
+        {...inputProps}
       />
     </label>
   );

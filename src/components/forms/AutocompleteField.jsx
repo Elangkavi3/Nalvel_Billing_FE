@@ -1,4 +1,14 @@
-export function AutocompleteField({ label, value, onChange, required = false, inputMode, maxLength, pattern, title }) {
+export function AutocompleteField({
+  label,
+  value,
+  onChange,
+  required = false,
+  readOnly = false,
+  inputMode,
+  maxLength,
+  pattern,
+  title,
+}) {
   return (
     <label className="field">
       <span>{label}</span>
@@ -11,6 +21,8 @@ export function AutocompleteField({ label, value, onChange, required = false, in
         maxLength={maxLength}
         pattern={pattern}
         title={title}
+        readOnly={readOnly}
+        className={readOnly ? 'readonly' : undefined}
         onChange={(event) => onChange(event.target.value)}
       />
     </label>
