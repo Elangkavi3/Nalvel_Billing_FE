@@ -728,7 +728,7 @@ export function App() {
         onClear={clearForm}
       />
 
-      <StatusLine loading={loading} message={message} error={error} />
+      {/* <StatusLine loading={loading} message={message} error={error} /> */}
 
       <Routes>
         <Route

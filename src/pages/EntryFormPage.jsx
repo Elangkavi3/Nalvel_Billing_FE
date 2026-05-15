@@ -37,6 +37,23 @@ function hasValue(value) {
   return String(value ?? "").trim().length > 0;
 }
 
+function hasDecimalInput(value) {
+  return String(value ?? "").includes(".");
+}
+
+function formatNetWeight(grossWeight, tareWeight) {
+  const netWeight = Number(grossWeight || 0) - Number(tareWeight || 0);
+  return hasDecimalInput(grossWeight) || hasDecimalInput(tareWeight)
+    ? netWeight.toFixed(2)
+    : String(netWeight);
+}
+
+function scrollToFormTop() {
+  window.requestAnimationFrame(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+}
+
 export function EntryFormPage({
   editingId,
   resetKey,
@@ -78,11 +95,10 @@ export function EntryFormPage({
     hasValue(form.viewMode) && hasValue(form.customerName);
   const isSupplierBillingComplete =
     isBasicInfoComplete && hasValue(form.truckpaymentMode);
-  const isSupplierReadOnly = activeStep === 1 && !isBasicInfoComplete;
-  const isProfitReadOnly = activeStep === 2 && !isSupplierBillingComplete;
 
   function goToStep(nextStep) {
     setActiveStep(Math.min(Math.max(nextStep, 0), lastStepIndex));
+    scrollToFormTop();
   }
 
   function handleNextStep(event) {
@@ -127,12 +143,6 @@ export function EntryFormPage({
       onSubmit={handleFormSubmit}
       autoComplete="off"
     >
-      <div className="form-header">
-        <span>
-          {editingId ? `Editing #${form.serialNo || editingId}` : "New Entry"}
-        </span>
-      </div>
-
       <nav className="entry-stepper" aria-label="Entry Form Steps">
         {entryFormSteps.map((step, index) => {
           const isActive = activeStep === index;
@@ -273,9 +283,7 @@ export function EntryFormPage({
               </div>
               <Field
                 label="Net Weight"
-                value={(
-                  Number(form.grossWeight || 0) - Number(form.tareWeight || 0)
-                ).toFixed(2)}
+                value={formatNetWeight(form.grossWeight, form.tareWeight)}
                 readOnly
                 {...decimalNumberProps}
               />
@@ -385,7 +393,6 @@ export function EntryFormPage({
                 label="Freight Amount Type"
                 value={form.supplierRateType}
                 options={supplierRateTypeOptions}
-                disabled={isSupplierReadOnly}
                 onChange={(value) => onUpdateField("supplierRateType", value)}
               />
 
@@ -396,14 +403,12 @@ export function EntryFormPage({
                     : "Fixed Cost"
                 }
                 value={form.supplierAmount}
-                readOnly={isSupplierReadOnly}
                 onChange={(value) => onUpdateField("supplierAmount", value)}
                 {...decimalNumberProps}
               />
               <Field
                 label="Chargeable Weight"
                 value={form.chargeableWeight}
-                readOnly={isSupplierReadOnly}
                 onChange={(value) => onUpdateField("chargeableWeight", value)}
                 {...decimalNumberProps}
               />
@@ -490,7 +495,6 @@ export function EntryFormPage({
                 label="Payment Type Options"
                 value={form.paymentType}
                 options={PaymentTypeOptions}
-                disabled={isSupplierReadOnly}
                 onChange={(value) => onUpdateField("paymentType", value)}
               />
               <SelectField
@@ -498,7 +502,6 @@ export function EntryFormPage({
                 value={form.truckpaymentMode}
                 options={paymentModeOptions}
                 required
-                disabled={isSupplierReadOnly}
                 onChange={(value) => onUpdateField("truckpaymentMode", value)}
               />
             </div>
@@ -516,7 +519,6 @@ export function EntryFormPage({
                     : "Fixed Cost"
                 }
                 value={form.customerAmount}
-                readOnly={isProfitReadOnly}
                 onChange={(value) => onUpdateField("customerAmount", value)}
                 {...decimalNumberProps}
               />
@@ -524,7 +526,6 @@ export function EntryFormPage({
               <Field
                 label="Our Chargeable Weight"
                 value={form.customerChargeableWeight}
-                readOnly={isProfitReadOnly}
                 onChange={(value) =>
                   onUpdateField("customerChargeableWeight", value)
                 }
@@ -540,7 +541,6 @@ export function EntryFormPage({
                     name="gstType"
                     value={form.gstType}
                     required={Boolean(form.gstNo && form.gstNo.trim())}
-                    disabled={isProfitReadOnly}
                     options={[
                       { label: "18%", value: "18" },
                       { label: "5%", value: "5" },
@@ -562,7 +562,6 @@ export function EntryFormPage({
               <Field
                 label="Additional Charge"
                 value={form.additionalCharges}
-                readOnly={isProfitReadOnly}
                 onChange={(value) => onUpdateField("additionalCharges", value)}
                 {...decimalNumberProps}
               />
@@ -594,14 +593,12 @@ export function EntryFormPage({
               <Field
                 label="LR No."
                 value={form.lrNo}
-                readOnly={isProfitReadOnly}
                 onChange={(value) => onUpdateField("lrNo", value)}
               />
               <Field
                 label="LR Date"
                 type="date"
                 value={form.lrDate}
-                readOnly={isProfitReadOnly}
                 onChange={(value) => onUpdateField("lrDate", value)}
               />
             </div>
@@ -609,14 +606,12 @@ export function EntryFormPage({
               <Field
                 label="Customer Invoice No."
                 value={form.invoiceNo}
-                readOnly={isProfitReadOnly}
                 onChange={(value) => onUpdateField("invoiceNo", value)}
               />
               <Field
                 label="Invoice Date"
                 type="date"
                 value={form.invoiceDate}
-                readOnly={isProfitReadOnly}
                 onChange={(value) => onUpdateField("invoiceDate", value)}
               />
             </div>
@@ -627,7 +622,6 @@ export function EntryFormPage({
               value={form.customerPaymentMode}
               options={paymentModeOptions}
               required
-              disabled={isProfitReadOnly}
               onChange={(value) => onUpdateField("customerPaymentMode", value)}
             />
             <label className="field">
@@ -635,8 +629,6 @@ export function EntryFormPage({
               <textarea
                 autoComplete="off"
                 value={form.remarks}
-                readOnly={isProfitReadOnly}
-                className={isProfitReadOnly ? "readonly" : undefined}
                 onChange={(event) =>
                   onUpdateField("remarks", event.target.value)
                 }

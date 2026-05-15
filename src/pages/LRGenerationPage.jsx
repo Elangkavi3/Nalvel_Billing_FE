@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import logoUrl from "../assets/svg/Logo.svg";
 import { lrEndpoints } from "../services/endpoints.js";
 import { deleteLR, getAllLR, request } from "../services/lrApi.js";
 import { toNumber } from "../utils/numbers.js";
@@ -527,7 +528,7 @@ export function LRGenerationPage({ onBack, onSaved }) {
             <div className="logo-box">
               <img
                 className="brand-logo"
-                src="Logo.svg"
+                src={logoUrl}
                 alt="Nalvel Logistics Logo"
                 style={{
                   height: "60px",
@@ -1105,7 +1106,7 @@ function LRPrintDuplicate({ form, copyIndex, copyLabel }) {
         <div className="logo-box">
           <img
             className="brand-logo"
-            src="Logo.svg"
+            src={logoUrl}
             alt="Nalvel Logistics Logo"
             style={{
               height: "60px",
