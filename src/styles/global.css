@@ -68,7 +68,9 @@ h2 {
 .app-shell {
   width: min(var(--max-width-container), calc(100% - var(--spacing-container-h)));
   margin: 0 auto;
-  padding: var(--spacing-container-v) 0 var(--spacing-container-v-bottom);
+
+  padding-top: 0;
+  padding-bottom: var(--spacing-container-v-bottom);
 }
 
 /* Flex Utilities */
@@ -79,6 +81,22 @@ h2 {
   justify-content: space-between;
   gap: var(--gap-xl);
   min-width: 0;
+}
+
+/* Sticky Header */
+.topbar {
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100vw;
+
+  z-index: 1000;
+  background: var(--color-paper);
+
+  padding: 12px 30px;
+  margin-left: calc(50% - 50vw);
+
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
 }
 
 .top-actions,

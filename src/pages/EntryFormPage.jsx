@@ -64,9 +64,6 @@ export function EntryFormPage({
         <span>
           {editingId ? `Editing #${form.serialNo || editingId}` : "New Entry"}
         </span>
-        <button type="button" className="header-back" onClick={onBack}>
-          Back to Home
-        </button>
       </div>
 
       <div className="entry-layout">

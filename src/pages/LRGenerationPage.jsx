@@ -986,13 +986,6 @@ export function LRGenerationPage({ onBack, onSaved }) {
             <button
               type="button"
               className="btn btn-secondary"
-              onClick={onBack}
-            >
-              Back
-            </button>
-            <button
-              type="button"
-              className="btn btn-secondary"
               onClick={() => window.print()}
             >
               Print / Save PDF
