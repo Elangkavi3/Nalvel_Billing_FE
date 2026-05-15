@@ -181,8 +181,10 @@ export function EntryFormPage({
               </div>
               <Field
                 label="Net Weight"
-                value={form.netWeight}
-                onChange={(value) => onUpdateField("netWeight", value)}
+                value={(
+                  Number(form.grossWeight || 0) - Number(form.tareWeight || 0)
+                ).toFixed(2)}
+                readOnly
                 {...decimalNumberProps}
               />
             </div>
@@ -207,7 +209,9 @@ export function EntryFormPage({
               label="Truck No"
               value={form.truckNo}
               suggestions={suggestions.truck}
-              onChange={(value) => onUpdateField("truckNo", value)}
+              onChange={(value) =>
+                onUpdateField("truckNo", value.toUpperCase())
+              }
             />
             <AutocompleteField
               label="Truck Type"
@@ -321,6 +325,7 @@ export function EntryFormPage({
             <Field
               label="Payable Amount"
               value={Math.floor(Number(form.ledgerAmount || 0))}
+              readOnly
               onChange={(value) => onUpdateField("ledgerAmount", value)}
               {...decimalNumberProps}
             />
@@ -332,20 +337,6 @@ export function EntryFormPage({
               onChange={(value) => onUpdateField("commission", value)}
               {...decimalNumberProps}
             />
-            {/* <Field label="Net Payment Balance" value={form.netBalance} onChange={(value) => onUpdateField('netBalance', value)} {...decimalNumberProps} /> */}
-            {/* <label className="field">
-              <span>Balance</span>
-
-              <div className="status-input-wrapper">
-                <input
-                  value={form.balance || ""}
-                  readOnly
-                  {...decimalNumberProps}
-                />
-
-                
-              </div>
-            </label> */}
           </div>
           <AdvanceEntriesField
             entries={form.advanceEntries}
@@ -358,6 +349,7 @@ export function EntryFormPage({
             <Field
               label="Total Amount Paid"
               value={Math.floor(Number(form.totalAdvance || 0))}
+              readOnly
               onChange={(value) => onUpdateField("totalAdvance", value)}
               {...decimalNumberProps}
             />
@@ -367,10 +359,10 @@ export function EntryFormPage({
               <div className="status-input-wrapper">
                 <input
                   value={
-  Number(form.balance || 0) > 0
-    ? Math.floor(Number(form.balance || 0))
-    : 0
-}
+                    Number(form.balance || 0) > 0
+                      ? Math.floor(Number(form.balance || 0))
+                      : 0
+                  }
                   readOnly
                   {...decimalNumberProps}
                 />

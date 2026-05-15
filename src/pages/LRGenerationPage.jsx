@@ -130,8 +130,6 @@ function composeLRText(form) {
     `NALVEL LOGISTICS SERVICES - LR ${form.lrNo || "-"}`,
     `Date: ${form.lrDate || "-"}`,
     `Vehicle: ${form.vehicleNo || "-"}`,
-    `From: ${form.from || "-"}`,
-    `To: ${form.to || "-"}`,
     `Consignor: ${form.consignorName || "-"}`,
     `Consignee: ${form.consigneeName || "-"}`,
     `Packages: ${form.noOfPackages || "-"}`,
