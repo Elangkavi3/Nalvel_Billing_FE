@@ -106,7 +106,7 @@ export const additionalFileEndpoints = {
     withApiBase(`${ADDITIONAL_FILE_BASE}/${consignmentId}`),
 
   previewById: (id) =>
-    withApiBase(`${ADDITIONAL_FILE_BASE}/preview/${id}`),
+    withApiBase(`${ADDITIONAL_FILE_BASE}/view/${id}`),
 
   deleteById: (id) =>
     withApiBase(`${ADDITIONAL_FILE_BASE}/${id}`),

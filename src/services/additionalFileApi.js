@@ -34,9 +34,8 @@ function normalizeAdditionalFile(file = {}) {
     fileName: name,
     size: file.size ?? file.fileSize ?? "",
     contentType: file.contentType ?? file.fileType ?? file.mimeType ?? "",
-    url: normalizeFileUrl(
-      file.url ?? file.fileUrl ?? file.previewUrl ?? file.uploadFilePath,
-    ),
+    url: normalizeFileUrl(file.url ?? file.fileUrl ?? file.previewUrl),
+    uploadFilePath: file.uploadFilePath ?? "",
     uploadedDate: file.uploadedDate ?? "",
     uploaded: true,
   };
