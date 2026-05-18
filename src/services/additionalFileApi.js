@@ -19,6 +19,16 @@ function normalizeFileUrl(value) {
   return base ? `${base}/${url}` : url;
 }
 
+function assertPreviewBlob(response) {
+  const contentType = String(response.headers?.["content-type"] || "");
+
+  if (contentType.includes("text/html")) {
+    throw new Error("File preview returned a page instead of a file");
+  }
+
+  return response.data;
+}
+
 function normalizeAdditionalFile(file = {}) {
   const name =
     file.name ??
@@ -94,7 +104,7 @@ export async function previewAdditionalFile(file) {
   const response = await API.get(additionalFileEndpoints.previewById(file.id), {
     responseType: "blob",
   });
-  const blobUrl = window.URL.createObjectURL(response.data);
+  const blobUrl = window.URL.createObjectURL(assertPreviewBlob(response));
   window.open(blobUrl, "_blank", "noopener,noreferrer");
   window.setTimeout(() => window.URL.revokeObjectURL(blobUrl), 60_000);
 }
@@ -117,7 +127,7 @@ export async function getAdditionalFilePreviewUrl(file) {
   });
 
   return {
-    url: window.URL.createObjectURL(response.data),
+    url: window.URL.createObjectURL(assertPreviewBlob(response)),
     shouldRevoke: true,
   };
 }
