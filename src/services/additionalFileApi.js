@@ -1,10 +1,29 @@
 import API from "./api";
 import { additionalFileEndpoints } from "./endpoints";
 
+function normalizeFileUrl(value) {
+  if (!value) return "";
+
+  const url = String(value);
+
+  if (/^(https?:|blob:|data:)/i.test(url)) {
+    return url;
+  }
+
+  const base = String(API.defaults.baseURL || "").replace(/\/$/, "");
+
+  if (url.startsWith("/")) {
+    return base ? `${base}${url}` : url;
+  }
+
+  return base ? `${base}/${url}` : url;
+}
+
 function normalizeAdditionalFile(file = {}) {
   const name =
     file.name ??
     file.fileName ??
+    file.uploadFileName ??
     file.originalFileName ??
     file.documentName ??
     "Uploaded file";
@@ -15,7 +34,10 @@ function normalizeAdditionalFile(file = {}) {
     fileName: name,
     size: file.size ?? file.fileSize ?? "",
     contentType: file.contentType ?? file.fileType ?? file.mimeType ?? "",
-    url: file.url ?? file.fileUrl ?? file.previewUrl ?? "",
+    url: normalizeFileUrl(
+      file.url ?? file.fileUrl ?? file.previewUrl ?? file.uploadFilePath,
+    ),
+    uploadedDate: file.uploadedDate ?? "",
     uploaded: true,
   };
 }
@@ -29,7 +51,7 @@ export async function uploadAdditionalFile(consignmentId, entry) {
   const file = entry?.file ?? entry;
   const fileName = String(entry?.fileName || file?.name || "").trim();
   const data = new FormData();
-  data.append("file", file);
+  data.append("files", file);
   if (fileName) {
     data.append("fileName", fileName);
   }
@@ -44,7 +66,7 @@ export async function uploadAdditionalFile(consignmentId, entry) {
     },
   );
 
-  return normalizeAdditionalFile(response.data);
+  return normalizeAdditionalFiles(response.data)[0] ?? null;
 }
 
 export async function getAdditionalFilesByConsignmentId(consignmentId) {

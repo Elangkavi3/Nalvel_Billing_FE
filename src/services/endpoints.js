@@ -24,7 +24,7 @@ function toQuery(params) {
 const CONSIGNMENT_BASE = "/api/billing/consignment";
 const ADVANCE_PAYMENT_BASE = "/api/billing/advance-payment";
 const LR_BASE = "/api/billing/lr";
-const ADDITIONAL_FILE_BASE = "/api/billing/additional-files";
+const ADDITIONAL_FILE_BASE = "/api/billing/document";
 
 export const consignmentEndpoints = {
   create: () => withApiBase(`${CONSIGNMENT_BASE}/save`),
@@ -103,7 +103,7 @@ export const additionalFileEndpoints = {
     withApiBase(`${ADDITIONAL_FILE_BASE}/upload/${consignmentId}`),
 
   readByConsignmentId: (consignmentId) =>
-    withApiBase(`${ADDITIONAL_FILE_BASE}/consignment/${consignmentId}`),
+    withApiBase(`${ADDITIONAL_FILE_BASE}/${consignmentId}`),
 
   previewById: (id) =>
     withApiBase(`${ADDITIONAL_FILE_BASE}/preview/${id}`),
