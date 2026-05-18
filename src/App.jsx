@@ -203,6 +203,13 @@ function applyBillingTypeFilter(items, filter) {
   ));
 }
 
+function shouldLoadAllDataLocally(filter) {
+  return (
+    filter.mode === 'all' ||
+    (filter.mode === 'range' && !filter.from && !filter.to)
+  );
+}
+
 function normalizeBillingFilter(filter) {
   const hasNewBillingSelection = filter && ('gstSelected' in filter || 'imsSelected' in filter);
   if (hasNewBillingSelection) return filter;
@@ -388,6 +395,13 @@ export function App() {
     async function loadHomeByFilter() {
       const effectiveFilter = normalizeBillingFilter(homeFilter);
       try {
+        if (shouldLoadAllDataLocally(effectiveFilter)) {
+          if (!cancelled) {
+            setHomeFilteredItems(applyBillingTypeFilter(allItems, effectiveFilter));
+          }
+          return;
+        }
+
         const rows = await getFilteredConsignments({
           mode: effectiveFilter.mode,
           from: effectiveFilter.from,
@@ -416,6 +430,13 @@ export function App() {
       try {
         if (searchName.trim()) {
           if (!cancelled) setRegisterFilteredItems(applyBillingTypeFilter(applyDateFilter(items, effectiveFilter), effectiveFilter));
+          return;
+        }
+
+        if (shouldLoadAllDataLocally(effectiveFilter)) {
+          if (!cancelled) {
+            setRegisterFilteredItems(applyBillingTypeFilter(items, effectiveFilter));
+          }
           return;
         }
 

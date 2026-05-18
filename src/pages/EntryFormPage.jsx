@@ -32,6 +32,13 @@ const decimalNumberProps = {
 };
 
 const maxAdditionalFileSize = 50 * 1024 * 1024;
+const allowedAdditionalFileMimeTypes = new Set([
+  "application/pdf",
+  "image/jpeg",
+  "image/png",
+]);
+const allowedAdditionalFileExtensions = new Set(["pdf", "jpeg", "jpg", "png"]);
+const additionalFileAccept = ".pdf,.jpeg,.jpg,.png,application/pdf,image/jpeg,image/png";
 
 const entryFormSteps = [
   { key: "basic", label: "Basic Info" },
@@ -58,6 +65,19 @@ function scrollToFormTop() {
   window.requestAnimationFrame(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
+}
+
+function isAllowedAdditionalFile(file) {
+  const extension = String(file?.name || "")
+    .split(".")
+    .pop()
+    .toLowerCase();
+  const type = String(file?.type || "").toLowerCase();
+
+  return (
+    allowedAdditionalFileMimeTypes.has(type) ||
+    allowedAdditionalFileExtensions.has(extension)
+  );
 }
 
 export function EntryFormPage({
@@ -813,6 +833,11 @@ function AdditionalFilesField({ files = [], onChange }) {
   function handleFileSelect(index, file) {
     if (!file) return;
 
+    if (!isAllowedAdditionalFile(file)) {
+      window.alert("Only PNG, PDF, and JPEG files are allowed.");
+      return;
+    }
+
     if (file.size > maxAdditionalFileSize) {
       window.alert("Each file must be 50 MB or smaller.");
       return;
@@ -913,6 +938,7 @@ function AdditionalFilesField({ files = [], onChange }) {
               <input
                 id={inputId}
                 type="file"
+                accept={additionalFileAccept}
                 onChange={(event) =>
                   handleFileSelect(index, event.target.files?.[0])
                 }
