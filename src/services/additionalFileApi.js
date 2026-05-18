@@ -29,6 +29,11 @@ function assertPreviewBlob(response) {
   return response.data;
 }
 
+function authHeaders() {
+  const token = localStorage.getItem("token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 function normalizeAdditionalFile(file = {}) {
   const name =
     file.name ??
@@ -105,6 +110,7 @@ export async function previewAdditionalFile(file) {
   }
 
   const response = await API.get(additionalFileEndpoints.previewById(file.id), {
+    headers: authHeaders(),
     responseType: "blob",
   });
   const blobUrl = window.URL.createObjectURL(assertPreviewBlob(response));
@@ -126,6 +132,7 @@ export async function getAdditionalFilePreviewUrl(file) {
   }
 
   const response = await API.get(additionalFileEndpoints.previewById(file.id), {
+    headers: authHeaders(),
     responseType: "blob",
   });
 
