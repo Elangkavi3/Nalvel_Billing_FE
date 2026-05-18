@@ -38,13 +38,16 @@ function normalizeAdditionalFile(file = {}) {
     file.documentName ??
     "Uploaded file";
 
+  const id = file.id ?? file.fileId ?? file.documentId ?? "";
+
   return {
-    id: file.id ?? file.fileId ?? file.documentId ?? "",
+    id,
     name,
     fileName: name,
     size: file.size ?? file.fileSize ?? "",
     contentType: file.contentType ?? file.fileType ?? file.mimeType ?? "",
-    url: normalizeFileUrl(file.url ?? file.fileUrl ?? file.previewUrl),
+    url: id ? "" : normalizeFileUrl(file.url ?? file.fileUrl),
+    previewUrl: file.previewUrl ?? "",
     uploadFilePath: file.uploadFilePath ?? "",
     uploadedDate: file.uploadedDate ?? "",
     uploaded: true,
@@ -92,7 +95,7 @@ export async function previewAdditionalFile(file) {
     return;
   }
 
-  if (file?.url) {
+  if (!file?.id && file?.url) {
     window.open(file.url, "_blank", "noopener,noreferrer");
     return;
   }
@@ -114,7 +117,7 @@ export async function getAdditionalFilePreviewUrl(file) {
     return { url: file.previewUrl, shouldRevoke: false };
   }
 
-  if (file?.url) {
+  if (!file?.id && file?.url) {
     return { url: file.url, shouldRevoke: false };
   }
 
