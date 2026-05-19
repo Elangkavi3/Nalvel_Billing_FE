@@ -7,6 +7,8 @@ import { MasterPage } from './pages/MasterPage.jsx';
 import { BillingViewPage } from './pages/BillingViewPage.jsx';
 import { EntryFormPage } from './pages/EntryFormPage.jsx';
 import { LRGenerationPage } from './pages/LRGenerationPage.jsx';
+import { RegisterUserPage } from './pages/RegisterUserPage.jsx';
+import { ResetPasswordPage } from './pages/ResetPasswordPage.jsx';
 import { SavedDataPage } from './pages/SavedDataPage.jsx';
 import {
   deleteConsignment,
@@ -299,6 +301,8 @@ export function App() {
     if (path === '/register') return 'data';
     if (path === '/lr') return 'lr';
     if (path === '/view') return 'view';
+    if (path === '/users/new') return 'user';
+    if (path === '/users/reset-password') return 'user';
     return 'home';
   }, [location.pathname]);
 
@@ -793,6 +797,8 @@ export function App() {
                 if (page === 'form') navigate('/entry');
                 else if (page === 'data') navigate('/register');
                 else if (page === 'lr') navigate('/lr');
+                else if (page === 'user') navigate('/users/new');
+                else if (page === 'resetPassword') navigate('/users/reset-password');
                 else navigate('/');
               }}
             />
@@ -850,6 +856,26 @@ export function App() {
         />
 
         <Route
+          path="/users/new"
+          element={
+            <RegisterUserPage
+              onBack={() => navigate('/')}
+              onSaved={setMessage}
+            />
+          }
+        />
+
+        <Route
+          path="/users/reset-password"
+          element={
+            <ResetPasswordPage
+              onBack={() => navigate('/')}
+              onSaved={setMessage}
+            />
+          }
+        />
+
+        <Route
           path="/view"
           element={
             <BillingViewPage
@@ -862,8 +888,12 @@ export function App() {
         />
 
         {/* Catch-all: redirect to home */}
-        <Route path="*" element={<MasterPage items={homeItems} filter={homeFilter} onFilterChange={setHomeFilter} onNavigate={(page) => { if (page === 'form') navigate('/entry'); else if (page === 'data') navigate('/register'); else if (page === 'lr') navigate('/lr'); else navigate('/'); }} />} />
+        <Route path="*" element={<MasterPage items={homeItems} filter={homeFilter} onFilterChange={setHomeFilter} onNavigate={(page) => { if (page === 'form') navigate('/entry'); else if (page === 'data') navigate('/register'); else if (page === 'lr') navigate('/lr'); else if (page === 'user') navigate('/users/new'); else if (page === 'resetPassword') navigate('/users/reset-password'); else navigate('/'); }} />} />
       </Routes>
+
+      <footer className="app-copyright">
+        © {new Date().getFullYear()} Nalvel Logistics Services. All rights reserved.
+      </footer>
 
       {successPopup && (
         <section className="success-popup-backdrop" role="presentation" onClick={() => setSuccessPopup('')}>

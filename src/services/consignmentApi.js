@@ -148,7 +148,7 @@ export async function downloadConsignmentsExcel({
   customerName = "",
 } = {}) {
   const params = buildExportParams({ startDate, endDate, customerName });
-  console.log("Downloading Excel with params:", params);
+ 
 
   try {
     const response = await API.get(consignmentEndpoints.exportExcel(), {
@@ -156,8 +156,6 @@ export async function downloadConsignmentsExcel({
       responseType: "blob",
       withCredentials: true,
     });
-
-    console.log("Excel export response received");
 
     const blobData = response.data;
     const contentDisposition = response.headers["content-disposition"];
@@ -171,7 +169,6 @@ export async function downloadConsignmentsExcel({
     link.remove();
     window.URL.revokeObjectURL(urlBlob);
   } catch (err) {
-    console.error("Excel export failed", err);
     throw err;
   }
 }

@@ -83,7 +83,8 @@ export function Header({ activePage, editingId, loading, onBack, onClear }) {
       <div className="top-actions">
         {activePage !== "home" &&
           activePage !== "view" &&
-          activePage !== "lr" && (
+          activePage !== "lr" &&
+          activePage !== "user" && (
             <>
               {activePage !== "data" && (
                 <button

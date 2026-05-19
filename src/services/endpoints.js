@@ -25,6 +25,7 @@ const CONSIGNMENT_BASE = "/api/billing/consignment";
 const ADVANCE_PAYMENT_BASE = "/api/billing/advance-payment";
 const LR_BASE = "/api/billing/lr";
 const ADDITIONAL_FILE_BASE = "/api/billing/document";
+const AUTH_BASE = "/api/auth";
 
 export const consignmentEndpoints = {
   create: () => withApiBase(`${CONSIGNMENT_BASE}/save`),
@@ -110,4 +111,9 @@ export const additionalFileEndpoints = {
 
   deleteById: (id) =>
     withApiBase(`${ADDITIONAL_FILE_BASE}/${id}`),
+};
+
+export const userEndpoints = {
+  register: () => withApiBase(`${AUTH_BASE}/register`),
+  resetPassword: () => withApiBase(`${AUTH_BASE}/reset`),
 };
