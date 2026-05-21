@@ -38,7 +38,8 @@ const allowedAdditionalFileMimeTypes = new Set([
   "image/png",
 ]);
 const allowedAdditionalFileExtensions = new Set(["pdf", "jpeg", "jpg", "png"]);
-const additionalFileAccept = ".pdf,.jpeg,.jpg,.png,application/pdf,image/jpeg,image/png";
+const additionalFileAccept =
+  ".pdf,.jpeg,.jpg,.png,application/pdf,image/jpeg,image/png";
 
 const entryFormSteps = [
   { key: "basic", label: "Basic Info" },
@@ -116,7 +117,9 @@ export function EntryFormPage({
   const totalFreight =
     totalFreightBeforeGST + (totalFreightBeforeGST * gstPercent) / 100;
 
-  const profit = totalFreight - totalExpense;
+  const otherExpenses = Number(form.otherExpenses || 0);
+
+  const profit = totalFreight - totalExpense - otherExpenses;
 
   const isFirstStep = activeStep === 0;
   const isLastStep = activeStep === lastStepIndex;
@@ -294,86 +297,115 @@ export function EntryFormPage({
                 />
               </div>
 
-          <div className="field-row">
-            <div>
               <div className="field-row">
-                <Field
-                  label="Gross Weight"
-                  value={form.grossWeight}
-                  onChange={(value) => onUpdateField("grossWeight", value)}
-                  {...decimalNumberProps}
+                <div>
+                  {/* Row 1 */}
+                  <div className="field-row">
+                    <Field
+                      label="Gross Weight"
+                      value={form.grossWeight}
+                      onChange={(value) => onUpdateField("grossWeight", value)}
+                      {...decimalNumberProps}
+                    />
+
+                    <Field
+                      label="Tare Weight"
+                      value={form.tareWeight}
+                      onChange={(value) => onUpdateField("tareWeight", value)}
+                      {...decimalNumberProps}
+                    />
+                  </div>
+
+                  {/* Row 2 */}
+                  <div className="field-row">
+                    <Field
+                      label="Net Weight"
+                      value={
+                        Number(form.grossWeight || 0) > 0 &&
+                        Number(form.tareWeight || 0) > 0
+                          ? formatNetWeight(form.grossWeight, form.tareWeight)
+                          : form.netWeight || ""
+                      }
+                      readOnly={
+                        Number(form.grossWeight || 0) > 0 &&
+                        Number(form.tareWeight || 0) > 0
+                      }
+                      onChange={(value) => onUpdateField("netWeight", value)}
+                      {...decimalNumberProps}
+                    />
+
+                    <RadioGroup
+                      label="Net Weight Unit"
+                      name="weightUnit"
+                      value={form.weightUnit || "MT"}
+                      options={[
+                        { label: "MT", value: "MT" },
+                        { label: "KG", value: "KG" },
+                      ]}
+                      onChange={(value) => onUpdateField("weightUnit", value)}
+                    />
+                  </div>
+                </div>
+
+                <label className="field">
+                  <span>Material Description</span>
+                  <textarea
+                    rows={5}
+                    autoComplete="off"
+                    value={form.material}
+                    onChange={(event) =>
+                      onUpdateField("material", event.target.value)
+                    }
+                  />
+                </label>
+              </div>
+            </fieldset>
+
+            <fieldset className="form-section form-section-half">
+              <legend>Vehicle Info</legend>
+              <div className="field-row">
+                <AutocompleteField
+                  label="Truck No"
+                  value={form.truckNo}
+                  suggestions={suggestions.truck}
+                  onChange={(value) =>
+                    onUpdateField("truckNo", value.toUpperCase())
+                  }
                 />
-                <Field
-                  label="Tare Weight"
-                  value={form.tareWeight}
-                  onChange={(value) => onUpdateField("tareWeight", value)}
-                  {...decimalNumberProps}
+                <AutocompleteField
+                  label="Truck Type"
+                  value={form.truckType}
+                  suggestions={suggestions.truckType}
+                  onChange={(value) => onUpdateField("truckType", value)}
                 />
               </div>
-              <Field
-                label="Net Weight"
-                value={formatNetWeight(form.grossWeight, form.tareWeight)}
-                readOnly
-                {...decimalNumberProps}
+              <AutocompleteField
+                label="Owner / Transporter (Name)"
+                value={form.ownerName}
+                suggestions={suggestions.owner}
+                onChange={(value) => onUpdateField("ownerName", value)}
               />
-            </div>
-            <label className="field">
-              <span>Material Description</span>
-              <textarea
-                rows={5}
-                autoComplete="off"
-                value={form.material}
-                onChange={(event) =>
-                  onUpdateField("material", event.target.value)
-                }
-              />
-            </label>
-          </div>
-        </fieldset>
-
-        <fieldset className="form-section form-section-half">
-          <legend>Vehicle Info</legend>
-          <div className="field-row">
-            <AutocompleteField
-              label="Truck No"
-              value={form.truckNo}
-              suggestions={suggestions.truck}
-              onChange={(value) =>
-                onUpdateField("truckNo", value.toUpperCase())
-              }
-            />
-            <AutocompleteField
-              label="Truck Type"
-              value={form.truckType}
-              suggestions={suggestions.truckType}
-              onChange={(value) => onUpdateField("truckType", value)}
-            />
-          </div>
-          <AutocompleteField
-            label="Owner / Transporter (Name)"
-            value={form.ownerName}
-            suggestions={suggestions.owner}
-            onChange={(value) => onUpdateField("ownerName", value)}
-          />
-          <div className="field-row">
-            <AutocompleteField
-              label="Owner Primary Contact"
-              value={form.ownerPrimaryContact}
-              suggestions={suggestions.ownerPrimaryContact}
-              onChange={(value) => onUpdateField("ownerPrimaryContact", value)}
-              {...mobileProps}
-            />
-            <AutocompleteField
-              label="Owner Alternate Contact"
-              value={form.ownerAlternateContact}
-              suggestions={suggestions.ownerAlternateContact}
-              onChange={(value) =>
-                onUpdateField("ownerAlternateContact", value)
-              }
-              {...mobileProps}
-            />
-          </div>
-        </fieldset>
+              <div className="field-row">
+                <AutocompleteField
+                  label="Owner Primary Contact"
+                  value={form.ownerPrimaryContact}
+                  suggestions={suggestions.ownerPrimaryContact}
+                  onChange={(value) =>
+                    onUpdateField("ownerPrimaryContact", value)
+                  }
+                  {...mobileProps}
+                />
+                <AutocompleteField
+                  label="Owner Alternate Contact"
+                  value={form.ownerAlternateContact}
+                  suggestions={suggestions.ownerAlternateContact}
+                  onChange={(value) =>
+                    onUpdateField("ownerAlternateContact", value)
+                  }
+                  {...mobileProps}
+                />
+              </div>
+            </fieldset>
 
             <fieldset className="form-section form-section-half">
               <legend>Driver Info</legend>
@@ -442,64 +474,64 @@ export function EntryFormPage({
                 {...decimalNumberProps}
               />
 
-            <Field
-              label="Halting Charge"
-              value={form.haltingCharge}
-              onChange={(value) => onUpdateField("haltingCharge", value)}
-              {...decimalNumberProps}
+              <Field
+                label="Halting Charge"
+                value={form.haltingCharge}
+                onChange={(value) => onUpdateField("haltingCharge", value)}
+                {...decimalNumberProps}
+              />
+            </div>
+            <div className="field-row">
+              <Field
+                label="Parking Charge"
+                value={form.parkingCharge}
+                onChange={(value) => onUpdateField("parkingCharge", value)}
+                {...decimalNumberProps}
+              />
+              <Field
+                label="Payable Amount"
+                value={Math.floor(Number(form.ledgerAmount || 0))}
+                readOnly
+                onChange={(value) => onUpdateField("ledgerAmount", value)}
+                {...decimalNumberProps}
+              />
+            </div>
+            <div className="field-row">
+              <Field
+                label="Commission"
+                value={form.commission}
+                onChange={(value) => onUpdateField("commission", value)}
+                {...decimalNumberProps}
+              />
+            </div>
+            <AdvanceEntriesField
+              entries={form.advanceEntries}
+              formBalance={form.balance}
+              onChange={(nextEntries) =>
+                onUpdateField("advanceEntries", nextEntries)
+              }
             />
-          </div>
-          <div className="field-row">
-            <Field
-              label="Parking Charge"
-              value={form.parkingCharge}
-              onChange={(value) => onUpdateField("parkingCharge", value)}
-              {...decimalNumberProps}
-            />
-            <Field
-              label="Payable Amount"
-              value={Math.floor(Number(form.ledgerAmount || 0))}
-              readOnly
-              onChange={(value) => onUpdateField("ledgerAmount", value)}
-              {...decimalNumberProps}
-            />
-          </div>
-          <div className="field-row">
-            <Field
-              label="Commission"
-              value={form.commission}
-              onChange={(value) => onUpdateField("commission", value)}
-              {...decimalNumberProps}
-            />
-          </div>
-          <AdvanceEntriesField
-            entries={form.advanceEntries}
-            formBalance={form.balance}
-            onChange={(nextEntries) =>
-              onUpdateField("advanceEntries", nextEntries)
-            }
-          />
-          <div className="field-row">
-            <Field
-              label="Total Amount Paid"
-              value={Math.floor(Number(form.totalAdvance || 0))}
-              readOnly
-              onChange={(value) => onUpdateField("totalAdvance", value)}
-              {...decimalNumberProps}
-            />
-            <label className="field">
-              <span>Balance</span>
+            <div className="field-row">
+              <Field
+                label="Total Amount Paid"
+                value={Math.floor(Number(form.totalAdvance || 0))}
+                readOnly
+                onChange={(value) => onUpdateField("totalAdvance", value)}
+                {...decimalNumberProps}
+              />
+              <label className="field">
+                <span>Balance</span>
 
-              <div className="status-input-wrapper">
-                <input
-                  value={
-                    Number(form.balance || 0) > 0
-                      ? Math.floor(Number(form.balance || 0))
-                      : 0
-                  }
-                  readOnly
-                  {...decimalNumberProps}
-                />
+                <div className="status-input-wrapper">
+                  <input
+                    value={
+                      Number(form.balance || 0) > 0
+                        ? Math.floor(Number(form.balance || 0))
+                        : 0
+                    }
+                    readOnly
+                    {...decimalNumberProps}
+                  />
 
                   <span
                     className={`inline-payment-status ${
@@ -588,6 +620,7 @@ export function EntryFormPage({
                 {...decimalNumberProps}
               />
             </div>
+            {/* Row 1 */}
             <div className="field-row">
               <Field
                 label="Additional Charge"
@@ -595,6 +628,17 @@ export function EntryFormPage({
                 onChange={(value) => onUpdateField("additionalCharges", value)}
                 {...decimalNumberProps}
               />
+
+              <Field
+                label="Other Expense"
+                value={form.otherExpenses}
+                onChange={(value) => onUpdateField("otherExpenses", value)}
+                {...decimalNumberProps}
+              />
+            </div>
+
+            {/* Row 2 */}
+            <div className="field-row">
               <Field
                 label="Total Expense"
                 value={Math.ceil(totalExpense)}
@@ -602,8 +646,7 @@ export function EntryFormPage({
                 onChange={(value) => onUpdateField("expenses", value)}
                 {...decimalNumberProps}
               />
-            </div>
-            <div className="field-row">
+
               <Field
                 label="Total Freight Amount(incl. GST)"
                 value={Math.ceil(totalFreight)}
@@ -611,6 +654,10 @@ export function EntryFormPage({
                 onChange={(value) => onUpdateField("netFreight", value)}
                 {...decimalNumberProps}
               />
+            </div>
+
+            {/* Row 3 */}
+            <div className="field-row">
               <Field
                 label="Profit"
                 value={Math.ceil(profit)}
@@ -697,7 +744,11 @@ export function EntryFormPage({
             {editingId ? "Update Entry" : "Save Entry"}
           </button>
         ) : (
-          <button type="button" className="btn primary" onClick={handleNextStep}>
+          <button
+            type="button"
+            className="btn primary"
+            onClick={handleNextStep}
+          >
             Continue
           </button>
         )}
@@ -738,7 +789,12 @@ function RadioGroup({
   );
 }
 
-function AdvanceEntriesField({ entries, onChange, formBalance, readOnly = false }) {
+function AdvanceEntriesField({
+  entries,
+  onChange,
+  formBalance,
+  readOnly = false,
+}) {
   const rows =
     Array.isArray(entries) && entries.length > 0
       ? entries
@@ -815,7 +871,15 @@ function AdditionalFilesField({ files = [], onChange }) {
   const rows =
     Array.isArray(files) && files.length > 0
       ? files
-      : [{ id: "file-empty-1", file: null, name: "", fileName: "", uploaded: false }];
+      : [
+          {
+            id: "file-empty-1",
+            file: null,
+            name: "",
+            fileName: "",
+            uploaded: false,
+          },
+        ];
 
   function updateRow(index, nextRow) {
     onChange(rows.map((row, rowIndex) => (rowIndex === index ? nextRow : row)));
@@ -826,7 +890,15 @@ function AdditionalFilesField({ files = [], onChange }) {
     onChange(
       nextRows.length > 0
         ? nextRows
-        : [{ id: "file-empty-1", file: null, name: "", fileName: "", uploaded: false }],
+        : [
+            {
+              id: "file-empty-1",
+              file: null,
+              name: "",
+              fileName: "",
+              uploaded: false,
+            },
+          ],
     );
   }
 
@@ -864,7 +936,13 @@ function AdditionalFilesField({ files = [], onChange }) {
   function addRow() {
     onChange([
       ...rows,
-      { id: `file-${Date.now()}`, file: null, name: "", fileName: "", uploaded: false },
+      {
+        id: `file-${Date.now()}`,
+        file: null,
+        name: "",
+        fileName: "",
+        uploaded: false,
+      },
     ]);
   }
 

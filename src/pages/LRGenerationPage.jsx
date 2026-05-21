@@ -59,6 +59,7 @@ const emptyLRForm = {
   description: "",
   actualWeight: "",
   chargedWeight: "",
+  weightUnit: "",
   invoiceValue: "",
   freight: "",
   surcharge: "",
@@ -113,8 +114,8 @@ function lrRecordToForm(record, currentForm = {}) {
     risk: record?.riskType ?? "",
     invoiceValue: record?.declaredValue ?? "",
     noOfPackages: record?.noOfPkgs ?? "",
-    description: record?.description ?? "",
-    actualWeight: record?.actualWt ?? "",
+    description: record?.description ?? record?.materialDescription ?? "",
+    actualWeight: record?.actualWt ?? record?.netWeight ?? "",
     chargedWeight: record?.chargedWt ?? "",
     freight: record?.freightRs ?? "",
     surcharge: record?.surchargeRs ?? "",
@@ -377,6 +378,9 @@ export function LRGenerationPage({ onBack, onSaved }) {
         to:
           current.to || prefill?.toLocation || prefill?.consigneeAddress || "",
         consigneeGstin: prefill?.consigneeGstin ?? current.consigneeGstin ?? "",
+        description: prefill?.materialDescription ?? current.description ?? "",
+        actualWeight: prefill?.netWeight ?? current.actualWeight ?? "",
+        weightUnit: prefill?.weightUnit ?? current.weightUnit ?? "",
       }));
       setLookupMessage(
         `No LR found yet. Loaded consignment prefill from backend for S.No ${prefill?.savedDataSNo || serialNo}`,
@@ -838,10 +842,12 @@ export function LRGenerationPage({ onBack, onSaved }) {
                       <td className="pkg-weight-cell">
                         <div className="pkg-weight-label">Actual</div>
                         <input
-                          value={form.actualWeight}
-                          onChange={(e) =>
-                            updateField("actualWeight", e.target.value)
+                          value={
+                            form.actualWeight
+                              ? `${form.actualWeight} ${form.weightUnit || ""}`
+                              : ""
                           }
+                          readOnly
                         />
                       </td>
                     </tr>
@@ -1310,7 +1316,14 @@ function LRPrintDuplicate({ form, copyIndex, copyLabel }) {
                   </td>
                   <td className="pkg-weight-cell">
                     <div className="pkg-weight-label">Actual</div>
-                    <input value={form.actualWeight} readOnly />
+                    <input
+                      value={
+                        form.actualWeight
+                          ? `${form.actualWeight} ${form.weightUnit || ""}`
+                          : ""
+                      }
+                      readOnly
+                    />
                   </td>
                 </tr>
                 <tr>
@@ -1576,7 +1589,11 @@ function LRPreview({ form }) {
                   <tr>
                     <td>{form.noOfPackages || "-"}</td>
                     <td>{form.description || "-"}</td>
-                    <td className="txt-right">{form.actualWeight || "-"}</td>
+                    <td className="txt-right">
+                      {form.actualWeight
+                        ? `${form.actualWeight} ${form.weightUnit || ""}`
+                        : "-"}
+                    </td>
                     <td className="txt-right">{form.chargedWeight || "-"}</td>
                   </tr>
                   <tr>
