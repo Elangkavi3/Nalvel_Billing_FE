@@ -132,44 +132,18 @@ export function SavedDataPage({
       <section className="list-panel">
         <div className="list-head">
           <div>
-            <p className="eyebrow">Register</p>
             <h2>Saved consignments</h2>
             <p className="subline">Showing maximum 10 records per page</p>
           </div>
-          <div className="data-actions">
-            <div className="data-primary-actions">
-              <button
-                type="button"
-                className="btn secondary"
-                onClick={onExportExcel}
-                disabled={loading}
-              >
-                Export Excel
-              </button>
-            </div>
-            <form className="search-row" onSubmit={onSearch}>
-              <input
-                placeholder="Search exact customer name"
-                value={searchName}
-                onChange={(event) => onSearchNameChange(event.target.value)}
-              />
-              <button
-                className="btn secondary"
-                type="submit"
-                disabled={loading}
-              >
-                Search
-              </button>
-              <button
-                className="btn ghost"
-                type="button"
-                onClick={onLoadAll}
-                disabled={loading}
-              >
-                All
-              </button>
-            </form>
-          </div>
+
+          <button
+            type="button"
+            className="btn secondary export-btn"
+            onClick={onExportExcel}
+            disabled={loading}
+          >
+            Export Excel
+          </button>
         </div>
 
         <div className="saved-filter-section">
@@ -177,8 +151,10 @@ export function SavedDataPage({
             filter={filter}
             onFilterChange={onFilterChange}
             showBillingFilters
-            dateGroupLabel="Saved data date filters"
-            billingGroupLabel="Saved data billing filters"
+            searchName={searchName}
+            onSearch={onSearch}
+            onSearchNameChange={onSearchNameChange}
+            onLoadAll={onLoadAll}
           />
         </div>
 
