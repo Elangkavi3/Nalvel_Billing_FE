@@ -428,12 +428,12 @@
 
 .lr-ui-page .charge-table th:nth-child(2),
 .lr-ui-page .charge-table td:nth-child(2) {
-  width: 20%;
+  width: 36%;
 }
 
 .lr-ui-page .charge-table th:nth-child(3),
 .lr-ui-page .charge-table td:nth-child(3) {
-  width: 36%;
+  width: 20%;
 }
 
 .lr-ui-page .pkg-table tbody tr:first-child td,

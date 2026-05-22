@@ -935,8 +935,8 @@ export function LRGenerationPage({ onBack, onSaved }) {
                   <thead>
                     <tr>
                       <th>Charge Type</th>
-                      <th>Rate Per</th>
                       <th>Rs.</th>
+                      <th>p</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1420,8 +1420,8 @@ function LRPrintDuplicate({ form, copyIndex, copyLabel }) {
               <thead>
                 <tr>
                   <th>Charge Type</th>
-                  <th>Rate Per</th>
                   <th>Rs.</th>
+                  <th>P</th>
                 </tr>
               </thead>
               <tbody>
