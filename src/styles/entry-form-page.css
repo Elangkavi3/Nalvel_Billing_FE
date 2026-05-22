@@ -39,6 +39,20 @@
   padding: 14px 16px;
   border-bottom: 1px solid var(--line);
   background: #f4faf8;
+
+  position: sticky;
+  top: 62px;
+  z-index: 999;
+
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+.entry-panel,
+.entry-layout {
+  overflow: visible !important;
+}
+.entry-layout {
+  position: relative;
+  z-index: 1;
 }
 
 .entry-step {
@@ -126,28 +140,40 @@ fieldset {
   margin-bottom: 10px;
 }
 
+.gst-options-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.gst-amount-inline {
+  margin-left: auto;
+  font-weight: 700;
+  font-size: 18px;
+}
+
 /* RADIO GROUP */
 .radio-group {
   margin: 0;
-  padding: 10px 12px;
+  padding: 4px 12px 8px;
   border: 1px solid var(--line);
   border-radius: 0;
   background: var(--soft);
+
+  min-height: 58px;
 }
 
 .radio-group legend {
   padding: 0 6px;
-  border-radius: 0;
-  background: var(--soft);
-  color: var(--accent-dark);
   font-size: 12px;
   font-weight: 800;
 }
 
 .radio-options {
   display: flex;
+  align-items: center;
   gap: 10px;
-  flex-wrap: wrap;
+  margin-top: -2px;
 }
 
 .radio-option {
@@ -601,4 +627,22 @@ fieldset {
 .inline-payment-status.pending {
   background: #ffe5cc;
   color: #cc6a00;
+}
+
+.supplier-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.supplier-full {
+  grid-column: 1 / -1;
+}
+
+/* wrapper for last row */
+.payment-row {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
 }

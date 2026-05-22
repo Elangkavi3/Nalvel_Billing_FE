@@ -4,8 +4,8 @@ export function Header({ activePage, editingId, loading, onBack, onClear }) {
   const navigate = useNavigate();
 
   function handleLogout() {
-    localStorage.removeItem('token');
-    window.location.href = 'http://nalvel.com/';
+    localStorage.removeItem("token");
+    window.location.href = "http://nalvel.com/";
   }
 
   return (
@@ -62,20 +62,13 @@ export function Header({ activePage, editingId, loading, onBack, onClear }) {
           LR Generation
         </NavLink>
         <div className="topbar-user">
-          <div
-            className="nl-avatar"
-            onClick={() => navigate("/")}
-            style={{ cursor: "pointer" }}
-            title="Home"
-          >
-            NL
-          </div>
           <button
             type="button"
-            className="topbar-logout"
-            onClick={handleLogout}
+            className="btn secondary"
+            onClick={() => navigate("/")}
+            title="Home"
           >
-            Logout
+            Home
           </button>
         </div>
       </div>
@@ -97,18 +90,21 @@ export function Header({ activePage, editingId, loading, onBack, onClear }) {
               )}
             </>
           )}
+
         {activePage === "form" && (
-          <>
-            <button
-              type="submit"
-              className="btn primary"
-              form="consignment-form"
-              disabled={loading}
-            >
-              {editingId ? "Update Entry" : "Save Entry"}
-            </button>
-          </>
+          <button
+            type="submit"
+            className="btn primary"
+            form="consignment-form"
+            disabled={loading}
+          >
+            {editingId ? "Update Entry" : "Save Entry"}
+          </button>
         )}
+
+        <button type="button" className="btn logout-btn" onClick={handleLogout}>
+          Logout
+        </button>
       </div>
     </section>
   );
