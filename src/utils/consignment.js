@@ -112,12 +112,13 @@ export function calculateConsignmentValues(form = {}) {
     calculatedFreightBookingCost ||
     Number(form.freightBookingCost ?? form.customerRate ?? 0);
   const totalExpense = payableAmount;
-  const gstPercentage = Number(form.gstType || 0);
+  const isGSTBilling = form.viewMode === "GST";
+  const gstPercentage = isGSTBilling ? Number(form.gstType || 0) : 0;
   const taxableFreight = freightBookingCost + additionalCharges;
   const gstAmount = (taxableFreight * gstPercentage) / 100;
   const netFreight = taxableFreight + gstAmount;
   const otherExpenses = Number(form.otherExpenses || 0);
-  const profit = netFreight - totalExpense - otherExpenses;
+  const profit = taxableFreight - totalExpense - otherExpenses;
 
   const balance = netPaymentBalance - totalAdvance;
   const paymentStatus = balanceStatus(balance);
@@ -199,8 +200,14 @@ export function buildConsignmentPayload(form) {
     balancePaymentStatus: paymentStatus,
     supplierPaymentMode: supplierPaymentModeValue(calculatedForm.paymentType),
     truckpaymentMode: calculatedForm.truckpaymentMode ?? "",
-    gstType: calculatedForm.gstType ? toNumber(calculatedForm.gstType) : null,
-    gstAmount: numberField(calculatedForm, "gstAmount"),
+    gstType:
+      calculatedForm.viewMode === "GST"
+        ? toNumber(calculatedForm.gstType)
+        : null,
+    gstAmount:
+      calculatedForm.viewMode === "GST"
+        ? numberField(calculatedForm, "gstAmount")
+        : 0,
     profitFixedCost:
       supplierRateType === "fixed_cost"
         ? numberField(calculatedForm, "profitFixedCost")

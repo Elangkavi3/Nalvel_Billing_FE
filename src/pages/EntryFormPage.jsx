@@ -108,18 +108,21 @@ export function EntryFormPage({
 
   const additionalCharge = Number(form.additionalCharges || 0);
 
-  const gstPercent = Number(form.gstType || 0);
+  const isGSTBilling = form.viewMode === "GST";
+
+  const gstPercent = isGSTBilling ? Number(form.gstType || 0) : 0;
 
   const totalExpense = Number(form.ledgerAmount || 0);
 
   const totalFreightBeforeGST = customerBaseAmount + additionalCharge;
 
-  const totalFreight =
-    totalFreightBeforeGST + (totalFreightBeforeGST * gstPercent) / 100;
+  const gstAmount = (totalFreightBeforeGST * gstPercent) / 100;
+
+  const totalFreight = totalFreightBeforeGST + gstAmount;
 
   const otherExpenses = Number(form.otherExpenses || 0);
 
-  const profit = totalFreight - totalExpense - otherExpenses;
+  const profit = totalFreightBeforeGST - totalExpense - otherExpenses;
 
   const isFirstStep = activeStep === 0;
   const isLastStep = activeStep === lastStepIndex;
@@ -219,7 +222,13 @@ export function EntryFormPage({
                     { label: "GST Invoice", value: "GST" },
                     { label: "IMS No", value: "IMS" },
                   ]}
-                  onChange={(value) => onUpdateField("viewMode", value)}
+                  onChange={(value) => {
+                    onUpdateField("viewMode", value);
+
+                    if (value === "IMS") {
+                      onUpdateField("gstType", "");
+                    }
+                  }}
                   required
                 />
 
@@ -602,7 +611,6 @@ export function EntryFormPage({
                     label="GST Type"
                     name="gstType"
                     value={form.gstType}
-                    required={Boolean(form.gstNo && form.gstNo.trim())}
                     options={[
                       { label: "18%", value: "18" },
                       { label: "5%", value: "5" },
@@ -648,7 +656,11 @@ export function EntryFormPage({
               />
 
               <Field
-                label="Total Freight Amount(incl. GST)"
+                label={
+                  form.viewMode === "GST"
+                    ? "Total Freight Amount (incl. GST)"
+                    : "Total Freight Amount"
+                }
                 value={Math.ceil(totalFreight)}
                 readOnly
                 onChange={(value) => onUpdateField("netFreight", value)}
