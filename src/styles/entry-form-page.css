@@ -628,3 +628,21 @@ fieldset {
   background: #ffe5cc;
   color: #cc6a00;
 }
+
+.supplier-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.supplier-full {
+  grid-column: 1 / -1;
+}
+
+/* wrapper for last row */
+.payment-row {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}

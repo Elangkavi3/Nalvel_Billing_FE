@@ -458,7 +458,9 @@ export function EntryFormPage({
         {activeStep === 1 && (
           <fieldset className="form-section form-section-wide">
             <legend>Supplier Billing</legend>
-            <div className="field-row">
+
+            <div className="supplier-grid">
+              {/* Row 1 */}
               <SelectField
                 label="Freight Amount Type"
                 value={form.supplierRateType}
@@ -476,6 +478,7 @@ export function EntryFormPage({
                 onChange={(value) => onUpdateField("supplierAmount", value)}
                 {...decimalNumberProps}
               />
+
               <Field
                 label="Chargeable Weight"
                 value={form.chargeableWeight}
@@ -483,65 +486,50 @@ export function EntryFormPage({
                 {...decimalNumberProps}
               />
 
+              {/* Row 2 */}
               <Field
                 label="Halting Charge"
                 value={form.haltingCharge}
-                onChange={(value) => onUpdateField("haltingCharge", value)}
+                onChange={(v) => onUpdateField("haltingCharge", v)}
                 {...decimalNumberProps}
               />
-            </div>
-            <div className="field-row">
+
               <Field
                 label="Parking Charge"
                 value={form.parkingCharge}
-                onChange={(value) => onUpdateField("parkingCharge", value)}
+                onChange={(v) => onUpdateField("parkingCharge", v)}
                 {...decimalNumberProps}
               />
+
+              <Field
+                label="Commission"
+                value={form.commission}
+                onChange={(v) => onUpdateField("commission", v)}
+                {...decimalNumberProps}
+              />
+
+              {/* Row 3 */}
               <Field
                 label="Payable Amount"
                 value={Math.floor(Number(form.ledgerAmount || 0))}
                 readOnly
-                onChange={(value) => onUpdateField("ledgerAmount", value)}
                 {...decimalNumberProps}
               />
-            </div>
-            <div className="field-row">
-              <Field
-                label="Commission"
-                value={form.commission}
-                onChange={(value) => onUpdateField("commission", value)}
-                {...decimalNumberProps}
-              />
-            </div>
-            <AdvanceEntriesField
-              entries={form.advanceEntries}
-              formBalance={form.balance}
-              onChange={(nextEntries) =>
-                onUpdateField("advanceEntries", nextEntries)
-              }
-            />
-            <div className="field-row">
+
               <Field
                 label="Total Amount Paid"
                 value={Math.floor(Number(form.totalAdvance || 0))}
                 readOnly
-                onChange={(value) => onUpdateField("totalAdvance", value)}
                 {...decimalNumberProps}
               />
-              <label className="field">
-                <span>Balance</span>
 
+              <div className="field">
+                <span>Balance</span>
                 <div className="status-input-wrapper">
                   <input
-                    value={
-                      Number(form.balance || 0) > 0
-                        ? Math.floor(Number(form.balance || 0))
-                        : 0
-                    }
+                    value={Math.floor(Number(form.balance || 0))}
                     readOnly
-                    {...decimalNumberProps}
                   />
-
                   <span
                     className={`inline-payment-status ${
                       Number(form.balance || 0) <= 0 ? "paid" : "pending"
@@ -550,30 +538,36 @@ export function EntryFormPage({
                     {Number(form.balance || 0) <= 0 ? "PAID" : "PENDING"}
                   </span>
                 </div>
-              </label>
-              {Number(form.balance || 0) < 0 && (
-                <Field
-                  label="Excess"
-                  value={Math.floor(Math.abs(Number(form.balance || 0)))}
-                  readOnly
-                  {...decimalNumberProps}
+              </div>
+
+              {/* Row 4 (ONLY AdvanceEntriesField) */}
+              <div className="supplier-full">
+                <AdvanceEntriesField
+                  entries={form.advanceEntries}
+                  formBalance={form.balance}
+                  onChange={(nextEntries) =>
+                    onUpdateField("advanceEntries", nextEntries)
+                  }
                 />
-              )}
-            </div>
-            <div className="field-row">
-              <SelectField
-                label="Payment Type Options"
-                value={form.paymentType}
-                options={PaymentTypeOptions}
-                onChange={(value) => onUpdateField("paymentType", value)}
-              />
-              <SelectField
-                label="Truck Pay Mode"
-                value={form.truckpaymentMode}
-                options={paymentModeOptions}
-                required
-                onChange={(value) => onUpdateField("truckpaymentMode", value)}
-              />
+              </div>
+
+              {/* Row 5 */}
+              <div className="payment-row">
+                <SelectField
+                  label="Payment Type Options"
+                  value={form.paymentType}
+                  options={PaymentTypeOptions}
+                  onChange={(value) => onUpdateField("paymentType", value)}
+                />
+
+                <SelectField
+                  label="Truck Pay Mode"
+                  value={form.truckpaymentMode}
+                  options={paymentModeOptions}
+                  required
+                  onChange={(value) => onUpdateField("truckpaymentMode", value)}
+                />
+              </div>
             </div>
           </fieldset>
         )}
