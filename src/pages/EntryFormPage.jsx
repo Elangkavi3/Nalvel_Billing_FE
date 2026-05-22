@@ -545,6 +545,7 @@ export function EntryFormPage({
                 <AdvanceEntriesField
                   entries={form.advanceEntries}
                   formBalance={form.balance}
+                  payableAmount={form.ledgerAmount}
                   onChange={(nextEntries) =>
                     onUpdateField("advanceEntries", nextEntries)
                   }
@@ -820,6 +821,7 @@ function AdvanceEntriesField({
   entries,
   onChange,
   formBalance,
+  payableAmount,
   readOnly = false,
 }) {
   const rows =
@@ -848,7 +850,9 @@ function AdvanceEntriesField({
         <div key={entry.id ?? index} className="advance-row">
           <label className="field advance-entry-field">
             <span>
-              {index === rows.length - 1 && Number(formBalance || 0) <= 0
+              {index === rows.length - 1 &&
+              Number(payableAmount || 0) > 0 &&
+              Number(formBalance || 0) <= 0
                 ? "Final Amount"
                 : `Advance ${index + 1}`}
             </span>
