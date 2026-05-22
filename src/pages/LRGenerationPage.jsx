@@ -505,6 +505,17 @@ export function LRGenerationPage({ onBack, onSaved }) {
     }
   }
 
+  function clearLRForm() {
+    setForm({
+      ...emptyLRForm,
+      lrDate: todayKey(),
+    });
+
+    setPackages([""]);
+    setLookupMessage("");
+    setSavePopup("");
+  }
+
   return (
     <section className="lr-page">
       <div className="lr-workspace">
@@ -530,6 +541,15 @@ export function LRGenerationPage({ onBack, onSaved }) {
             >
               Fill
             </button>
+
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={clearLRForm}
+            >
+              Clear
+            </button>
+
             <button
               type="button"
               className="btn btn-secondary"

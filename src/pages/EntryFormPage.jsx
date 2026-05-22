@@ -581,7 +581,8 @@ export function EntryFormPage({
         {activeStep === 2 && (
           <fieldset className="form-section form-section-wide">
             <legend>Our Rate & Profit</legend>
-            <div className="field-row">
+            {/* Row 1 */}
+            <div className="field-row field-row-3">
               <Field
                 label={isCostPerMt ? "Our Cost Per MT" : "Our Fixed Cost"}
                 value={ourRateAmount}
@@ -602,34 +603,59 @@ export function EntryFormPage({
                 }
                 {...decimalNumberProps}
               />
+
+              {form.viewMode === "GST" ? (
+                <div className="inline-option-block">
+                  <fieldset className="radio-group">
+                    <legend>GST Type</legend>
+
+                    <div className="radio-options gst-options-row">
+                      <label className="radio-option">
+                        <input
+                          type="radio"
+                          name="gstType"
+                          value="18"
+                          checked={form.gstType === "18"}
+                          onChange={(e) =>
+                            onUpdateField("gstType", e.target.value)
+                          }
+                        />
+                        <span>18%</span>
+                      </label>
+
+                      <label className="radio-option">
+                        <input
+                          type="radio"
+                          name="gstType"
+                          value="5"
+                          checked={form.gstType === "5"}
+                          onChange={(e) =>
+                            onUpdateField("gstType", e.target.value)
+                          }
+                        />
+                        <span>5%</span>
+                      </label>
+
+                      <span className="gst-amount-inline">
+                        ₹{Math.ceil(gstAmount)}
+                      </span>
+                    </div>
+                  </fieldset>
+                </div>
+              ) : (
+                <div></div>
+              )}
             </div>
 
-            <div className="field-row">
-              {form.viewMode === "GST" && (
-                <div className="inline-option-block">
-                  <RadioGroup
-                    label="GST Type"
-                    name="gstType"
-                    value={form.gstType}
-                    options={[
-                      { label: "18%", value: "18" },
-                      { label: "5%", value: "5" },
-                    ]}
-                    onChange={(value) => onUpdateField("gstType", value)}
-                  />
-                </div>
-              )}
-
+            {/* Row 2 */}
+            <div className="field-row field-row-3">
               <Field
                 label="Freight Booking Cost"
                 value={Math.ceil(customerBaseAmount)}
                 readOnly
-                onChange={(value) => onUpdateField("customerRate", value)}
                 {...decimalNumberProps}
               />
-            </div>
-            {/* Row 1 */}
-            <div className="field-row">
+
               <Field
                 label="Additional Charge"
                 value={form.additionalCharges}
@@ -645,13 +671,12 @@ export function EntryFormPage({
               />
             </div>
 
-            {/* Row 2 */}
-            <div className="field-row">
+            {/* Row 3 */}
+            <div className="field-row field-row-3">
               <Field
                 label="Total Expense"
                 value={Math.ceil(totalExpense)}
                 readOnly
-                onChange={(value) => onUpdateField("expenses", value)}
                 {...decimalNumberProps}
               />
 
@@ -663,21 +688,17 @@ export function EntryFormPage({
                 }
                 value={Math.ceil(totalFreight)}
                 readOnly
-                onChange={(value) => onUpdateField("netFreight", value)}
                 {...decimalNumberProps}
               />
-            </div>
 
-            {/* Row 3 */}
-            <div className="field-row">
               <Field
                 label="Profit"
                 value={Math.ceil(profit)}
                 readOnly
-                onChange={(value) => onUpdateField("profit", value)}
                 {...decimalNumberProps}
               />
             </div>
+
             <div className="field-row">
               <Field
                 label="LR No."

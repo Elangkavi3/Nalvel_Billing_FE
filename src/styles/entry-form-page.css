@@ -39,6 +39,20 @@
   padding: 14px 16px;
   border-bottom: 1px solid var(--line);
   background: #f4faf8;
+
+  position: sticky;
+  top: 62px;
+  z-index: 999;
+
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+.entry-panel,
+.entry-layout {
+  overflow: visible !important;
+}
+.entry-layout {
+  position: relative;
+  z-index: 1;
 }
 
 .entry-step {
@@ -124,6 +138,18 @@ fieldset {
 /* INLINE OPTION BLOCK */
 .inline-option-block {
   margin-bottom: 10px;
+}
+
+.gst-options-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.gst-amount-inline {
+  margin-left: auto;
+  font-weight: 700;
+  font-size: 18px;
 }
 
 /* RADIO GROUP */
