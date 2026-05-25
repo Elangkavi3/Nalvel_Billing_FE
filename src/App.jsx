@@ -15,7 +15,6 @@ import {
   downloadConsignmentsExcel,
   getAllConsignments,
   saveConsignment,
-  searchConsignmentsByCustomer,
   getFilteredConsignments,
   updateConsignment,
 } from './services/consignmentApi.js';
@@ -271,6 +270,14 @@ function resolveExportDateRange(filter) {
   }
 
   return { startDate: '', endDate: '' };
+}
+
+function resolveBillingType(filter) {
+  const gstSelected = Boolean(filter?.gstSelected);
+  const imsSelected = Boolean(filter?.imsSelected);
+  if (gstSelected && !imsSelected) return 'GST';
+  if (imsSelected && !gstSelected) return 'IMS';
+  return '';
 }
 
 export function App() {
@@ -738,20 +745,24 @@ export function App() {
 
   async function searchByCustomer(event) {
     event.preventDefault();
-    if (!searchName.trim()) {
-      await loadData();
-      return;
-    }
 
     setLoading(true);
     setError('');
     try {
-      const consignments = await searchConsignmentsByCustomer(searchName.trim());
-      setItems(consignments);
+      const effectiveFilter = normalizeBillingFilter(dataFilter);
+      const consignments = await getFilteredConsignments({
+        mode: effectiveFilter.mode,
+        from: effectiveFilter.from,
+        to: effectiveFilter.to,
+        gstSelected: effectiveFilter.gstSelected,
+        imsSelected: effectiveFilter.imsSelected,
+        customerName: searchName.trim(),
+      });
+      setRegisterFilteredItems(consignments);
       setCurrentPage(1);
-      setMessage(`${consignments.length} matches for ${searchName.trim()}`);
+      setMessage(`${consignments.length} matches found`);
     } catch (err) {
-      setError(getErrorMessage(err, 'Unable to search customer'));
+      setError(getErrorMessage(err, 'Unable to search consignments'));
     } finally {
       setLoading(false);
     }
@@ -766,6 +777,7 @@ export function App() {
         startDate,
         endDate,
         customerName: searchName.trim(),
+        billingType: resolveBillingType(dataFilter),
       });
       setMessage('Consignment Excel exported successfully');
     } catch (err) {

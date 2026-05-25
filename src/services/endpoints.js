@@ -17,10 +17,6 @@ function withApiBase(path) {
   return `${base}/${normalizedPath}`;
 }
 
-function toQuery(params) {
-  return new URLSearchParams(params).toString();
-}
-
 const CONSIGNMENT_BASE = "/api/billing/consignment";
 const ADVANCE_PAYMENT_BASE = "/api/billing/advance-payment";
 const LR_BASE = "/api/billing/lr";
@@ -32,21 +28,11 @@ export const consignmentEndpoints = {
   readAll: () => withApiBase(`${CONSIGNMENT_BASE}/getAllData`),
   exportExcel: () => withApiBase(`${CONSIGNMENT_BASE}/excel`),
   readById: (id) => withApiBase(`${CONSIGNMENT_BASE}/${id}`),
-  readByCustomer: (name) =>
-    withApiBase(`${CONSIGNMENT_BASE}/byCustomer?${toQuery({ name })}`),
+  search: () => withApiBase(`${CONSIGNMENT_BASE}/search`),
   updateById: (id) =>
     withApiBase(`${CONSIGNMENT_BASE}/update/${id}`),
   deleteById: (id) =>
     withApiBase(`${CONSIGNMENT_BASE}/${id}`),
-  readByDateRange: (startDate, endDate) =>
-    withApiBase(
-      `${CONSIGNMENT_BASE}/filter?${toQuery({
-        startDate,
-        endDate,
-      })}`
-    ),
-  readFilteredData: (params) =>
-    withApiBase(`${CONSIGNMENT_BASE}/filterData?${toQuery(params)}`),
   readTodaySummary: () =>
     withApiBase(`${CONSIGNMENT_BASE}/today`),
   readWeekSummary: () =>
