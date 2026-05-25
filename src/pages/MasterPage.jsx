@@ -48,7 +48,8 @@ export function MasterPage({ items = [], filter, onFilterChange, onNavigate }) {
     
       </div>
 
-      <div className="home-actions">
+      <div className="home-actions"> 
+        {/* coloum incremented to 3 from 5 */}
         <button type="button" className="home-action" onClick={() => onNavigate('form')}>
           <small>New Work</small>
           <span>Entry Form</span>
@@ -67,7 +68,7 @@ export function MasterPage({ items = [], filter, onFilterChange, onNavigate }) {
           <strong>Create loading receipt from saved data</strong>
         </button>
 
-        <button type="button" className="home-action" onClick={() => onNavigate('user')}>
+        {/* <button type="button" className="home-action" onClick={() => onNavigate('user')}>
           <small>Access</small>
           <span>Register User</span>
           <strong>Add a new user login for this billing workspace</strong>
@@ -77,7 +78,7 @@ export function MasterPage({ items = [], filter, onFilterChange, onNavigate }) {
           <small>Access</small>
           <span>Reset Password</span>
           <strong>Set a new password for an existing user</strong>
-        </button>
+        </button> */}
       </div>
 
       <div className="home-filter-section">
