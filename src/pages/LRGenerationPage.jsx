@@ -877,8 +877,8 @@ export function LRGenerationPage({ onBack, onSaved }) {
                   <thead>
                     <tr>
                       <th>Charge Type</th>
-                      <th>Rate Per</th>
                       <th>Rs.</th>
+                      <th>p</th>
                     </tr>
                   </thead>
                   <tbody>

@@ -68,12 +68,35 @@ export async function deleteConsignment(id) {
   return normalizeConsignments(response.data);
 }
 
-export async function searchConsignmentsByCustomer(name) {
+export async function searchConsignments({
+  customerName = "",
+  truckOwnerName = "",
+  driverName = "",
+  gstNo = "",
+  imsNo = "",
+  billingType = "",
+  startDate = "",
+  endDate = "",
+} = {}) {
+  const params = {};
+  if (customerName) params.customerName = customerName;
+  if (truckOwnerName) params.truckOwnerName = truckOwnerName;
+  if (driverName) params.driverName = driverName;
+  if (gstNo) params.gstNo = gstNo;
+  if (imsNo) params.imsNo = imsNo;
+  if (billingType) params.billingType = billingType;
+  if (startDate) params.startDate = startDate;
+  if (endDate) params.endDate = endDate;
+
   const response = await API.get(
-    consignmentEndpoints.readByCustomer(name)
+    consignmentEndpoints.readFilteredData(params)
   );
 
   return normalizeConsignments(response.data);
+}
+
+export async function searchConsignmentsByCustomer(name) {
+  return searchConsignments({ customerName: name });
 }
 
 export async function getTodayConsignments() {
@@ -125,6 +148,12 @@ export async function getFilteredConsignments({
   to = "",
   gstSelected = false,
   imsSelected = false,
+  customerName = "",
+  truckOwnerName = "",
+  driverName = "",
+  gstNo = "",
+  imsNo = "",
+  billingType = "",
 } = {}) {
   const params = {
     mode,
@@ -134,6 +163,12 @@ export async function getFilteredConsignments({
 
   if (from) params.startDate = from;
   if (to) params.endDate = to;
+  if (customerName) params.customerName = customerName;
+  if (truckOwnerName) params.truckOwnerName = truckOwnerName;
+  if (driverName) params.driverName = driverName;
+  if (gstNo) params.gstNo = gstNo;
+  if (imsNo) params.imsNo = imsNo;
+  if (billingType) params.billingType = billingType;
 
   const response = await API.get(
     consignmentEndpoints.readFilteredData(params)
