@@ -307,3 +307,10 @@ input[type="number"] {
   -moz-appearance: textfield;
   appearance: textfield;
 }
+
+/* Hide global app footer when printing documents (invoice / LR) */
+@media print {
+  .app-copyright {
+    display: none !important;
+  }
+}

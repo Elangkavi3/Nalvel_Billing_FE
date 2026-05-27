@@ -746,18 +746,42 @@ export function App() {
   async function searchByCustomer(event) {
     event.preventDefault();
 
+    if (!searchName.trim()) {
+      await loadData();
+      return;
+    }
+
     setLoading(true);
     setError('');
     try {
       const effectiveFilter = normalizeBillingFilter(dataFilter);
-      const consignments = await getFilteredConsignments({
+      const commonParams = {
         mode: effectiveFilter.mode,
         from: effectiveFilter.from,
         to: effectiveFilter.to,
         gstSelected: effectiveFilter.gstSelected,
         imsSelected: effectiveFilter.imsSelected,
+      };
+
+      let consignments = await getFilteredConsignments({
+        ...commonParams,
         customerName: searchName.trim(),
       });
+
+      if (!consignments.length) {
+        consignments = await getFilteredConsignments({
+          ...commonParams,
+          driverName: searchName.trim(),
+        });
+      }
+
+      if (!consignments.length) {
+        consignments = await getFilteredConsignments({
+          ...commonParams,
+          truckOwnerName: searchName.trim(),
+        });
+      }
+
       setRegisterFilteredItems(consignments);
       setCurrentPage(1);
       setMessage(`${consignments.length} matches found`);

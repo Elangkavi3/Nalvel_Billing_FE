@@ -38,7 +38,15 @@ export function DateBillingFilters({
 
   return (
     <div className="modern-filter-bar">
-      <form className="search-filter" onSubmit={onSearch}>
+      <form
+        className="search-filter"
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (typeof onSearch === "function") {
+            onSearch(e);
+          }
+        }}
+      >
         <input
           placeholder="Search customer..."
           value={searchName}

@@ -130,7 +130,8 @@ export async function searchConsignments({
   if (endDate) params.endDate = endDate;
 
   const response = await API.get(
-    consignmentEndpoints.readFilteredData(params)
+    consignmentEndpoints.search(),
+    { params }
   );
 
   return normalizeConsignments(response.data);
