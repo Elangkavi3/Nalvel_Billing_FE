@@ -78,6 +78,7 @@
 .field-input,
 input[type="text"],
 input[type="email"],
+input[type="password"],
 input[type="number"],
 input[type="date"],
 input[type="time"],
@@ -96,6 +97,7 @@ select {
 .field-input:hover,
 input[type="text"]:hover,
 input[type="email"]:hover,
+input[type="password"]:hover,
 input[type="number"]:hover,
 input[type="date"]:hover,
 input[type="time"]:hover,
@@ -107,6 +109,7 @@ select:hover {
 .field-input:focus,
 input[type="text"]:focus,
 input[type="email"]:focus,
+input[type="password"]:focus,
 input[type="number"]:focus,
 input[type="date"]:focus,
 input[type="time"]:focus,
@@ -145,81 +148,93 @@ input[type="checkbox"] {
   gap: var(--spacing-4);
 }
 
-/* FILTER PILLS & BARS */
-.filter-bar {
+/* MODERN FILTER BAR */
+
+/* ===== FILTER BAR ===== */
+
+.modern-filter-bar {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: start;
-  gap: 12px 18px;
-  margin-top: 0;
-}
+  grid-template-columns:
+    3.8fr /* Search box bigger */
+    110px /* Search button */
+    90px /* Date Filter - half size */
+    90px /* Billing Type - half size */
+    130px /* From - 75% size */
+    130px /* To - 75% size */
+    130px; /* Clear */
 
-.filter-pills {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  row-gap: 8px;
-}
+  gap: 12px;
+  align-items: end;
 
-.filter-pill {
-  min-height: 38px;
-  border: 1px solid #bdd2dd;
-  border-radius: 999px;
+  width: 100%;
+  padding: 18px;
   background: #fff;
-  color: var(--accent-dark);
-  font-size: 13px;
-  font-weight: 800;
-  padding: 8px 14px;
-  cursor: pointer;
-  transition: border-color 0.15s ease, background 0.15s ease;
+  border: 1px solid var(--color-line);
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-.filter-pill:hover {
-  background: var(--soft);
+.search-filter {
+  display: contents;
 }
 
-.filter-pill.active {
-  border-color: var(--accent);
-  background: #e7f6f2;
-  color: var(--accent-dark);
-  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.1);
+.search-filter input {
+  width: 100%;
+  min-width: 0;
+  height: 42px;
 }
 
-.filter-range {
+.search-filter button {
+  width: 100%;
+  height: 42px;
+}
+
+.filter-group {
   display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  padding: 10px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: var(--soft);
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
 }
 
-.filter-date-field {
-  display: grid;
-  gap: 4px;
-  min-width: 170px;
-}
-
-.filter-date-field span {
-  color: var(--accent-dark);
+.filter-group label {
   font-size: 12px;
   font-weight: 800;
+  color: var(--color-accent-dark);
+  text-transform: uppercase;
 }
 
-.filter-date-field input {
-  min-height: 38px;
-  border: 1px solid #bdd2dd;
-  border-radius: 6px;
-  background: #fff;
-  color: var(--ink);
-  padding: 8px 10px;
+.filter-group input,
+.filter-group select {
+  height: 42px;
 }
 
-.filter-date-field input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
-  outline: none;
+.range-container {
+  display: contents;
+}
+
+.clear-filter-btn {
+  width: 100%;
+  height: 42px;
+  margin: 0;
+}
+
+/* mobile */
+@media (max-width: 1200px) {
+  .modern-filter-bar {
+    grid-template-columns: 1fr;
+  }
+
+  .search-filter {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .range-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
 }
 
 /* SUMMARY BOX */

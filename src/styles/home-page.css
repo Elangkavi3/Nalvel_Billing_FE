@@ -66,7 +66,7 @@
 /* HOME ACTIONS */
 .home-actions {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, 1fr);/* 3 equal columns */
   gap: 12px;
   padding: 24px;
   background: #fff;
@@ -101,7 +101,7 @@
 .home-action span {
   display: block;
   color: var(--accent-dark);
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 900;
   margin-bottom: 8px;
 }
@@ -217,33 +217,19 @@
   margin-left: auto;
 }
 
-.nl-avatar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: var(--accent-dark);
-  color: #fff;
-  font-size: 12px;
-  font-weight: 900;
+.logout-btn {
+  background: #dc2626;
+  color: white;
+  border: 1px solid #dc2626;
 }
 
-.topbar-logout {
-  min-height: 32px;
-  border: 1px solid var(--accent);
-  border-radius: 6px;
-  background: #fff;
-  color: var(--accent-dark);
-  padding: 6px 10px;
-  font-size: 12px;
-  font-weight: 800;
-  white-space: nowrap;
+.logout-btn:hover {
+  background: #b91c1c;
+  border-color: #b91c1c;
 }
 
-.topbar-logout:hover {
-  background: var(--soft);
+.logout-btn:active {
+  transform: scale(0.98);
 }
 
 /* HEADER BACK BUTTON */

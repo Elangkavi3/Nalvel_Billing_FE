@@ -7,13 +7,14 @@ import { MasterPage } from './pages/MasterPage.jsx';
 import { BillingViewPage } from './pages/BillingViewPage.jsx';
 import { EntryFormPage } from './pages/EntryFormPage.jsx';
 import { LRGenerationPage } from './pages/LRGenerationPage.jsx';
+import { RegisterUserPage } from './pages/RegisterUserPage.jsx';
+import { ResetPasswordPage } from './pages/ResetPasswordPage.jsx';
 import { SavedDataPage } from './pages/SavedDataPage.jsx';
 import {
   deleteConsignment,
   downloadConsignmentsExcel,
   getAllConsignments,
   saveConsignment,
-  searchConsignmentsByCustomer,
   getFilteredConsignments,
   updateConsignment,
 } from './services/consignmentApi.js';
@@ -203,6 +204,13 @@ function applyBillingTypeFilter(items, filter) {
   ));
 }
 
+function shouldLoadAllDataLocally(filter) {
+  return (
+    filter.mode === 'all' ||
+    (filter.mode === 'range' && !filter.from && !filter.to)
+  );
+}
+
 function normalizeBillingFilter(filter) {
   const hasNewBillingSelection = filter && ('gstSelected' in filter || 'imsSelected' in filter);
   if (hasNewBillingSelection) return filter;
@@ -264,6 +272,14 @@ function resolveExportDateRange(filter) {
   return { startDate: '', endDate: '' };
 }
 
+function resolveBillingType(filter) {
+  const gstSelected = Boolean(filter?.gstSelected);
+  const imsSelected = Boolean(filter?.imsSelected);
+  if (gstSelected && !imsSelected) return 'GST';
+  if (imsSelected && !gstSelected) return 'IMS';
+  return '';
+}
+
 export function App() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -292,6 +308,8 @@ export function App() {
     if (path === '/register') return 'data';
     if (path === '/lr') return 'lr';
     if (path === '/view') return 'view';
+    if (path === '/users/new') return 'user';
+    if (path === '/users/reset-password') return 'user';
     return 'home';
   }, [location.pathname]);
 
@@ -388,6 +406,13 @@ export function App() {
     async function loadHomeByFilter() {
       const effectiveFilter = normalizeBillingFilter(homeFilter);
       try {
+        if (shouldLoadAllDataLocally(effectiveFilter)) {
+          if (!cancelled) {
+            setHomeFilteredItems(applyBillingTypeFilter(allItems, effectiveFilter));
+          }
+          return;
+        }
+
         const rows = await getFilteredConsignments({
           mode: effectiveFilter.mode,
           from: effectiveFilter.from,
@@ -416,6 +441,13 @@ export function App() {
       try {
         if (searchName.trim()) {
           if (!cancelled) setRegisterFilteredItems(applyBillingTypeFilter(applyDateFilter(items, effectiveFilter), effectiveFilter));
+          return;
+        }
+
+        if (shouldLoadAllDataLocally(effectiveFilter)) {
+          if (!cancelled) {
+            setRegisterFilteredItems(applyBillingTypeFilter(items, effectiveFilter));
+          }
           return;
         }
 
@@ -496,6 +528,7 @@ export function App() {
       tareWeight: item.tareWeight ?? '',
       actualWeight: item.actualWeight ?? '',
       grossWeight: item.grossWeight ?? item.crossVehicleWeight ?? '',
+      weightUnit: item.weightUnit ?? "MT",
       material: item.material ?? '',
       supplierRateType: item.supplierRateType ?? 'fixed_cost',
       supplierAmount: item.supplierAmount ?? '',
@@ -514,6 +547,7 @@ export function App() {
       profitChargeableWeight: item.profitChargeableWeight ?? '',
       customerRate: item.customerRate ?? '',
       additionalCharges: item.additionalCharges ?? '',
+      otherExpenses: item.otherExpenses ?? "",
       expenses: item.expenses ?? '',
       gstAmount: item.gstAmount ?? '',
       netFreight: item.netFreight ?? '',
@@ -711,20 +745,24 @@ export function App() {
 
   async function searchByCustomer(event) {
     event.preventDefault();
-    if (!searchName.trim()) {
-      await loadData();
-      return;
-    }
 
     setLoading(true);
     setError('');
     try {
-      const consignments = await searchConsignmentsByCustomer(searchName.trim());
-      setItems(consignments);
+      const effectiveFilter = normalizeBillingFilter(dataFilter);
+      const consignments = await getFilteredConsignments({
+        mode: effectiveFilter.mode,
+        from: effectiveFilter.from,
+        to: effectiveFilter.to,
+        gstSelected: effectiveFilter.gstSelected,
+        imsSelected: effectiveFilter.imsSelected,
+        customerName: searchName.trim(),
+      });
+      setRegisterFilteredItems(consignments);
       setCurrentPage(1);
-      setMessage(`${consignments.length} matches for ${searchName.trim()}`);
+      setMessage(`${consignments.length} matches found`);
     } catch (err) {
-      setError(getErrorMessage(err, 'Unable to search customer'));
+      setError(getErrorMessage(err, 'Unable to search consignments'));
     } finally {
       setLoading(false);
     }
@@ -739,6 +777,7 @@ export function App() {
         startDate,
         endDate,
         customerName: searchName.trim(),
+        billingType: resolveBillingType(dataFilter),
       });
       setMessage('Consignment Excel exported successfully');
     } catch (err) {
@@ -772,6 +811,8 @@ export function App() {
                 if (page === 'form') navigate('/entry');
                 else if (page === 'data') navigate('/register');
                 else if (page === 'lr') navigate('/lr');
+                else if (page === 'user') navigate('/users/new');
+                else if (page === 'resetPassword') navigate('/users/reset-password');
                 else navigate('/');
               }}
             />
@@ -829,6 +870,26 @@ export function App() {
         />
 
         <Route
+          path="/users/new"
+          element={
+            <RegisterUserPage
+              onBack={() => navigate('/')}
+              onSaved={setMessage}
+            />
+          }
+        />
+
+        <Route
+          path="/users/reset-password"
+          element={
+            <ResetPasswordPage
+              onBack={() => navigate('/')}
+              onSaved={setMessage}
+            />
+          }
+        />
+
+        <Route
           path="/view"
           element={
             <BillingViewPage
@@ -841,8 +902,12 @@ export function App() {
         />
 
         {/* Catch-all: redirect to home */}
-        <Route path="*" element={<MasterPage items={homeItems} filter={homeFilter} onFilterChange={setHomeFilter} onNavigate={(page) => { if (page === 'form') navigate('/entry'); else if (page === 'data') navigate('/register'); else if (page === 'lr') navigate('/lr'); else navigate('/'); }} />} />
+        <Route path="*" element={<MasterPage items={homeItems} filter={homeFilter} onFilterChange={setHomeFilter} onNavigate={(page) => { if (page === 'form') navigate('/entry'); else if (page === 'data') navigate('/register'); else if (page === 'lr') navigate('/lr'); else if (page === 'user') navigate('/users/new'); else if (page === 'resetPassword') navigate('/users/reset-password'); else navigate('/'); }} />} />
       </Routes>
+
+      <footer className="app-copyright">
+        © {new Date().getFullYear()} Nalvel Logistics Services. All rights reserved.
+      </footer>
 
       {successPopup && (
         <section className="success-popup-backdrop" role="presentation" onClick={() => setSuccessPopup('')}>

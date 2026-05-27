@@ -1,112 +1,110 @@
-function getFilterButtonClass(isActive) {
-  return isActive ? "filter-pill active" : "filter-pill";
-}
-
 export function DateBillingFilters({
   filter,
   onFilterChange,
   showBillingFilters = false,
-  dateGroupLabel = "Date filters",
-  billingGroupLabel = "Billing filters",
+
+  searchName,
+  onSearch,
+  onSearchNameChange,
+  onLoadAll,
 }) {
-  function setMode(mode) {
-    onFilterChange((current) => ({ ...current, mode }));
+  function updateFilter(key, value) {
+    onFilterChange((current) => ({
+      ...current,
+      [key]: value,
+    }));
   }
 
-  function setRangeValue(key, value) {
-    onFilterChange((current) => ({ ...current, mode: "range", [key]: value }));
+  function handleBillingChange(value) {
+    onFilterChange((current) => ({
+      ...current,
+      gstSelected: value === "gst",
+      imsSelected: value === "ims",
+    }));
   }
 
-  function toggleBillingType(key) {
-    onFilterChange((current) => ({ ...current, [key]: !current[key] }));
+  function clearFilters() {
+    onFilterChange({
+      mode: "all",
+      gstSelected: false,
+      imsSelected: false,
+      from: "",
+      to: "",
+    });
+
+    onSearchNameChange("");
+    onLoadAll();
   }
 
   return (
-    <div className="filter-bar">
-      <div className="filter-pills" role="group" aria-label={dateGroupLabel}>
-        <button
-          type="button"
-          className={getFilterButtonClass(filter.mode === "all")}
-          onClick={() => setMode("all")}
-        >
-          All
-        </button>
-        <button
-          type="button"
-          className={getFilterButtonClass(filter.mode === "today")}
-          onClick={() => setMode("today")}
-        >
-          Today
-        </button>
-        <button
-          type="button"
-          className={getFilterButtonClass(filter.mode === "week")}
-          onClick={() => setMode("week")}
-        >
-          This Week
-        </button>
-        <button
-          type="button"
-          className={getFilterButtonClass(filter.mode === "month")}
-          onClick={() => setMode("month")}
-        >
-          This Month
-        </button>
-        <button
-          type="button"
-          className={getFilterButtonClass(filter.mode === "year")}
-          onClick={() => setMode("year")}
-        >
-          This Year
-        </button>
-        <button
-          type="button"
-          className={getFilterButtonClass(filter.mode === "range")}
-          onClick={() => setMode("range")}
-        >
-          Date Range
-        </button>
+    <div className="modern-filter-bar">
+      <form className="search-filter" onSubmit={onSearch}>
+        <input
+          placeholder="Search customer..."
+          value={searchName}
+          onChange={(e) => onSearchNameChange(e.target.value)}
+        />
 
-        {showBillingFilters ? (
-          <>
-            <button
-              type="button"
-              className={getFilterButtonClass(Boolean(filter.gstSelected))}
-              onClick={() => toggleBillingType("gstSelected")}
-              aria-label={`${billingGroupLabel}: GST`}
-            >
-              GST
-            </button>
-            <button
-              type="button"
-              className={getFilterButtonClass(Boolean(filter.imsSelected))}
-              onClick={() => toggleBillingType("imsSelected")}
-              aria-label={`${billingGroupLabel}: IMS`}
-            >
-              IMS
-            </button>
-          </>
-        ) : null}
+        <button type="submit" className="btn secondary">
+          Search
+        </button>
+      </form>
+
+      <div className="filter-group">
+        <label>Date Filter</label>
+
+        <select
+          value={filter.mode}
+          onChange={(e) => updateFilter("mode", e.target.value)}
+        >
+          <option value="all">All</option>
+          <option value="today">Today</option>
+          <option value="week">This Week</option>
+          <option value="month">This Month</option>
+          <option value="year">This Year</option>
+        </select>
       </div>
 
-      <div className="filter-range">
-        <label className="filter-date-field">
-          <span>From</span>
+      {showBillingFilters && (
+        <div className="filter-group">
+          <label>Billing Type</label>
+
+          <select
+            value={filter.gstSelected ? "gst" : filter.imsSelected ? "ims" : ""}
+            onChange={(e) => handleBillingChange(e.target.value)}
+          >
+            <option value="">All</option>
+            <option value="gst">GST</option>
+            <option value="ims">IMS</option>
+          </select>
+        </div>
+      )}
+
+      <div className="range-container">
+        <div className="filter-group">
+          <label>From</label>
+
           <input
             type="date"
             value={filter.from}
-            onChange={(event) => setRangeValue("from", event.target.value)}
+            onChange={(e) => updateFilter("from", e.target.value)}
           />
-        </label>
-        <label className="filter-date-field">
-          <span>To</span>
+        </div>
+
+        <div className="filter-group">
+          <label>To</label>
+
           <input
             type="date"
             value={filter.to}
-            onChange={(event) => setRangeValue("to", event.target.value)}
+            onChange={(e) => updateFilter("to", e.target.value)}
           />
-        </label>
+        </div>
       </div>
+
+      <button className="btn secondary clear-filter-btn" onClick={clearFilters}>
+        Clear
+      </button>
     </div>
   );
 }

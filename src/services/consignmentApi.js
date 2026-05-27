@@ -26,6 +26,47 @@ function buildExportParams({ startDate, endDate, customerName }) {
   return params;
 }
 
+function formatDateKey(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function getStartOfWeek(date) {
+  const start = new Date(date);
+  const day = start.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  start.setDate(start.getDate() + diff);
+  start.setHours(0, 0, 0, 0);
+  return start;
+}
+
+function resolveDateRangeByMode(mode) {
+  const now = new Date();
+  if (mode === "today") {
+    const today = formatDateKey(now);
+    return { startDate: today, endDate: today };
+  }
+
+  if (mode === "week") {
+    const start = getStartOfWeek(now);
+    return { startDate: formatDateKey(start), endDate: formatDateKey(now) };
+  }
+
+  if (mode === "month") {
+    const start = new Date(now.getFullYear(), now.getMonth(), 1);
+    return { startDate: formatDateKey(start), endDate: formatDateKey(now) };
+  }
+
+  if (mode === "year") {
+    const start = new Date(now.getFullYear(), 0, 1);
+    return { startDate: formatDateKey(start), endDate: formatDateKey(now) };
+  }
+
+  return { startDate: "", endDate: "" };
+}
+
 export async function getAllConsignments() {
   const response = await API.get(
     consignmentEndpoints.readAll()
@@ -135,9 +176,9 @@ export async function getConsignmentsByDateRange(
   startDate,
   endDate
 ) {
-  const response = await API.get(
-    consignmentEndpoints.readByDateRange(startDate, endDate)
-  );
+  const response = await API.get(consignmentEndpoints.search(), {
+    params: { startDate, endDate },
+  });
 
   return normalizeConsignments(response.data);
 }
@@ -155,11 +196,9 @@ export async function getFilteredConsignments({
   imsNo = "",
   billingType = "",
 } = {}) {
-  const params = {
-    mode,
-    gstSelected,
-    imsSelected,
-  };
+  const params = {};
+
+  if (customerName) params.customerName = customerName;
 
   if (from) params.startDate = from;
   if (to) params.endDate = to;
@@ -170,9 +209,16 @@ export async function getFilteredConsignments({
   if (imsNo) params.imsNo = imsNo;
   if (billingType) params.billingType = billingType;
 
-  const response = await API.get(
-    consignmentEndpoints.readFilteredData(params)
-  );
+  if (!from && !to && mode && mode !== "all" && mode !== "range") {
+    const { startDate, endDate } = resolveDateRangeByMode(mode);
+    if (startDate) params.startDate = startDate;
+    if (endDate) params.endDate = endDate;
+  }
+
+  if (gstSelected && !imsSelected) params.billingType = "GST";
+  if (imsSelected && !gstSelected) params.billingType = "IMS";
+
+  const response = await API.get(consignmentEndpoints.search(), { params });
 
   return normalizeConsignments(response.data);
 }
@@ -181,9 +227,11 @@ export async function downloadConsignmentsExcel({
   startDate = "",
   endDate = "",
   customerName = "",
+  billingType = "",
 } = {}) {
   const params = buildExportParams({ startDate, endDate, customerName });
-  console.log("Downloading Excel with params:", params);
+  if (billingType) params.billingType = billingType;
+ 
 
   try {
     const response = await API.get(consignmentEndpoints.exportExcel(), {
@@ -191,8 +239,6 @@ export async function downloadConsignmentsExcel({
       responseType: "blob",
       withCredentials: true,
     });
-
-    console.log("Excel export response received");
 
     const blobData = response.data;
     const contentDisposition = response.headers["content-disposition"];
@@ -206,7 +252,6 @@ export async function downloadConsignmentsExcel({
     link.remove();
     window.URL.revokeObjectURL(urlBlob);
   } catch (err) {
-    console.error("Excel export failed", err);
     throw err;
   }
 }

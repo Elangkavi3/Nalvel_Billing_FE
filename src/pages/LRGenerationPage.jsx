@@ -59,6 +59,7 @@ const emptyLRForm = {
   description: "",
   actualWeight: "",
   chargedWeight: "",
+  weightUnit: "",
   invoiceValue: "",
   freight: "",
   surcharge: "",
@@ -113,8 +114,8 @@ function lrRecordToForm(record, currentForm = {}) {
     risk: record?.riskType ?? "",
     invoiceValue: record?.declaredValue ?? "",
     noOfPackages: record?.noOfPkgs ?? "",
-    description: record?.description ?? "",
-    actualWeight: record?.actualWt ?? "",
+    description: record?.description ?? record?.materialDescription ?? "",
+    actualWeight: record?.actualWt ?? record?.netWeight ?? "",
     chargedWeight: record?.chargedWt ?? "",
     freight: record?.freightRs ?? "",
     surcharge: record?.surchargeRs ?? "",
@@ -312,12 +313,26 @@ export function LRGenerationPage({ onBack, onSaved }) {
   }));
   const [lookupMessage, setLookupMessage] = useState("");
   const [savePopup, setSavePopup] = useState("");
+  const [packages, setPackages] = useState([""]);
   const isCustomerInsured = String(form.insuranceNote || "")
     .toLowerCase()
     .includes("covered");
 
   const lrText = useMemo(() => composeLRText(form), [form]);
   const mailHref = `mailto:${encodeURIComponent(form.recipientEmail)}?subject=${encodeURIComponent(`LR ${form.lrNo || ""}`)}&body=${encodeURIComponent(lrText)}`;
+
+  function addPackageField() {
+    setPackages([...packages, ""]);
+  }
+
+  function updatePackage(index, value) {
+    const updated = [...packages];
+    updated[index] = value;
+    setPackages(updated);
+
+    // optional: save combined value into form
+    updateField("noOfPackages", updated.join(", "));
+  }
 
   function updateField(field, value) {
     setForm((current) => ({ ...current, [field]: value }));
@@ -377,6 +392,9 @@ export function LRGenerationPage({ onBack, onSaved }) {
         to:
           current.to || prefill?.toLocation || prefill?.consigneeAddress || "",
         consigneeGstin: prefill?.consigneeGstin ?? current.consigneeGstin ?? "",
+        description: prefill?.materialDescription ?? current.description ?? "",
+        actualWeight: prefill?.netWeight ?? current.actualWeight ?? "",
+        weightUnit: prefill?.weightUnit ?? current.weightUnit ?? "",
       }));
       setLookupMessage(
         `No LR found yet. Loaded consignment prefill from backend for S.No ${prefill?.savedDataSNo || serialNo}`,
@@ -487,6 +505,17 @@ export function LRGenerationPage({ onBack, onSaved }) {
     }
   }
 
+  function clearLRForm() {
+    setForm({
+      ...emptyLRForm,
+      lrDate: todayKey(),
+    });
+
+    setPackages([""]);
+    setLookupMessage("");
+    setSavePopup("");
+  }
+
   return (
     <section className="lr-page">
       <div className="lr-workspace">
@@ -512,6 +541,15 @@ export function LRGenerationPage({ onBack, onSaved }) {
             >
               Fill
             </button>
+
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={clearLRForm}
+            >
+              Clear
+            </button>
+
             <button
               type="button"
               className="btn btn-secondary"
@@ -818,17 +856,36 @@ export function LRGenerationPage({ onBack, onSaved }) {
                   <tbody>
                     <tr>
                       <td rowSpan="2" className="pkg-vertical-cell">
-                        <input
-                          value={form.noOfPackages}
-                          onChange={(e) =>
-                            updateField("noOfPackages", e.target.value)
-                          }
-                        />
+                        <div className="package-list">
+                          {packages.map((pkg, index) => (
+                            <div
+                              key={index}
+                              style={{
+                                display: "flex",
+                                gap: "6px",
+                                marginBottom: "8px",
+                              }}
+                            >
+                              <input
+                                value={pkg}
+                                onChange={(e) =>
+                                  updatePackage(index, e.target.value)
+                                }
+                                className="field-input"
+                              />
+
+                              {index === packages.length - 1 && (
+                                <button type="button" onClick={addPackageField}>
+                                  +
+                                </button>
+                              )}
+                            </div>
+                          ))}
+                        </div>
                       </td>
                       <td rowSpan="2" className="pkg-description-cell">
                         <textarea
-                          className="pkg-description-input"
-                          rows={6}
+                          className="pkg-description-input auto-grow"
                           value={form.description}
                           onChange={(e) =>
                             updateField("description", e.target.value)
@@ -838,9 +895,10 @@ export function LRGenerationPage({ onBack, onSaved }) {
                       <td className="pkg-weight-cell">
                         <div className="pkg-weight-label">Actual</div>
                         <input
-                          value={form.actualWeight}
-                          onChange={(e) =>
-                            updateField("actualWeight", e.target.value)
+                          value={
+                            form.actualWeight
+                              ? `${form.actualWeight} ${form.weightUnit || ""}`
+                              : ""
                           }
                         />
                       </td>
@@ -1298,19 +1356,36 @@ function LRPrintDuplicate({ form, copyIndex, copyLabel }) {
               <tbody>
                 <tr>
                   <td rowSpan="2" className="pkg-vertical-cell">
-                    <input value={form.noOfPackages} readOnly />
+                    <div className="package-list">
+                      {(form.noOfPackages || "")
+                        .split(",")
+                        .map((pkg, index) => (
+                          <input
+                            key={index}
+                            value={pkg.trim()}
+                            readOnly
+                            className="field-input"
+                            style={{ marginBottom: "8px" }}
+                          />
+                        ))}
+                    </div>
                   </td>
                   <td rowSpan="2" className="pkg-description-cell">
                     <textarea
                       className="pkg-description-input"
-                      rows={6}
                       value={form.description}
                       readOnly
                     />
                   </td>
                   <td className="pkg-weight-cell">
                     <div className="pkg-weight-label">Actual</div>
-                    <input value={form.actualWeight} readOnly />
+                    <input
+                      value={
+                        form.actualWeight
+                          ? `${form.actualWeight} ${form.weightUnit || ""}`
+                          : ""
+                      }
+                    />
                   </td>
                 </tr>
                 <tr>
@@ -1345,8 +1420,8 @@ function LRPrintDuplicate({ form, copyIndex, copyLabel }) {
               <thead>
                 <tr>
                   <th>Charge Type</th>
-                  <th>Rate Per</th>
                   <th>Rs.</th>
+                  <th>P</th>
                 </tr>
               </thead>
               <tbody>
@@ -1574,9 +1649,26 @@ function LRPreview({ form }) {
                 </thead>
                 <tbody>
                   <tr>
-                    <td>{form.noOfPackages || "-"}</td>
-                    <td>{form.description || "-"}</td>
-                    <td className="txt-right">{form.actualWeight || "-"}</td>
+                    <td>
+                      {(form.noOfPackages || "")
+                        .split(",")
+                        .map((pkg, index) => (
+                          <div key={index}>{pkg.trim()}</div>
+                        ))}
+                    </td>
+                    <td
+                      style={{
+                        minHeight: "220px",
+                        verticalAlign: "top",
+                      }}
+                    >
+                      {form.description || "-"}
+                    </td>
+                    <td className="txt-right">
+                      {form.actualWeight
+                        ? `${form.actualWeight} ${form.weightUnit || ""}`
+                        : "-"}
+                    </td>
                     <td className="txt-right">{form.chargedWeight || "-"}</td>
                   </tr>
                   <tr>

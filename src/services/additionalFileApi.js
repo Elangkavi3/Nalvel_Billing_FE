@@ -1,6 +1,13 @@
 import API from "./api";
 import { additionalFileEndpoints } from "./endpoints";
 
+const allowedUploadMimeTypes = new Set([
+  "application/pdf",
+  "image/jpeg",
+  "image/png",
+]);
+const allowedUploadExtensions = new Set(["pdf", "jpeg", "jpg", "png"]);
+
 function normalizeFileUrl(value) {
   if (!value) return "";
 
@@ -64,8 +71,22 @@ function normalizeAdditionalFiles(value) {
   return rows.map(normalizeAdditionalFile);
 }
 
+function isAllowedUploadFile(file) {
+  const extension = String(file?.name || "")
+    .split(".")
+    .pop()
+    .toLowerCase();
+  const type = String(file?.type || "").toLowerCase();
+
+  return allowedUploadMimeTypes.has(type) || allowedUploadExtensions.has(extension);
+}
+
 export async function uploadAdditionalFile(consignmentId, entry) {
   const file = entry?.file ?? entry;
+  if (!isAllowedUploadFile(file)) {
+    throw new Error("Only PNG, PDF, and JPEG files are allowed.");
+  }
+
   const fileName = String(entry?.fileName || file?.name || "").trim();
   const data = new FormData();
   data.append("files", file);

@@ -32,6 +32,14 @@ const decimalNumberProps = {
 };
 
 const maxAdditionalFileSize = 50 * 1024 * 1024;
+const allowedAdditionalFileMimeTypes = new Set([
+  "application/pdf",
+  "image/jpeg",
+  "image/png",
+]);
+const allowedAdditionalFileExtensions = new Set(["pdf", "jpeg", "jpg", "png"]);
+const additionalFileAccept =
+  ".pdf,.jpeg,.jpg,.png,application/pdf,image/jpeg,image/png";
 
 const entryFormSteps = [
   { key: "basic", label: "Basic Info" },
@@ -58,6 +66,19 @@ function scrollToFormTop() {
   window.requestAnimationFrame(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
+}
+
+function isAllowedAdditionalFile(file) {
+  const extension = String(file?.name || "")
+    .split(".")
+    .pop()
+    .toLowerCase();
+  const type = String(file?.type || "").toLowerCase();
+
+  return (
+    allowedAdditionalFileMimeTypes.has(type) ||
+    allowedAdditionalFileExtensions.has(extension)
+  );
 }
 
 export function EntryFormPage({
@@ -87,16 +108,21 @@ export function EntryFormPage({
 
   const additionalCharge = Number(form.additionalCharges || 0);
 
-  const gstPercent = Number(form.gstType || 0);
+  const isGSTBilling = form.viewMode === "GST";
+
+  const gstPercent = isGSTBilling ? Number(form.gstType || 0) : 0;
 
   const totalExpense = Number(form.ledgerAmount || 0);
 
   const totalFreightBeforeGST = customerBaseAmount + additionalCharge;
 
-  const totalFreight =
-    totalFreightBeforeGST + (totalFreightBeforeGST * gstPercent) / 100;
+  const gstAmount = (totalFreightBeforeGST * gstPercent) / 100;
 
-  const profit = totalFreight - totalExpense;
+  const totalFreight = totalFreightBeforeGST + gstAmount;
+
+  const otherExpenses = Number(form.otherExpenses || 0);
+
+  const profit = totalFreightBeforeGST - totalExpense - otherExpenses;
 
   const isFirstStep = activeStep === 0;
   const isLastStep = activeStep === lastStepIndex;
@@ -196,7 +222,13 @@ export function EntryFormPage({
                     { label: "GST Invoice", value: "GST" },
                     { label: "IMS No", value: "IMS" },
                   ]}
-                  onChange={(value) => onUpdateField("viewMode", value)}
+                  onChange={(value) => {
+                    onUpdateField("viewMode", value);
+
+                    if (value === "IMS") {
+                      onUpdateField("gstType", "");
+                    }
+                  }}
                   required
                 />
 
@@ -274,86 +306,115 @@ export function EntryFormPage({
                 />
               </div>
 
-          <div className="field-row">
-            <div>
               <div className="field-row">
-                <Field
-                  label="Gross Weight"
-                  value={form.grossWeight}
-                  onChange={(value) => onUpdateField("grossWeight", value)}
-                  {...decimalNumberProps}
+                <div>
+                  {/* Row 1 */}
+                  <div className="field-row">
+                    <Field
+                      label="Gross Weight"
+                      value={form.grossWeight}
+                      onChange={(value) => onUpdateField("grossWeight", value)}
+                      {...decimalNumberProps}
+                    />
+
+                    <Field
+                      label="Tare Weight"
+                      value={form.tareWeight}
+                      onChange={(value) => onUpdateField("tareWeight", value)}
+                      {...decimalNumberProps}
+                    />
+                  </div>
+
+                  {/* Row 2 */}
+                  <div className="field-row">
+                    <Field
+                      label="Net Weight"
+                      value={
+                        Number(form.grossWeight || 0) > 0 &&
+                        Number(form.tareWeight || 0) > 0
+                          ? formatNetWeight(form.grossWeight, form.tareWeight)
+                          : form.netWeight || ""
+                      }
+                      readOnly={
+                        Number(form.grossWeight || 0) > 0 &&
+                        Number(form.tareWeight || 0) > 0
+                      }
+                      onChange={(value) => onUpdateField("netWeight", value)}
+                      {...decimalNumberProps}
+                    />
+
+                    <RadioGroup
+                      label="Net Weight Unit"
+                      name="weightUnit"
+                      value={form.weightUnit || "MT"}
+                      options={[
+                        { label: "MT", value: "MT" },
+                        { label: "KG", value: "KG" },
+                      ]}
+                      onChange={(value) => onUpdateField("weightUnit", value)}
+                    />
+                  </div>
+                </div>
+
+                <label className="field">
+                  <span>Material Description</span>
+                  <textarea
+                    rows={5}
+                    autoComplete="off"
+                    value={form.material}
+                    onChange={(event) =>
+                      onUpdateField("material", event.target.value)
+                    }
+                  />
+                </label>
+              </div>
+            </fieldset>
+
+            <fieldset className="form-section form-section-half">
+              <legend>Vehicle Info</legend>
+              <div className="field-row">
+                <AutocompleteField
+                  label="Truck No"
+                  value={form.truckNo}
+                  suggestions={suggestions.truck}
+                  onChange={(value) =>
+                    onUpdateField("truckNo", value.toUpperCase())
+                  }
                 />
-                <Field
-                  label="Tare Weight"
-                  value={form.tareWeight}
-                  onChange={(value) => onUpdateField("tareWeight", value)}
-                  {...decimalNumberProps}
+                <AutocompleteField
+                  label="Truck Type"
+                  value={form.truckType}
+                  suggestions={suggestions.truckType}
+                  onChange={(value) => onUpdateField("truckType", value)}
                 />
               </div>
-              <Field
-                label="Net Weight"
-                value={formatNetWeight(form.grossWeight, form.tareWeight)}
-                readOnly
-                {...decimalNumberProps}
+              <AutocompleteField
+                label="Owner / Transporter (Name)"
+                value={form.ownerName}
+                suggestions={suggestions.owner}
+                onChange={(value) => onUpdateField("ownerName", value)}
               />
-            </div>
-            <label className="field">
-              <span>Material Description</span>
-              <textarea
-                rows={5}
-                autoComplete="off"
-                value={form.material}
-                onChange={(event) =>
-                  onUpdateField("material", event.target.value)
-                }
-              />
-            </label>
-          </div>
-        </fieldset>
-
-        <fieldset className="form-section form-section-half">
-          <legend>Vehicle Info</legend>
-          <div className="field-row">
-            <AutocompleteField
-              label="Truck No"
-              value={form.truckNo}
-              suggestions={suggestions.truck}
-              onChange={(value) =>
-                onUpdateField("truckNo", value.toUpperCase())
-              }
-            />
-            <AutocompleteField
-              label="Truck Type"
-              value={form.truckType}
-              suggestions={suggestions.truckType}
-              onChange={(value) => onUpdateField("truckType", value)}
-            />
-          </div>
-          <AutocompleteField
-            label="Owner / Transporter (Name)"
-            value={form.ownerName}
-            suggestions={suggestions.owner}
-            onChange={(value) => onUpdateField("ownerName", value)}
-          />
-          <div className="field-row">
-            <AutocompleteField
-              label="Owner Primary Contact"
-              value={form.ownerPrimaryContact}
-              suggestions={suggestions.ownerPrimaryContact}
-              onChange={(value) => onUpdateField("ownerPrimaryContact", value)}
-              {...mobileProps}
-            />
-            <AutocompleteField
-              label="Owner Alternate Contact"
-              value={form.ownerAlternateContact}
-              suggestions={suggestions.ownerAlternateContact}
-              onChange={(value) =>
-                onUpdateField("ownerAlternateContact", value)
-              }
-              {...mobileProps}
-            />
-          </div>
-        </fieldset>
+              <div className="field-row">
+                <AutocompleteField
+                  label="Owner Primary Contact"
+                  value={form.ownerPrimaryContact}
+                  suggestions={suggestions.ownerPrimaryContact}
+                  onChange={(value) =>
+                    onUpdateField("ownerPrimaryContact", value)
+                  }
+                  {...mobileProps}
+                />
+                <AutocompleteField
+                  label="Owner Alternate Contact"
+                  value={form.ownerAlternateContact}
+                  suggestions={suggestions.ownerAlternateContact}
+                  onChange={(value) =>
+                    onUpdateField("ownerAlternateContact", value)
+                  }
+                  {...mobileProps}
+                />
+              </div>
+            </fieldset>
 
             <fieldset className="form-section form-section-half">
               <legend>Driver Info</legend>
@@ -397,7 +458,9 @@ export function EntryFormPage({
         {activeStep === 1 && (
           <fieldset className="form-section form-section-wide">
             <legend>Supplier Billing</legend>
-            <div className="field-row">
+
+            <div className="supplier-grid">
+              {/* Row 1 */}
               <SelectField
                 label="Freight Amount Type"
                 value={form.supplierRateType}
@@ -415,6 +478,7 @@ export function EntryFormPage({
                 onChange={(value) => onUpdateField("supplierAmount", value)}
                 {...decimalNumberProps}
               />
+
               <Field
                 label="Chargeable Weight"
                 value={form.chargeableWeight}
@@ -422,65 +486,50 @@ export function EntryFormPage({
                 {...decimalNumberProps}
               />
 
-            <Field
-              label="Halting Charge"
-              value={form.haltingCharge}
-              onChange={(value) => onUpdateField("haltingCharge", value)}
-              {...decimalNumberProps}
-            />
-          </div>
-          <div className="field-row">
-            <Field
-              label="Parking Charge"
-              value={form.parkingCharge}
-              onChange={(value) => onUpdateField("parkingCharge", value)}
-              {...decimalNumberProps}
-            />
-            <Field
-              label="Payable Amount"
-              value={Math.floor(Number(form.ledgerAmount || 0))}
-              readOnly
-              onChange={(value) => onUpdateField("ledgerAmount", value)}
-              {...decimalNumberProps}
-            />
-          </div>
-          <div className="field-row">
-            <Field
-              label="Commission"
-              value={form.commission}
-              onChange={(value) => onUpdateField("commission", value)}
-              {...decimalNumberProps}
-            />
-          </div>
-          <AdvanceEntriesField
-            entries={form.advanceEntries}
-            formBalance={form.balance}
-            onChange={(nextEntries) =>
-              onUpdateField("advanceEntries", nextEntries)
-            }
-          />
-          <div className="field-row">
-            <Field
-              label="Total Amount Paid"
-              value={Math.floor(Number(form.totalAdvance || 0))}
-              readOnly
-              onChange={(value) => onUpdateField("totalAdvance", value)}
-              {...decimalNumberProps}
-            />
-            <label className="field">
-              <span>Balance</span>
+              {/* Row 2 */}
+              <Field
+                label="Halting Charge"
+                value={form.haltingCharge}
+                onChange={(v) => onUpdateField("haltingCharge", v)}
+                {...decimalNumberProps}
+              />
 
-              <div className="status-input-wrapper">
-                <input
-                  value={
-                    Number(form.balance || 0) > 0
-                      ? Math.floor(Number(form.balance || 0))
-                      : 0
-                  }
-                  readOnly
-                  {...decimalNumberProps}
-                />
+              <Field
+                label="Parking Charge"
+                value={form.parkingCharge}
+                onChange={(v) => onUpdateField("parkingCharge", v)}
+                {...decimalNumberProps}
+              />
 
+              <Field
+                label="Commission"
+                value={form.commission}
+                onChange={(v) => onUpdateField("commission", v)}
+                {...decimalNumberProps}
+              />
+
+              {/* Row 3 */}
+              <Field
+                label="Payable Amount"
+                value={Math.floor(Number(form.ledgerAmount || 0))}
+                readOnly
+                {...decimalNumberProps}
+              />
+
+              <Field
+                label="Total Amount Paid"
+                value={Math.floor(Number(form.totalAdvance || 0))}
+                readOnly
+                {...decimalNumberProps}
+              />
+
+              <div className="field">
+                <span>Balance</span>
+                <div className="status-input-wrapper">
+                  <input
+                    value={Math.floor(Number(form.balance || 0))}
+                    readOnly
+                  />
                   <span
                     className={`inline-payment-status ${
                       Number(form.balance || 0) <= 0 ? "paid" : "pending"
@@ -489,30 +538,37 @@ export function EntryFormPage({
                     {Number(form.balance || 0) <= 0 ? "PAID" : "PENDING"}
                   </span>
                 </div>
-              </label>
-              {Number(form.balance || 0) < 0 && (
-                <Field
-                  label="Excess"
-                  value={Math.floor(Math.abs(Number(form.balance || 0)))}
-                  readOnly
-                  {...decimalNumberProps}
+              </div>
+
+              {/* Row 4 (ONLY AdvanceEntriesField) */}
+              <div className="supplier-full">
+                <AdvanceEntriesField
+                  entries={form.advanceEntries}
+                  formBalance={form.balance}
+                  payableAmount={form.ledgerAmount}
+                  onChange={(nextEntries) =>
+                    onUpdateField("advanceEntries", nextEntries)
+                  }
                 />
-              )}
-            </div>
-            <div className="field-row">
-              <SelectField
-                label="Payment Type Options"
-                value={form.paymentType}
-                options={PaymentTypeOptions}
-                onChange={(value) => onUpdateField("paymentType", value)}
-              />
-              <SelectField
-                label="Truck Pay Mode"
-                value={form.truckpaymentMode}
-                options={paymentModeOptions}
-                required
-                onChange={(value) => onUpdateField("truckpaymentMode", value)}
-              />
+              </div>
+
+              {/* Row 5 */}
+              <div className="payment-row">
+                <SelectField
+                  label="Payment Type Options"
+                  value={form.paymentType}
+                  options={PaymentTypeOptions}
+                  onChange={(value) => onUpdateField("paymentType", value)}
+                />
+
+                <SelectField
+                  label="Truck Pay Mode"
+                  value={form.truckpaymentMode}
+                  options={paymentModeOptions}
+                  required
+                  onChange={(value) => onUpdateField("truckpaymentMode", value)}
+                />
+              </div>
             </div>
           </fieldset>
         )}
@@ -520,7 +576,8 @@ export function EntryFormPage({
         {activeStep === 2 && (
           <fieldset className="form-section form-section-wide">
             <legend>Our Rate & Profit</legend>
-            <div className="field-row">
+            {/* Row 1 */}
+            <div className="field-row field-row-3">
               <Field
                 label={isCostPerMt ? "Our Cost Per MT" : "Our Fixed Cost"}
                 value={ourRateAmount}
@@ -541,64 +598,102 @@ export function EntryFormPage({
                 }
                 {...decimalNumberProps}
               />
+
+              {form.viewMode === "GST" ? (
+                <div className="inline-option-block">
+                  <fieldset className="radio-group">
+                    <legend>GST Type</legend>
+
+                    <div className="radio-options gst-options-row">
+                      <label className="radio-option">
+                        <input
+                          type="radio"
+                          name="gstType"
+                          value="18"
+                          checked={form.gstType === "18"}
+                          onChange={(e) =>
+                            onUpdateField("gstType", e.target.value)
+                          }
+                        />
+                        <span>18%</span>
+                      </label>
+
+                      <label className="radio-option">
+                        <input
+                          type="radio"
+                          name="gstType"
+                          value="5"
+                          checked={form.gstType === "5"}
+                          onChange={(e) =>
+                            onUpdateField("gstType", e.target.value)
+                          }
+                        />
+                        <span>5%</span>
+                      </label>
+
+                      <span className="gst-amount-inline">
+                        ₹{Math.ceil(gstAmount)}
+                      </span>
+                    </div>
+                  </fieldset>
+                </div>
+              ) : (
+                <div></div>
+              )}
             </div>
 
-            <div className="field-row">
-              {form.viewMode === "GST" && (
-                <div className="inline-option-block">
-                  <RadioGroup
-                    label="GST Type"
-                    name="gstType"
-                    value={form.gstType}
-                    required={Boolean(form.gstNo && form.gstNo.trim())}
-                    options={[
-                      { label: "18%", value: "18" },
-                      { label: "5%", value: "5" },
-                    ]}
-                    onChange={(value) => onUpdateField("gstType", value)}
-                  />
-                </div>
-              )}
-
+            {/* Row 2 */}
+            <div className="field-row field-row-3">
               <Field
                 label="Freight Booking Cost"
                 value={Math.ceil(customerBaseAmount)}
                 readOnly
-                onChange={(value) => onUpdateField("customerRate", value)}
                 {...decimalNumberProps}
               />
-            </div>
-            <div className="field-row">
+
               <Field
                 label="Additional Charge"
                 value={form.additionalCharges}
                 onChange={(value) => onUpdateField("additionalCharges", value)}
                 {...decimalNumberProps}
               />
+
+              <Field
+                label="Other Expense"
+                value={form.otherExpenses}
+                onChange={(value) => onUpdateField("otherExpenses", value)}
+                {...decimalNumberProps}
+              />
+            </div>
+
+            {/* Row 3 */}
+            <div className="field-row field-row-3">
               <Field
                 label="Total Expense"
                 value={Math.ceil(totalExpense)}
                 readOnly
-                onChange={(value) => onUpdateField("expenses", value)}
                 {...decimalNumberProps}
               />
-            </div>
-            <div className="field-row">
+
               <Field
-                label="Total Freight Amount(incl. GST)"
+                label={
+                  form.viewMode === "GST"
+                    ? "Total Freight Amount (incl. GST)"
+                    : "Total Freight Amount"
+                }
                 value={Math.ceil(totalFreight)}
                 readOnly
-                onChange={(value) => onUpdateField("netFreight", value)}
                 {...decimalNumberProps}
               />
+
               <Field
                 label="Profit"
                 value={Math.ceil(profit)}
                 readOnly
-                onChange={(value) => onUpdateField("profit", value)}
                 {...decimalNumberProps}
               />
             </div>
+
             <div className="field-row">
               <Field
                 label="LR No."
@@ -677,7 +772,11 @@ export function EntryFormPage({
             {editingId ? "Update Entry" : "Save Entry"}
           </button>
         ) : (
-          <button type="button" className="btn primary" onClick={handleNextStep}>
+          <button
+            type="button"
+            className="btn primary"
+            onClick={handleNextStep}
+          >
             Continue
           </button>
         )}
@@ -718,7 +817,13 @@ function RadioGroup({
   );
 }
 
-function AdvanceEntriesField({ entries, onChange, formBalance, readOnly = false }) {
+function AdvanceEntriesField({
+  entries,
+  onChange,
+  formBalance,
+  payableAmount,
+  readOnly = false,
+}) {
   const rows =
     Array.isArray(entries) && entries.length > 0
       ? entries
@@ -745,7 +850,9 @@ function AdvanceEntriesField({ entries, onChange, formBalance, readOnly = false 
         <div key={entry.id ?? index} className="advance-row">
           <label className="field advance-entry-field">
             <span>
-              {index === rows.length - 1 && Number(formBalance || 0) <= 0
+              {index === rows.length - 1 &&
+              Number(payableAmount || 0) > 0 &&
+              Number(formBalance || 0) <= 0
                 ? "Final Amount"
                 : `Advance ${index + 1}`}
             </span>
@@ -795,7 +902,15 @@ function AdditionalFilesField({ files = [], onChange }) {
   const rows =
     Array.isArray(files) && files.length > 0
       ? files
-      : [{ id: "file-empty-1", file: null, name: "", fileName: "", uploaded: false }];
+      : [
+          {
+            id: "file-empty-1",
+            file: null,
+            name: "",
+            fileName: "",
+            uploaded: false,
+          },
+        ];
 
   function updateRow(index, nextRow) {
     onChange(rows.map((row, rowIndex) => (rowIndex === index ? nextRow : row)));
@@ -806,12 +921,25 @@ function AdditionalFilesField({ files = [], onChange }) {
     onChange(
       nextRows.length > 0
         ? nextRows
-        : [{ id: "file-empty-1", file: null, name: "", fileName: "", uploaded: false }],
+        : [
+            {
+              id: "file-empty-1",
+              file: null,
+              name: "",
+              fileName: "",
+              uploaded: false,
+            },
+          ],
     );
   }
 
   function handleFileSelect(index, file) {
     if (!file) return;
+
+    if (!isAllowedAdditionalFile(file)) {
+      window.alert("Only PNG, PDF, and JPEG files are allowed.");
+      return;
+    }
 
     if (file.size > maxAdditionalFileSize) {
       window.alert("Each file must be 50 MB or smaller.");
@@ -839,7 +967,13 @@ function AdditionalFilesField({ files = [], onChange }) {
   function addRow() {
     onChange([
       ...rows,
-      { id: `file-${Date.now()}`, file: null, name: "", fileName: "", uploaded: false },
+      {
+        id: `file-${Date.now()}`,
+        file: null,
+        name: "",
+        fileName: "",
+        uploaded: false,
+      },
     ]);
   }
 
@@ -913,6 +1047,7 @@ function AdditionalFilesField({ files = [], onChange }) {
               <input
                 id={inputId}
                 type="file"
+                accept={additionalFileAccept}
                 onChange={(event) =>
                   handleFileSelect(index, event.target.files?.[0])
                 }
