@@ -23,6 +23,23 @@ export function DateBillingFilters({
     }));
   }
 
+  function handleRangeChange(key, value) {
+    onFilterChange((current) => {
+      const nextFilter = {
+        ...current,
+        [key]: value,
+      };
+
+      if (value) {
+        nextFilter.mode = "range";
+      } else if (!nextFilter.from && !nextFilter.to) {
+        nextFilter.mode = "all";
+      }
+
+      return nextFilter;
+    });
+  }
+
   function clearFilters() {
     onFilterChange({
       mode: "all",
@@ -48,7 +65,7 @@ export function DateBillingFilters({
         }}
       >
         <input
-          placeholder="Search customer..."
+          placeholder="Search customer, driver, truck owner, GST or IMS"
           value={searchName}
           onChange={(e) => onSearchNameChange(e.target.value)}
         />
@@ -69,6 +86,7 @@ export function DateBillingFilters({
           <option value="today">Today</option>
           <option value="week">This Week</option>
           <option value="month">This Month</option>
+          <option value="range">Custom Range</option>
           <option value="year">This Year</option>
         </select>
       </div>
@@ -95,7 +113,7 @@ export function DateBillingFilters({
           <input
             type="date"
             value={filter.from}
-            onChange={(e) => updateFilter("from", e.target.value)}
+            onChange={(e) => handleRangeChange("from", e.target.value)}
           />
         </div>
 
@@ -105,7 +123,7 @@ export function DateBillingFilters({
           <input
             type="date"
             value={filter.to}
-            onChange={(e) => updateFilter("to", e.target.value)}
+            onChange={(e) => handleRangeChange("to", e.target.value)}
           />
         </div>
       </div>

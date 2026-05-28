@@ -206,7 +206,7 @@ function applyBillingTypeFilter(items, filter) {
 
 function shouldLoadAllDataLocally(filter) {
   return (
-    filter.mode === 'all' ||
+    (filter.mode === 'all' && !filter.from && !filter.to) ||
     (filter.mode === 'range' && !filter.from && !filter.to)
   );
 }
@@ -782,6 +782,20 @@ export function App() {
         });
       }
 
+      if (!consignments.length) {
+        consignments = await getFilteredConsignments({
+          ...commonParams,
+          gstNo: searchName.trim(),
+        });
+      }
+
+      if (!consignments.length) {
+        consignments = await getFilteredConsignments({
+          ...commonParams,
+          imsNo: searchName.trim(),
+        });
+      }
+
       setRegisterFilteredItems(consignments);
       setCurrentPage(1);
       setMessage(`${consignments.length} matches found`);
@@ -837,6 +851,24 @@ export function App() {
 
             if (results.length) {
               exportParams.truckOwnerName = searchTerm;
+            } else {
+              results = await getFilteredConsignments({
+                ...commonParams,
+                gstNo: searchTerm,
+              });
+
+              if (results.length) {
+                exportParams.gstNo = searchTerm;
+              } else {
+                results = await getFilteredConsignments({
+                  ...commonParams,
+                  imsNo: searchTerm,
+                });
+
+                if (results.length) {
+                  exportParams.imsNo = searchTerm;
+                }
+              }
             }
           }
         }
