@@ -18,11 +18,25 @@ function resolveExportFilename(headers = {}) {
   }
 }
 
-function buildExportParams({ startDate, endDate, customerName }) {
+function buildExportParams({
+  startDate,
+  endDate,
+  customerName,
+  truckOwnerName,
+  driverName,
+  gstNo,
+  imsNo,
+  billingType,
+} = {}) {
   const params = {};
   if (startDate) params.startDate = startDate;
   if (endDate) params.endDate = endDate;
   if (customerName) params.customerName = customerName;
+  if (truckOwnerName) params.truckOwnerName = truckOwnerName;
+  if (driverName) params.driverName = driverName;
+  if (gstNo) params.gstNo = gstNo;
+  if (imsNo) params.imsNo = imsNo;
+  if (billingType) params.billingType = billingType;
   return params;
 }
 
@@ -199,8 +213,6 @@ export async function getFilteredConsignments({
 } = {}) {
   const params = {};
 
-  if (customerName) params.customerName = customerName;
-
   if (from) params.startDate = from;
   if (to) params.endDate = to;
   if (customerName) params.customerName = customerName;
@@ -228,11 +240,22 @@ export async function downloadConsignmentsExcel({
   startDate = "",
   endDate = "",
   customerName = "",
+  truckOwnerName = "",
+  driverName = "",
+  gstNo = "",
+  imsNo = "",
   billingType = "",
 } = {}) {
-  const params = buildExportParams({ startDate, endDate, customerName });
-  if (billingType) params.billingType = billingType;
- 
+  const params = buildExportParams({
+    startDate,
+    endDate,
+    customerName,
+    truckOwnerName,
+    driverName,
+    gstNo,
+    imsNo,
+    billingType,
+  });
 
   try {
     const response = await API.get(consignmentEndpoints.exportExcel(), {

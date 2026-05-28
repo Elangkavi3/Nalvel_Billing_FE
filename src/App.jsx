@@ -797,12 +797,52 @@ export function App() {
     setError('');
     try {
       const { startDate, endDate } = resolveExportDateRange(dataFilter);
-      await downloadConsignmentsExcel({
+      const searchTerm = searchName.trim();
+      const exportParams = {
         startDate,
         endDate,
-        customerName: searchName.trim(),
         billingType: resolveBillingType(dataFilter),
-      });
+      };
+
+      if (searchTerm) {
+        const effectiveFilter = normalizeBillingFilter(dataFilter);
+        const commonParams = {
+          mode: effectiveFilter.mode,
+          from: effectiveFilter.from,
+          to: effectiveFilter.to,
+          gstSelected: effectiveFilter.gstSelected,
+          imsSelected: effectiveFilter.imsSelected,
+        };
+
+        let results = await getFilteredConsignments({
+          ...commonParams,
+          customerName: searchTerm,
+        });
+
+        if (results.length) {
+          exportParams.customerName = searchTerm;
+        } else {
+          results = await getFilteredConsignments({
+            ...commonParams,
+            driverName: searchTerm,
+          });
+
+          if (results.length) {
+            exportParams.driverName = searchTerm;
+          } else {
+            results = await getFilteredConsignments({
+              ...commonParams,
+              truckOwnerName: searchTerm,
+            });
+
+            if (results.length) {
+              exportParams.truckOwnerName = searchTerm;
+            }
+          }
+        }
+      }
+
+      await downloadConsignmentsExcel(exportParams);
       setMessage('Consignment Excel exported successfully');
     } catch (err) {
       setError(getErrorMessage(err, 'Unable to export consignment Excel'));
